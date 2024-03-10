@@ -18,8 +18,11 @@ public class DBServer {
     private String storageFolderPath;
 
     public static void main(String args[]) throws IOException {
+        String fileName = "people.tab";
         FileProcess showFiles = new FileProcess();
         showFiles.displayFiles();
+        showFiles.readFileContent(fileName);
+
         DBServer server = new DBServer();
         server.blockingListenOn(8888);
 
@@ -47,6 +50,10 @@ public class DBServer {
     public String handleCommand(String command) {
         // TODO implement your server logic here
         return "";
+    }
+    // For file class can know the folder path
+    public String getStorageFolderPath() {
+        return storageFolderPath;
     }
 
     //  === Methods below handle networking aspects of the project - you will not need to change these ! ===
