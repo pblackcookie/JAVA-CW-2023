@@ -1,0 +1,7 @@
+# ignore unnecessary folders
+.idea/
+target/
+
+# ignore datatbase folder 
+databases/
+

@@ -18,8 +18,11 @@ public class DBServer {
     private String storageFolderPath;
 
     public static void main(String args[]) throws IOException {
+        FileProcess showFiles = new FileProcess();
+        showFiles.displayFiles();
         DBServer server = new DBServer();
         server.blockingListenOn(8888);
+
     }
 
     /**
