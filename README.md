@@ -21,3 +21,14 @@ Emmm.Alright.Just finding one simpler way to run them by @id
 **On linux system**
 
 `./mvnw exec:java@server` and `./mvnw exec:java@client`
+
+2. About file read / write
+
+Add the class name *FileProcessing* to process various kind of operation relevant to the file and folder.
+
+Finishing printing the content in the terminal when the tables are not empty.
+
+Implenment the function that create the database in folder databases and empty table in database.
+
+
+

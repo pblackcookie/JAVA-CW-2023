@@ -18,8 +18,24 @@ public class DBServer {
     private String storageFolderPath;
 
     public static void main(String args[]) throws IOException {
+        String fileName[] = new String[2];
+        fileName[0] = "people.tab";
+        fileName[1] = "test.tab";
+        String folderName[] = new String[2];
+        folderName[0] = "company";
+        folderName[1] = "university";
+        FileProcess showFiles = new FileProcess();
+        showFiles.displayFiles();
+        showFiles.createFolder(folderName[0]);
+        showFiles.createFolder(folderName[1]);
+        showFiles.readFileContent(fileName[0]);
+        showFiles.readFileContent(fileName[1]);
+
         DBServer server = new DBServer();
         server.blockingListenOn(8888);
+        // write a while loop to receive the message and parser it...
+        //while(){ server.handleCommand()}
+
     }
 
     /**
@@ -44,6 +60,10 @@ public class DBServer {
     public String handleCommand(String command) {
         // TODO implement your server logic here
         return "";
+    }
+    // For file class can know the folder path
+    public String getStorageFolderPath() {
+        return storageFolderPath;
     }
 
     //  === Methods below handle networking aspects of the project - you will not need to change these ! ===
