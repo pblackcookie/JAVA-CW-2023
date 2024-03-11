@@ -21,13 +21,20 @@ public class DBServer {
         String fileName[] = new String[2];
         fileName[0] = "people.tab";
         fileName[1] = "test.tab";
+        String folderName[] = new String[2];
+        folderName[0] = "company";
+        folderName[1] = "university";
         FileProcess showFiles = new FileProcess();
         showFiles.displayFiles();
+        showFiles.createFolder(folderName[0]);
+        showFiles.createFolder(folderName[1]);
         showFiles.readFileContent(fileName[0]);
         showFiles.readFileContent(fileName[1]);
 
         DBServer server = new DBServer();
         server.blockingListenOn(8888);
+        // write a while loop to receive the message and parser it...
+        //while(){ server.handleCommand()}
 
     }
 
