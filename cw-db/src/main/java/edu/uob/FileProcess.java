@@ -1,5 +1,7 @@
 package edu.uob;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class FileProcess {
@@ -28,8 +30,17 @@ public class FileProcess {
             while((line = reader.readLine())  != null){
                 System.out.println(line);
             }
-        }catch (IOException ioe){
-            throw new IOException("Error reading file: " + ioe.getMessage());
+        }catch (IOException e){
+            // If server can't found the file, then will create it first.
+            try {
+                Files.createFile(Path.of(folderPath + File.separator + fileName));
+            }catch(IOException ioe) {
+                throw new IOException("Error reading file: " + ioe.getMessage());
+            }
         }
+    }
+
+    public void storageFileContent (String fileName) throws IOException{
+
     }
 }

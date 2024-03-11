@@ -18,10 +18,13 @@ public class DBServer {
     private String storageFolderPath;
 
     public static void main(String args[]) throws IOException {
-        String fileName = "people.tab";
+        String fileName[] = new String[2];
+        fileName[0] = "people.tab";
+        fileName[1] = "test.tab";
         FileProcess showFiles = new FileProcess();
         showFiles.displayFiles();
-        showFiles.readFileContent(fileName);
+        showFiles.readFileContent(fileName[0]);
+        showFiles.readFileContent(fileName[1]);
 
         DBServer server = new DBServer();
         server.blockingListenOn(8888);
