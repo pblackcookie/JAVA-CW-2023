@@ -102,21 +102,27 @@ public class ExampleDBTests {
         assertTrue(response.contains("[ERROR]"), "An attempt was made to access a non-existent table, however an [ERROR] tag was not returned");
         assertFalse(response.contains("[OK]"), "An attempt was made to access a non-existent table, however an [OK] tag was returned");
     }
-    // Test to make sure the file and folder can be created correctly
+    // Test to make sure the file can be created correctly
     @Test
     public void testFileCreate() throws IOException {
         String fileName[] = new String[2];
         fileName[0] = "people.tab";
         fileName[1] = "test.tab";
-        String folderName[] = new String[2];
-        folderName[0] = "company";
-        folderName[1] = "university";
         FileProcess showFiles = new FileProcess();
         showFiles.displayFiles();
         showFiles.readFileContent(fileName[0]);
         showFiles.readFileContent(fileName[1]);
-        showFiles.createFolder(folderName[0]);
-        showFiles.createFolder(folderName[1]);
+    }
+
+    // Test to make sure the database folder can be created correctly
+    @Test
+    public void testDatabaseCreate() throws IOException {
+        String DatabaseName[] = new String[2];
+        DatabaseName[0] = "company";
+        DatabaseName[1] = "university";
+        DatabaseProcess testDatabase = new DatabaseProcess();
+        testDatabase.createDatabase(DatabaseName[0]);
+        testDatabase.createDatabase(DatabaseName[1]);
     }
 
 }

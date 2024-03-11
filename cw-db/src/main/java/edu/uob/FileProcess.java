@@ -22,7 +22,7 @@ public class FileProcess {
         }
     }
 
-    public void createFolder(String folderName) throws IOException{
+    /*public void createFolder(String folderName) throws IOException{
         DBServer dbServer = new DBServer();
         folderPath = dbServer.getStorageFolderPath() + File.separator + folderName;
         try {
@@ -30,7 +30,7 @@ public class FileProcess {
         }catch (IOException e){
             System.out.println("Can't seem to create database storage folder " + folderName);
         }
-    }
+    }*/
     // For reading the stored files in the databases.
     public void readFileContent (String fileName) throws IOException{
         DBServer dbServer = new DBServer();
