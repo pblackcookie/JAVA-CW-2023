@@ -2,18 +2,23 @@ package edu.uob;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class FileProcess {
-    private String folderPath;
+    private String databasePath;
     private String filePath;
+
+    //DBServer dbServer = new DBServer();
+    //DatabaseProcess curDatabasePath = new DatabaseProcess();
+
     // Try to display all files by importing java.io package and using it.
-    public void displayFiles(){
-        DBServer dbServer = new DBServer();
-        folderPath = dbServer.getStorageFolderPath();
-        File documentsFolder = new File(folderPath);
+    public void displayFiles(String databaseName) throws IOException{
+        //DBServer dbServer = new DBServer();
+        DatabaseProcess curDatabasePath = new DatabaseProcess();
+        databasePath = curDatabasePath.getDatabasePath(databaseName);
+        System.out.println(databasePath);
+        File documentsFolder = new File(databasePath);
         File[] documents = documentsFolder.listFiles();
-        for(File document : documents){
+        for (File document : documents) {
             if (document.isDirectory()) {
                 System.out.println("Folder: " + document.getName());
             } else {
@@ -22,19 +27,12 @@ public class FileProcess {
         }
     }
 
-    /*public void createFolder(String folderName) throws IOException{
-        DBServer dbServer = new DBServer();
-        folderPath = dbServer.getStorageFolderPath() + File.separator + folderName;
-        try {
-            Files.createDirectories(Path.of(folderPath));
-        }catch (IOException e){
-            System.out.println("Can't seem to create database storage folder " + folderName);
-        }
-    }*/
     // For reading the stored files in the databases.
-    public void readFileContent (String fileName) throws IOException{
-        DBServer dbServer = new DBServer();
-        filePath = folderPath + File.separator + fileName;
+    public void readFileContent (String fileName, String databaseName) throws IOException{
+        //DBServer dbServer = new DBServer();
+        DatabaseProcess curDatabasePath = new DatabaseProcess();
+        databasePath = curDatabasePath.getDatabasePath(databaseName);
+        filePath = databasePath + File.separator + fileName;
         try(BufferedReader reader = new BufferedReader(new FileReader(filePath))){
             String line;
             while((line = reader.readLine())  != null){

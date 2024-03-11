@@ -109,9 +109,10 @@ public class ExampleDBTests {
         fileName[0] = "people.tab";
         fileName[1] = "test.tab";
         FileProcess showFiles = new FileProcess();
-        showFiles.displayFiles();
-        showFiles.readFileContent(fileName[0]);
-        showFiles.readFileContent(fileName[1]);
+        showFiles.readFileContent(fileName[0],"company");
+        showFiles.readFileContent(fileName[1],"university");
+        showFiles.displayFiles("company");
+        showFiles.displayFiles("university");
     }
 
     // Test to make sure the database folder can be created correctly
