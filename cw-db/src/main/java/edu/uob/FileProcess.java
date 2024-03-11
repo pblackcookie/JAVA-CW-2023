@@ -7,10 +7,10 @@ import java.util.regex.Matcher;
 
 public class FileProcess {
     private String databasePath;
+    DatabaseProcess curDatabasePath = new DatabaseProcess();
 
     // Try to display all files by importing java.io package and using it.
     public void displayFiles(String databaseName) throws IOException{
-        DatabaseProcess curDatabasePath = new DatabaseProcess();
         databasePath = curDatabasePath.getDatabasePath(databaseName);
         System.out.println(databasePath);
         File documentsFolder = new File(databasePath);
@@ -28,14 +28,13 @@ public class FileProcess {
 
     // For reading the stored files in the databases.
     public void readFileContent (String fileName, String databaseName) throws IOException{
-        DatabaseProcess curDatabasePath = new DatabaseProcess();
         databasePath = curDatabasePath.getDatabasePath(databaseName);
         String filePath = databasePath + File.separator + fileName;
         try{
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
             String line;
             int lineNumber = 0; // expression to check if the tab is correctly used
-            Pattern pattern = Pattern.compile("\\w+(?:\\t[\\w@]+)*");
+            Pattern pattern = Pattern.compile("[\\w@]+(?:\\t[\\w@]+)*");
             lineNumber++;
             while((line = reader.readLine())  != null){
                 System.out.println(line);

@@ -7,19 +7,29 @@ import java.nio.file.Path;
 
 public class DatabaseProcess {
     private String databasePath;
-    //DBServer dbServer = new DBServer();
+    DBServer dbServer = new DBServer();
     public void createDatabase(String databaseName) throws IOException {
-        DBServer dbServer = new DBServer();
         databasePath = dbServer.getStorageFolderPath() + File.separator + databaseName;
         try {
             Files.createDirectories(Path.of(databasePath));
-        }catch (IOException e){
+        }catch (IOException ioe){
             throw new IOException("Can't able to create database storage folder " + databaseName);
+        }
+    }
+    // Drop the database if it exists
+    public void dropDatabase(String databaseName) throws IOException{
+        databasePath = dbServer.getStorageFolderPath() + File.separator + databaseName;
+        try{
+
+            Files.deleteIfExists(Path.of(databasePath));
+        }catch (IOException ioe){ // Record the error message rather than delete it.
+            System.err.println("Error deleting database folder " + databaseName + ": " + ioe.getMessage());
+            throw new IOException("Can't able to drop database folder " + databaseName);
         }
     }
     // Return the databasePath for FileProcess class to use.
     public String getDatabasePath(String databaseName) {
-        DBServer dbServer = new DBServer();
         databasePath = dbServer.getStorageFolderPath() + File.separator + databaseName;
-        return databasePath;}
+        return databasePath;
+    }
 }

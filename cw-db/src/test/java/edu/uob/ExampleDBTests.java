@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -118,12 +120,32 @@ public class ExampleDBTests {
     // Test to make sure the database folder can be created correctly
     @Test
     public void testDatabaseCreate() throws IOException {
-        String DatabaseName[] = new String[2];
-        DatabaseName[0] = "company";
-        DatabaseName[1] = "university";
+        String databaseName[] = new String[2];
+        databaseName[0] = "company";
+        databaseName[1] = "university";
         DatabaseProcess testDatabase = new DatabaseProcess();
-        testDatabase.createDatabase(DatabaseName[0]);
-        testDatabase.createDatabase(DatabaseName[1]);
+        testDatabase.createDatabase(databaseName[0]);
+        testDatabase.createDatabase(databaseName[1]);
+    }
+    @Test
+    public void testDatabaseDrop() throws IOException {
+        String databaseName[] = new String[3];
+        databaseName[0] = "BigBother";
+        databaseName[1] = "Is";
+        databaseName[2] = "WatchingYou";
+        DatabaseProcess testDatabase = new DatabaseProcess();
+        testDatabase.createDatabase(databaseName[0]);
+        testDatabase.createDatabase(databaseName[1]);
+        testDatabase.createDatabase(databaseName[2]);
+        testDatabase.dropDatabase(databaseName[0]);
+        testDatabase.dropDatabase(databaseName[1]);
+        testDatabase.dropDatabase(databaseName[2]);
+
+    }
+
+    @AfterEach
+    public void setupClean() {
+        server = null;
     }
 
 }
