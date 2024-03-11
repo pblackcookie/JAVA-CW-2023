@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
 import java.time.Duration;
 
 public class ExampleDBTests {
@@ -99,6 +101,22 @@ public class ExampleDBTests {
         String response = sendCommandToServer("SELECT * FROM libraryfines;");
         assertTrue(response.contains("[ERROR]"), "An attempt was made to access a non-existent table, however an [ERROR] tag was not returned");
         assertFalse(response.contains("[OK]"), "An attempt was made to access a non-existent table, however an [OK] tag was returned");
+    }
+    // Test to make sure the file and folder can be created correctly
+    @Test
+    public void testFileCreate() throws IOException {
+        String fileName[] = new String[2];
+        fileName[0] = "people.tab";
+        fileName[1] = "test.tab";
+        String folderName[] = new String[2];
+        folderName[0] = "company";
+        folderName[1] = "university";
+        FileProcess showFiles = new FileProcess();
+        showFiles.displayFiles();
+        showFiles.readFileContent(fileName[0]);
+        showFiles.readFileContent(fileName[1]);
+        showFiles.createFolder(folderName[0]);
+        showFiles.createFolder(folderName[1]);
     }
 
 }
