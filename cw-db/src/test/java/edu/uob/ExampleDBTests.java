@@ -130,7 +130,7 @@ public class ExampleDBTests {
     @Test
     public void testDatabaseDrop() throws IOException {
         String databaseName[] = new String[3];
-        databaseName[0] = "BigBother";
+        databaseName[0] = "BigBrother";
         databaseName[1] = "Is";
         databaseName[2] = "WatchingYou";
         DatabaseProcess testDatabase = new DatabaseProcess();
