@@ -38,7 +38,7 @@ public class DatabaseProcess {
                 System.out.println("Delete the database: [" + databaseName + "] successfully.");
             } catch (IOException ioe) { // Record the error message rather than delete it.
                 System.err.println("Error deleting database folder " + databaseName + ": " + ioe.getMessage());
-                // throw new IOException("Can't able to drop database folder " + databaseName);
+                throw new IOException("Can't able to drop database folder " + databaseName);
             }
         }else{
             System.out.println("Database: [" +  databaseName + "] doesn't exist.");
@@ -46,13 +46,15 @@ public class DatabaseProcess {
     }
 
     // Select the exist database(folder) to using...
-    public void useDatabase(String databaseName) throws IOException {
+    public String useDatabase(String databaseName) throws IOException {
         databasePath = getCurDatabasePath(databaseName);
         if (Files.exists(Path.of(databasePath))) {
             currentDatabase = setCurDatabase(databaseName);
             System.out.println("Database [" + databaseName + "] is selected.");
+            return databaseName;
         }else{
-            System.out.println("Selected database: [" +  databaseName + "] doesn't exist.\n Please create it first");
+            System.out.println("Selected database: [" +  databaseName + "] doesn't exist.\nPlease create it first");
+            return "";
         }
     }
 

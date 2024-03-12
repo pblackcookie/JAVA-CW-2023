@@ -1,5 +1,6 @@
 package edu.uob;
 import java.io.*;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
@@ -8,7 +9,23 @@ import java.util.regex.Matcher;
 public class FileProcess {
     private String databasePath;
     DatabaseProcess curDatabasePath = new DatabaseProcess();
-
+    //Create an empty table
+    public void createFile(String fileName, String databaseName) throws IOException {
+        String extension = ".tab";
+        //fileName += extension;
+        String filePath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + extension;
+        //Only create it if this table isn't exist
+        Path path = Path.of(filePath);
+        try {
+            Files.createFile(path);
+            System.out.println("File created successfully.");
+        } catch (FileAlreadyExistsException e) {
+            System.out.println("File already exists.");
+        } catch (IOException e) {
+            System.out.println("An error occurred while creating the file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
     // Try to display all files by importing java.io package and using it.
     public void displayFiles(String databaseName) throws IOException{
         databasePath = curDatabasePath.getDatabasePath(databaseName);

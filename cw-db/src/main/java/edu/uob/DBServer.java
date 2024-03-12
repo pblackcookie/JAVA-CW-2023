@@ -16,13 +16,11 @@ public class DBServer {
 
     private static final char END_OF_TRANSMISSION = 4;
     private String storageFolderPath;
+    private String curDatabaseName;
 
     public static void main(String args[]) throws IOException {
         DBServer server = new DBServer();
         server.blockingListenOn(8888);
-        // write a while loop to receive the message and parser it...
-        //while(){ server.handleCommand()}
-
     }
 
     /**
@@ -44,15 +42,42 @@ public class DBServer {
     *
     * <p>This method handles all incoming DB commands and carries out the required actions.
     */
-    public String handleCommand(String command) {
+    public String handleCommand(String command) throws IOException {
         // TODO implement your server logic here
-        return "";
+        CommandToken token = new CommandToken();
+        DatabaseProcess database = new DatabaseProcess();
+        token.setup(command);
+        if(token.tokens.get(0).equalsIgnoreCase("USE")){
+             database.useDatabase(token.tokens.get(1));
+             setCurDatabaseName(token.tokens.get(1));
+        }
+        if(token.tokens.get(0).equalsIgnoreCase("CREATE")){
+            if(token.tokens.get(1).equalsIgnoreCase("DATABASE")){
+                //DatabaseProcess database = new DatabaseProcess();
+                database.createDatabase(token.tokens.get(2));
+            }else if(token.tokens.get(1).equalsIgnoreCase("TABLE")){
+                FileProcess table = new FileProcess();
+                table.createFile(token.tokens.get(2),getCurDatabaseName());
+            }
+        };
+        // Check if this command is valid.
+        if(command.endsWith(";")){
+            return "[OK]";
+        }else {
+            return "[ERROR]";
+        }
     }
+    // Using for store current database name.
+    public void setCurDatabaseName(String databaseName){
+        this.curDatabaseName = databaseName;
+    }
+    public String getCurDatabaseName(){ return this.curDatabaseName;}
     // For file class can know the folder path
     public String getStorageFolderPath() {
         return storageFolderPath;
     }
 
+    //public String getCommandString() { return commandString; }
     //  === Methods below handle networking aspects of the project - you will not need to change these ! ===
 
     public void blockingListenOn(int portNumber) throws IOException {
