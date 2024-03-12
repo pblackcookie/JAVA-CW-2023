@@ -14,7 +14,11 @@ public class DatabaseProcess {
         //databasePath = dbServer.getStorageFolderPath() + File.separator + databaseName;
         databasePath = getCurDatabasePath(databaseName);
         try {
-            Files.createDirectories(Path.of(databasePath));
+            if(Files.exists(Path.of(databasePath))) {
+                System.err.println("Database: " + databaseName + " already exists.");
+            }else {
+                Files.createDirectories(Path.of(databasePath));
+            }
         }catch (IOException ioe){
             throw new IOException("Can't able to create database storage folder " + databaseName);
         }
