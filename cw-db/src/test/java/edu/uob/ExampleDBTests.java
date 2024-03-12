@@ -128,6 +128,8 @@ public class ExampleDBTests {
         showFiles.displayFiles("company");
         showFiles.displayFiles("university");
     }
+
+    // To make sure the database drop logic is correct
     @Test
     public void testDatabaseDrop() throws IOException {
         String databaseName[] = new String[3];
@@ -142,6 +144,28 @@ public class ExampleDBTests {
         testDatabase.dropDatabase(databaseName[1]);
         testDatabase.dropDatabase(databaseName[2]);
         testDatabase.dropDatabase("university");
+
+    }
+    // To make sure the database selected to use logic is correct
+    @Test
+    public void testDatabaseUse() throws IOException {
+        String databaseName[] = new String[3];
+        databaseName[0] = "q";
+        databaseName[1] = "qq";
+        databaseName[2] = "nomeaning";
+        String curDatabase;
+        DatabaseProcess testDatabase = new DatabaseProcess();
+        testDatabase.createDatabase(databaseName[0]);
+        testDatabase.createDatabase(databaseName[1]);
+        testDatabase.createDatabase(databaseName[2]);
+        testDatabase.dropDatabase(databaseName[0]);
+        //testDatabase.dropDatabase(databaseName[1]);
+        testDatabase.dropDatabase(databaseName[2]);
+        testDatabase.useDatabase(databaseName[0]);
+        testDatabase.useDatabase(databaseName[1]);
+        // testDatabase.useDatabase(databaseName[2]);
+        curDatabase = testDatabase.getCurDatabase();
+        System.out.println(curDatabase);
 
     }
 

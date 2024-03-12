@@ -7,9 +7,12 @@ import java.nio.file.Path;
 
 public class DatabaseProcess {
     private String databasePath;
+    private String currentDatabase;
     DBServer dbServer = new DBServer();
+
     public void createDatabase(String databaseName) throws IOException {
-        databasePath = dbServer.getStorageFolderPath() + File.separator + databaseName;
+        //databasePath = dbServer.getStorageFolderPath() + File.separator + databaseName;
+        databasePath = getCurDatabasePath(databaseName);
         try {
             Files.createDirectories(Path.of(databasePath));
         }catch (IOException ioe){
@@ -18,7 +21,7 @@ public class DatabaseProcess {
     }
     // Drop the database if it exists
     public void dropDatabase(String databaseName) throws IOException {
-        databasePath = dbServer.getStorageFolderPath() + File.separator + databaseName;
+        databasePath = getCurDatabasePath(databaseName);
         if (Files.exists(Path.of(databasePath))) {
             try {
                 Files.walk(Path.of(databasePath))
@@ -41,9 +44,33 @@ public class DatabaseProcess {
             System.out.println("Database: [" +  databaseName + "] doesn't exist.");
         }
     }
+
+    // Select the exist database(folder) to using...
+    public void useDatabase(String databaseName) throws IOException {
+        databasePath = getCurDatabasePath(databaseName);
+        if (Files.exists(Path.of(databasePath))) {
+            currentDatabase = setCurDatabase(databaseName);
+            System.out.println("Database [" + databaseName + "] is selected.");
+        }else{
+            System.out.println("Selected database: [" +  databaseName + "] doesn't exist.\n Please create it first");
+        }
+    }
+
+
     // Return the databasePath for FileProcess class to use.
     public String getDatabasePath(String databaseName) {
         databasePath = dbServer.getStorageFolderPath() + File.separator + databaseName;
         return databasePath;
     }
+    public String getCurDatabasePath(String databaseName){
+        databasePath = dbServer.getStorageFolderPath() + File.separator + databaseName;
+        return databasePath;
+    }
+
+    public String setCurDatabase(String databaseName){
+        this.currentDatabase = databaseName;
+        return databaseName;
+    }
+
+    public String getCurDatabase(){ return currentDatabase;}
 }
