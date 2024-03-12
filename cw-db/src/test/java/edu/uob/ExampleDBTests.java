@@ -104,18 +104,6 @@ public class ExampleDBTests {
         assertTrue(response.contains("[ERROR]"), "An attempt was made to access a non-existent table, however an [ERROR] tag was not returned");
         assertFalse(response.contains("[OK]"), "An attempt was made to access a non-existent table, however an [OK] tag was returned");
     }
-    // Test to make sure the file can be created correctly
-    @Test
-    public void testFileCreate() throws IOException {
-        String fileName[] = new String[2];
-        fileName[0] = "people.tab";
-        fileName[1] = "test.tab";
-        FileProcess showFiles = new FileProcess();
-        showFiles.readFileContent(fileName[0],"company");
-        showFiles.readFileContent(fileName[1],"university");
-        showFiles.displayFiles("company");
-        showFiles.displayFiles("university");
-    }
 
     // Test to make sure the database folder can be created correctly
     @Test
@@ -126,6 +114,19 @@ public class ExampleDBTests {
         DatabaseProcess testDatabase = new DatabaseProcess();
         testDatabase.createDatabase(databaseName[0]);
         testDatabase.createDatabase(databaseName[1]);
+    }
+
+    // Test to make sure the file can be created correctly
+    @Test
+    public void testFileCreate() throws IOException {
+        String fileName[] = new String[2];
+        fileName[0] = "people.tab";
+        fileName[1] = "test.tab";
+        FileProcess showFiles = new FileProcess();
+        showFiles.readFileContent(fileName[0],"company");
+        //showFiles.readFileContent(fileName[1],"university");
+        showFiles.displayFiles("company");
+        showFiles.displayFiles("university");
     }
     @Test
     public void testDatabaseDrop() throws IOException {
@@ -140,12 +141,13 @@ public class ExampleDBTests {
         testDatabase.dropDatabase(databaseName[0]);
         testDatabase.dropDatabase(databaseName[1]);
         testDatabase.dropDatabase(databaseName[2]);
+        testDatabase.dropDatabase("university");
 
     }
 
-    @AfterEach
+    /*@AfterEach
     public void setupClean() {
         server = null;
-    }
+    }*/
 
 }

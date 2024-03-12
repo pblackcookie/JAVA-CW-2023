@@ -33,7 +33,8 @@ public class FileProcess {
         try{
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
             String line;
-            int lineNumber = 0; // expression to check if the tab is correctly used
+            int lineNumber = 0;
+            // expression to check if the tab is correctly used
             Pattern pattern = Pattern.compile("[\\w@]+(?:\\t[\\w@]+)*");
             lineNumber++;
             while((line = reader.readLine())  != null){
