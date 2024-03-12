@@ -30,5 +30,10 @@ Finishing printing the content in the terminal when the tables are not empty.
 
 Implenment the function that create the database in folder databases and empty table in database.
 
+3. About handle command
+
+Continuing implement the table/database functions.
+
+Statring to add some logic process functions into handleCommandhandle function in the DBServer class. 
 
 
