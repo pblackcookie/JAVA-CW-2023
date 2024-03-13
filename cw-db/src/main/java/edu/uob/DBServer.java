@@ -44,36 +44,30 @@ public class DBServer {
     */
     public String handleCommand(String command) throws IOException {
         // TODO implement your server logic here
-        // Parser need to created in here
-        CommandToken token = new CommandToken();
+        // DBParser need to created in here=====
+        DBParser parser = new DBParser(command);
         DatabaseProcess database = new DatabaseProcess();
         FileProcess table = new FileProcess();
-        token.setup(command);
-        if(token.tokens.get(0).equalsIgnoreCase("USE")){
-             database.useDatabase(token.tokens.get(1));
-             setCurDatabaseName(token.tokens.get(1));
-        }
-        if(token.tokens.get(0).equalsIgnoreCase("CREATE")){
-            if(token.tokens.get(1).equalsIgnoreCase("DATABASE")){
+        //=======================================
+        if (parser.token.tokens.get(0).equalsIgnoreCase("USE")) {
+            database.useDatabase(parser.token.tokens.get(1));
+            setCurDatabaseName(parser.token.tokens.get(1));
+        } else if (parser.token.tokens.get(0).equalsIgnoreCase("CREATE")) {
+            if (parser.token.tokens.get(1).equalsIgnoreCase("DATABASE")) {
                 //DatabaseProcess database = new DatabaseProcess();
-                database.createDatabase(token.tokens.get(2));
-            }else if(token.tokens.get(1).equalsIgnoreCase("TABLE")){
-                table.createFile(token.tokens.get(2),getCurDatabaseName());
+                database.createDatabase(parser.token.tokens.get(2));
+            } else if (parser.token.tokens.get(1).equalsIgnoreCase("TABLE")) {
+                table.createFile(parser.token.tokens.get(2), getCurDatabaseName());
+            }
+        } else if (parser.token.tokens.get(0).equalsIgnoreCase("DROP")) {
+            if (parser.token.tokens.get(1).equalsIgnoreCase("DATABASE")) {
+                database.dropDatabase(parser.token.tokens.get(2));
+            } else if (parser.token.tokens.get(1).equalsIgnoreCase("TABLE")) {
+                table.dropFile(parser.token.tokens.get(2), getCurDatabaseName());
             }
         }
-        if(token.tokens.get(0).equalsIgnoreCase("DROP")){
-            if(token.tokens.get(1).equalsIgnoreCase("DATABASE")){
-                database.dropDatabase(token.tokens.get(2));
-            }else if(token.tokens.get(1).equalsIgnoreCase("TABLE")){
-                table.dropFile(token.tokens.get(2),getCurDatabaseName());
-            }
-        }
-        // Check if this command is valid.
-        if(command.endsWith(";")){
-            return "[OK]";
-        }else {
-            return "[ERROR]";
-        }
+        if(parser.syntaxCheck(command)) return "[OK]";
+        else return "[ERROR]";
     }
     // Using for store current database name.
     public void setCurDatabaseName(String databaseName){

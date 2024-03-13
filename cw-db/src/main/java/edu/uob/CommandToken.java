@@ -1,12 +1,15 @@
 package edu.uob;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 // Token Class is rewrite from the provided code
 public class CommandToken {
     String[] specialCharacters = {"(", ")", ",", ";"};
     ArrayList<String> tokens = new ArrayList<String>();
 
-    public void setup(String query) {
+    public List<String> setup(String query) {
         // Remove any whitespace at the beginning and end of the query
         query = query.trim();
         // Split the query on single quotes (to separate out query characters from string literals)
@@ -25,6 +28,9 @@ public class CommandToken {
         }
         // Finally, loop through the result array list, printing out each token a line at a time
         //for (int i = 0; i < tokens.size(); i++) System.out.println(tokens.get(i));
+        //return null;
+        for (String token : tokens) return Collections.singletonList(token);
+        return null;
     }
 
     public String[] tokenise(String input) {
