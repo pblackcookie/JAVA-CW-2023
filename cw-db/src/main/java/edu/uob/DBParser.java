@@ -38,27 +38,28 @@ public class DBParser {
                 index++;
                 parserCreate();
                 break;
-            case "DROP": //parserDrop();
+            case "DROP":
+                index++;
+                parserDrop();
             case "ALTER": //parserAlter();
             case "INSERT": //parserInsert();
             case "SELECT": //parserSelect();
             case "UPDATE": //parserUpdate();
             case "DELETE": //parserDelete();
             case "JOIN": //parserDrop();
-                //index++;
                 break;
             default:
                 System.out.println("Invalid commandType");
         }
     }
-
+    //When command type = 'USE'
     private void parserUse() throws IOException {
         String curToken = token.tokens.get(index);
         database.useDatabase(curToken);
         GlobalMethod.setCurDatabaseName(curToken);
 
     }
-
+    // When command type = 'CREATE'
     private void parserCreate() throws IOException {
         String curToken = token.tokens.get(index);
         switch (curToken.toUpperCase()) {
@@ -71,7 +72,7 @@ public class DBParser {
                 parserCreateTable();
                 break;
             default:
-                System.out.println("Invalid create type. Please use [TABLE] or [DATABASE]");
+                System.out.println("Invalid create command. Please use [TABLE] or [DATABASE]");
         }
     }
 
@@ -84,4 +85,32 @@ public class DBParser {
         String curDatabase = GlobalMethod.getCurDatabaseName();
         table.createFile(curToken, curDatabase);
     }
+
+    // When command type = 'DROP'
+    private void parserDrop() throws IOException {
+        String curToken = token.tokens.get(index);
+        switch (curToken.toUpperCase()) {
+            case "DATABASE":
+                index++;
+                parserDropDatabase();
+                break;
+            case "TABLE":
+                index++;
+                parserDropTable();
+                break;
+            default:
+                System.out.println("Invalid drop command. Please use [TABLE] or [DATABASE]");
+        }
+    }
+    private void parserDropDatabase() throws IOException {
+        String curToken = token.tokens.get(index);
+        database.dropDatabase(curToken);
+    }
+    private void parserDropTable() throws IOException {
+        String curToken = token.tokens.get(index);
+        String curDatabase = GlobalMethod.getCurDatabaseName();
+        table.dropFile(curToken,curDatabase);
+    }
+
+
 }

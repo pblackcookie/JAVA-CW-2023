@@ -16,8 +16,6 @@ public class DBServer {
 
     private static final char END_OF_TRANSMISSION = 4;
     private String storageFolderPath;
-    private String curDatabaseName;
-
 
     public static void main(String args[]) throws IOException {
         DBServer server = new DBServer();
@@ -68,14 +66,6 @@ public class DBServer {
         if(parser.syntaxCheck(command)) return "[OK]";
         else return "[ERROR]";
     }
-
-    /*
-    // Using for store current database name.
-    public void  setCurDatabaseName(String databaseName){
-        curDatabaseName = databaseName;
-    }
-    public String getCurDatabaseName(){ return curDatabaseName;}*/
-
 
     // For file class can know the folder path
     public String getStorageFolderPath() {
