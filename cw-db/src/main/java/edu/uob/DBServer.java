@@ -46,10 +46,11 @@ public class DBServer {
         // TODO implement your server logic here
         // DBParser need to created in here=====
         DBParser parser = new DBParser(command);
-        DatabaseProcess database = new DatabaseProcess();
-        FileProcess table = new FileProcess();
+        //DatabaseProcess database = new DatabaseProcess();
+        //FileProcess table = new FileProcess();
+        parser.parserCommand(command);
         //=======================================
-        if (parser.token.tokens.get(0).equalsIgnoreCase("USE")) {
+        /*if (parser.token.tokens.get(0).equalsIgnoreCase("USE")) {
             database.useDatabase(parser.token.tokens.get(1));
             setCurDatabaseName(parser.token.tokens.get(1));
         } else if (parser.token.tokens.get(0).equalsIgnoreCase("CREATE")) {
@@ -65,7 +66,7 @@ public class DBServer {
             } else if (parser.token.tokens.get(1).equalsIgnoreCase("TABLE")) {
                 table.dropFile(parser.token.tokens.get(2), getCurDatabaseName());
             }
-        }
+        }*/
         if(parser.syntaxCheck(command)) return "[OK]";
         else return "[ERROR]";
     }
