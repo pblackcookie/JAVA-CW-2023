@@ -1,24 +1,17 @@
 package edu.uob;
 
 import java.io.IOException;
-import java.util.List;
 
 public class DBParser {
-    private List<String> tokens;
-    private int index;
-    CommandToken token = new CommandToken();
+    private int index; // use to indicate the current token
+    private String curDatabaseName; // use to store current database name.
+    CommandToken token = new CommandToken(); // storage all tokens
     DatabaseProcess database = new DatabaseProcess();
     FileProcess table = new FileProcess();
     public DBParser(String command){
-
-        tokens = token.setup(command);
-        index = 0;
-        for (String token : tokens) {
-            System.out.println(token);
-        }
-
+        token.setup(command); // get all tokens from command
+        index = 0; // initialise the index
     }
-
     public boolean syntaxCheck(String command){
         // Check if this command is valid. -> normal syntax check
         if(command.endsWith(";")){
@@ -35,12 +28,16 @@ public class DBParser {
     }
 
     private void parserCommandType() throws IOException {
-        //String token = tokens.get(index);
-        switch ((tokens.get(index)).toUpperCase()){
+        String curToken = token.tokens.get(index);
+        switch (curToken.toUpperCase()){
             case "USE":
+                index++;
                 parserUse();
                 break;
-            case "CREATE": //parserCreate();
+            case "CREATE":
+                index++;
+                parserCreate();
+                break;
             case "DROP": //parserDrop();
             case "ALTER": //parserAlter();
             case "INSERT": //parserInsert();
@@ -56,9 +53,35 @@ public class DBParser {
     }
 
     private void parserUse() throws IOException {
-        index++;
-        String token = tokens.get(index);
-        database.useDatabase(tokens.get(index));
+        String curToken = token.tokens.get(index);
+        database.useDatabase(curToken);
+        //setCurDatabaseName(curToken); need to store it
+        System.out.println(curDatabaseName);
     }
 
+    private void parserCreate() throws IOException {
+        String curToken = token.tokens.get(index);
+        switch (curToken.toUpperCase()) {
+            case "DATABASE":
+                index++;
+                parserCreateDatabase();
+                break;
+            case "TABLE":
+                index++;
+                parserCreateTable();
+                break;
+            default:
+                System.out.println("Invalid create type. Please use [TABLE] or [DATABASE]");
+        }
+    }
+
+    private void parserCreateDatabase() throws IOException {
+        String curToken = token.tokens.get(index);
+        database.createDatabase(curToken);
+    }
+    private void parserCreateTable() throws IOException {
+        String curToken = token.tokens.get(index);
+        //String curDatabase = getCurDatabaseName();
+        //table.createFile(curToken, getCurDatabaseName());
+    }
 }

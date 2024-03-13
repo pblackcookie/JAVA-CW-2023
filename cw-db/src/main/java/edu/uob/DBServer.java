@@ -18,6 +18,7 @@ public class DBServer {
     private String storageFolderPath;
     private String curDatabaseName;
 
+
     public static void main(String args[]) throws IOException {
         DBServer server = new DBServer();
         server.blockingListenOn(8888);
@@ -55,7 +56,6 @@ public class DBServer {
             setCurDatabaseName(parser.token.tokens.get(1));
         } else if (parser.token.tokens.get(0).equalsIgnoreCase("CREATE")) {
             if (parser.token.tokens.get(1).equalsIgnoreCase("DATABASE")) {
-                //DatabaseProcess database = new DatabaseProcess();
                 database.createDatabase(parser.token.tokens.get(2));
             } else if (parser.token.tokens.get(1).equalsIgnoreCase("TABLE")) {
                 table.createFile(parser.token.tokens.get(2), getCurDatabaseName());
@@ -71,10 +71,10 @@ public class DBServer {
         else return "[ERROR]";
     }
     // Using for store current database name.
-    public void setCurDatabaseName(String databaseName){
-        this.curDatabaseName = databaseName;
+    public void  setCurDatabaseName(String databaseName){
+        curDatabaseName = databaseName;
     }
-    public String getCurDatabaseName(){ return this.curDatabaseName;}
+    public String getCurDatabaseName(){ return curDatabaseName;}
     // For file class can know the folder path
     public String getStorageFolderPath() {
         return storageFolderPath;
