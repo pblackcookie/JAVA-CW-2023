@@ -58,7 +58,7 @@ public class DatabaseProcess {
             return databaseName;
         }else{
             System.out.println("Selected database: [" +  databaseName + "] doesn't exist.\nPlease create it first");
-            return "";
+            return "[ERROR]";
         }
     }
 
@@ -72,7 +72,7 @@ public class DatabaseProcess {
         databasePath = dbServer.getStorageFolderPath() + File.separator + databaseName;
         return databasePath;
     }
-
+    // Return current database name which is the user selecting
     public String setCurDatabase(String databaseName){
         this.currentDatabase = databaseName;
         return databaseName;

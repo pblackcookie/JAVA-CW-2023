@@ -46,6 +46,7 @@ public class DBServer {
         // TODO implement your server logic here
         CommandToken token = new CommandToken();
         DatabaseProcess database = new DatabaseProcess();
+        FileProcess table = new FileProcess();
         token.setup(command);
         if(token.tokens.get(0).equalsIgnoreCase("USE")){
              database.useDatabase(token.tokens.get(1));
@@ -56,10 +57,16 @@ public class DBServer {
                 //DatabaseProcess database = new DatabaseProcess();
                 database.createDatabase(token.tokens.get(2));
             }else if(token.tokens.get(1).equalsIgnoreCase("TABLE")){
-                FileProcess table = new FileProcess();
                 table.createFile(token.tokens.get(2),getCurDatabaseName());
             }
-        };
+        }
+        if(token.tokens.get(0).equalsIgnoreCase("DROP")){
+            if(token.tokens.get(1).equalsIgnoreCase("DATABASE")){
+                database.dropDatabase(token.tokens.get(2));
+            }else if(token.tokens.get(1).equalsIgnoreCase("TABLE")){
+                table.dropFile(token.tokens.get(2),getCurDatabaseName());
+            }
+        }
         // Check if this command is valid.
         if(command.endsWith(";")){
             return "[OK]";

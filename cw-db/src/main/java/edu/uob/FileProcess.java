@@ -2,16 +2,18 @@ package edu.uob;
 import java.io.*;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 public class FileProcess {
     private String databasePath;
+    String extension = ".tab";
     DatabaseProcess curDatabasePath = new DatabaseProcess();
     //Create an empty table
     public void createFile(String fileName, String databaseName) throws IOException {
-        String extension = ".tab";
+
         //fileName += extension;
         String filePath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + extension;
         //Only create it if this table isn't exist
@@ -26,6 +28,23 @@ public class FileProcess {
             e.printStackTrace();
         }
     }
+
+    // Try to delete file when is selected
+    public void dropFile(String fileName, String databaseName) throws IOException{
+        String filePath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + extension;
+        Path path = Path.of(filePath);
+        try{
+            Files.delete(path);
+            System.out.println("File deleted successfully.");
+        }catch (NoSuchFileException e) {
+            System.out.println("File does not exist: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("An error occurred: " + e.getMessage());
+        }
+    }
+
+
+
     // Try to display all files by importing java.io package and using it.
     public void displayFiles(String databaseName) throws IOException{
         databasePath = curDatabasePath.getDatabasePath(databaseName);
