@@ -12,34 +12,39 @@ public class FileProcess {
     String extension = ".tab";
     DatabaseProcess curDatabasePath = new DatabaseProcess();
     //Create an empty table
-    public void createFile(String fileName, String databaseName) throws IOException {
-
-        //fileName += extension;
+    public String createFile(String fileName, String databaseName) throws IOException {
         String filePath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + extension;
         //Only create it if this table isn't exist
         Path path = Path.of(filePath);
         try {
             Files.createFile(path);
-            System.out.println("File created successfully.");
+            //System.out.println("File created successfully.");
+            return "[OK]File created successfully.";
         } catch (FileAlreadyExistsException e) {
             System.out.println("File already exists.");
+            return "[ERROR]File already exists.";
         } catch (IOException e) {
-            System.out.println("An error occurred while creating the file: " + e.getMessage());
-            e.printStackTrace();
+            //System.out.println("An error occurred while creating the file: " + e.getMessage());
+            throw new RuntimeException("[ERROR]An error occurred while creating the file: " + e.getMessage());
+        }catch (RuntimeException rune){
+            return rune.getMessage();
         }
     }
 
     // Try to delete file when is selected
-    public void dropFile(String fileName, String databaseName) throws IOException{
+    public String dropFile(String fileName, String databaseName) throws IOException{
         String filePath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + extension;
         Path path = Path.of(filePath);
         try{
             Files.delete(path);
             System.out.println("File deleted successfully.");
+            return "[OK]File: " + fileName + " deleted successfully.";
         }catch (NoSuchFileException e) {
-            System.out.println("File does not exist: " + e.getMessage());
+            //System.out.println("File does not exist: " + e.getMessage());
+            return "[ERROR]File" + fileName + " does not exist: " + e.getMessage();
         } catch (IOException e) {
             System.out.println("An error occurred: " + e.getMessage());
+            return "[ERROR]An error occurred: " + e.getMessage();
         }
     }
 

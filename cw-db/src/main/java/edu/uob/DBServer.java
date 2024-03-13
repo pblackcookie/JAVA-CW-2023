@@ -43,28 +43,12 @@ public class DBServer {
     */
     public String handleCommand(String command) throws IOException {
         // TODO implement your server logic here
-        // DBParser need to created in here=====
+        String commandStatus = null;
         DBParser parser = new DBParser(command);
-        parser.parserCommand(command);
-        //=======================================
-        /*if (parser.token.tokens.get(0).equalsIgnoreCase("USE")) {
-            database.useDatabase(parser.token.tokens.get(1));
-            setCurDatabaseName(parser.token.tokens.get(1));
-        } else if (parser.token.tokens.get(0).equalsIgnoreCase("CREATE")) {
-            if (parser.token.tokens.get(1).equalsIgnoreCase("DATABASE")) {
-                database.createDatabase(parser.token.tokens.get(2));
-            } else if (parser.token.tokens.get(1).equalsIgnoreCase("TABLE")) {
-                table.createFile(parser.token.tokens.get(2), getCurDatabaseName());
-            }
-        } else if (parser.token.tokens.get(0).equalsIgnoreCase("DROP")) {
-            if (parser.token.tokens.get(1).equalsIgnoreCase("DATABASE")) {
-                database.dropDatabase(parser.token.tokens.get(2));
-            } else if (parser.token.tokens.get(1).equalsIgnoreCase("TABLE")) {
-                table.dropFile(parser.token.tokens.get(2), getCurDatabaseName());
-            }
-        }*/
-        if(parser.syntaxCheck(command)) return "[OK]";
-        else return "[ERROR]";
+        //commandStatus = parser.parserCommand(command);
+        //parser.parserCommand(command);
+        //return commandStatus;
+        return parser.parserCommand();
     }
 
     // For file class can know the folder path
@@ -72,7 +56,6 @@ public class DBServer {
         return storageFolderPath;
     }
 
-    //public String getCommandString() { return commandString; }
     //  === Methods below handle networking aspects of the project - you will not need to change these ! ===
 
     public void blockingListenOn(int portNumber) throws IOException {
