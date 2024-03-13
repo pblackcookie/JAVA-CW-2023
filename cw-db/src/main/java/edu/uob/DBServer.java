@@ -44,6 +44,7 @@ public class DBServer {
     */
     public String handleCommand(String command) throws IOException {
         // TODO implement your server logic here
+        // Parser need to created in here
         CommandToken token = new CommandToken();
         DatabaseProcess database = new DatabaseProcess();
         FileProcess table = new FileProcess();
