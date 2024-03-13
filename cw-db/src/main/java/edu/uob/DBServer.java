@@ -45,10 +45,9 @@ public class DBServer {
         // TODO implement your server logic here
         String commandStatus = null;
         DBParser parser = new DBParser(command);
-        //commandStatus = parser.parserCommand(command);
-        //parser.parserCommand(command);
-        //return commandStatus;
-        return parser.parserCommand();
+        commandStatus = parser.parserCommand();
+        System.out.println("command:" + commandStatus); //For test...
+        return commandStatus;
     }
 
     // For file class can know the folder path

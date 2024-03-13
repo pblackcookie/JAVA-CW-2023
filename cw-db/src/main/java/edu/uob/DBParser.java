@@ -58,6 +58,7 @@ public class DBParser {
         return curCommandStatus;
     }
     // When command type = 'CREATE'
+    // One thing need to be considered: table may with attributes.
     private String parserCreate() throws IOException {
         String curToken = token.tokens.get(index);
         switch (curToken.toUpperCase()) {
@@ -67,7 +68,8 @@ public class DBParser {
                 break;
             case "TABLE":
                 index++;
-                parserCreateTable();
+                if(token.tokens.get(index+2).equals(";")){parserCreateTable();}
+                else{parserCreateTableAtt();}
                 break;
             default:
                 curCommandStatus = "[ERROR]Invalid create command. Please use [TABLE] or [DATABASE]";
@@ -80,7 +82,21 @@ public class DBParser {
         curCommandStatus = database.createDatabase(curToken);
         return curCommandStatus;
     }
+    // Two different situation: 1. Just create the table. 2. With the attributes
+    // situation 1
     private String parserCreateTable() throws IOException {
+        String curToken = token.tokens.get(index);
+        String curDatabase = GlobalMethod.getCurDatabaseName();
+        System.out.println("TEST: " + curDatabase);
+        if(curDatabase != null) {
+            curCommandStatus = table.createFile(curToken, curDatabase);
+            return curCommandStatus;
+        }
+        curCommandStatus = "[ERROR]Please choose use database first.";
+        return curCommandStatus;
+    }
+    // situation2
+    private String parserCreateTableAtt() throws IOException {
         String curToken = token.tokens.get(index);
         String curDatabase = GlobalMethod.getCurDatabaseName();
         System.out.println("TEST: " + curDatabase);
