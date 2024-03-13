@@ -47,8 +47,6 @@ public class DBServer {
         // TODO implement your server logic here
         // DBParser need to created in here=====
         DBParser parser = new DBParser(command);
-        //DatabaseProcess database = new DatabaseProcess();
-        //FileProcess table = new FileProcess();
         parser.parserCommand(command);
         //=======================================
         /*if (parser.token.tokens.get(0).equalsIgnoreCase("USE")) {
@@ -70,11 +68,15 @@ public class DBServer {
         if(parser.syntaxCheck(command)) return "[OK]";
         else return "[ERROR]";
     }
+
+    /*
     // Using for store current database name.
     public void  setCurDatabaseName(String databaseName){
         curDatabaseName = databaseName;
     }
-    public String getCurDatabaseName(){ return curDatabaseName;}
+    public String getCurDatabaseName(){ return curDatabaseName;}*/
+
+
     // For file class can know the folder path
     public String getStorageFolderPath() {
         return storageFolderPath;

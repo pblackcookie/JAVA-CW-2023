@@ -55,8 +55,8 @@ public class DBParser {
     private void parserUse() throws IOException {
         String curToken = token.tokens.get(index);
         database.useDatabase(curToken);
-        //setCurDatabaseName(curToken); need to store it
-        System.out.println(curDatabaseName);
+        GlobalMethod.setCurDatabaseName(curToken);
+
     }
 
     private void parserCreate() throws IOException {
@@ -81,7 +81,7 @@ public class DBParser {
     }
     private void parserCreateTable() throws IOException {
         String curToken = token.tokens.get(index);
-        //String curDatabase = getCurDatabaseName();
-        //table.createFile(curToken, getCurDatabaseName());
+        String curDatabase = GlobalMethod.getCurDatabaseName();
+        table.createFile(curToken, curDatabase);
     }
 }
