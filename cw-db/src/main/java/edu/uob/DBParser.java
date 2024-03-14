@@ -67,6 +67,10 @@ public class DBParser {
     }
     //When command type = 'USE'
     private String parserUse() throws IOException {
+        if(token.tokens.size() != 3){
+            curCommandStatus = "[ERROR]Invalid syntax.";
+            return curCommandStatus;
+        }
         String curToken = token.tokens.get(index);
         curCommandStatus = database.useDatabase(curToken);
         setCurDatabaseName(curToken);
@@ -164,18 +168,22 @@ public class DBParser {
     }
 
 
-    // Insert content to the table
+    // // When command type = 'INSERT'
     private String parserInsert() throws IOException {
         int idNumber;
-        String curToken = token.tokens.get(index);
         String filePath = database.getCurDatabasePath(getCurDatabaseName()) + File.separator + token.tokens.get(index+1) + ".tab";
+        String curToken = token.tokens.get(index);
         if(!curToken.equalsIgnoreCase("INTO")){
             curCommandStatus = "[ERROR] Missing or wrong the 'INTO'";
+            return curCommandStatus;
         }else{
             index++; // should be the table name now
             curToken = token.tokens.get(index);
-            if(!curToken.equalsIgnoreCase(getCurTableName())){
-                curCommandStatus = "[ERROR] Table doesn't exist.";
+            ArrayList<String> curFiles = new ArrayList<>();
+            curFiles = table.displayFiles(getCurDatabaseName());
+            if(!curFiles.contains(curToken + ".tab")){
+                curCommandStatus = "[ERROR]: Select file doesn't exists.";
+                return curCommandStatus;
             }
             // Table exists ,so Read the id file to see which id it should be now
             String IdRecordPath = database.getCurDatabasePath(getCurDatabaseName()) + File.separator + curToken + id;
@@ -192,22 +200,24 @@ public class DBParser {
             curToken = token.tokens.get(index);
             if(!curToken.equalsIgnoreCase("VALUES")){
                 curCommandStatus = "[ERROR] Missing or typo 'VALUES'.";
+                return curCommandStatus;
             }
             index++; // should be the '(' now
             curToken = token.tokens.get(index);
             if(!curToken.equalsIgnoreCase("(")){
                 curCommandStatus = "[ERROR] Missing or typo '('.";
+                return curCommandStatus;
             }
             if(!token.tokens.get(token.tokens.size() - 2).equals(")")) {
                 // In order to prevent the situation like 'create table test(ss, mark, kkk)deaf;' occur.
                 curCommandStatus = "[ERROR]Invalid format: Error occurs between ')' and ';'. ";
+                return curCommandStatus;
             }
             attributes.add(String.valueOf(idNumber));
             // For loop to store the data
             for (int i = index+1; i < token.tokens.size()-2; i++) { // should be the data now
                 if (!token.tokens.get(i).equals(",")) {
                     attributes.add(token.tokens.get(i));
-                    System.out.println(attributes);
                 }
             }
         }
