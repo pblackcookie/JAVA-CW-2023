@@ -11,15 +11,16 @@ import java.util.regex.Matcher;
 public class FileProcess {
     private String databasePath;
     String extension = ".tab";
+    String IdRecord = ".id";
     DatabaseProcess curDatabasePath = new DatabaseProcess();
     //Create an empty table
     public String createFile(String fileName, String databaseName) throws IOException {
         String filePath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + extension;
+        String IdRecordPath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + IdRecord;
         //Only create it if this table isn't exist
-        Path path = Path.of(filePath);
         try {
-            Files.createFile(path);
-            //System.out.println("File created successfully.");
+            Files.createFile(Path.of(filePath));
+            Files.createFile(Path.of(IdRecordPath));
             return "[OK]File created successfully.";
         } catch (FileAlreadyExistsException e) {
             System.out.println("File already exists.");
@@ -34,14 +35,21 @@ public class FileProcess {
     // when the table with attributes
     public String createFile(String fileName, String databaseName, ArrayList<String> attributes) throws IOException {
         String filePath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + extension;
+        String IdRecordPath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + IdRecord;
         //Only create it if this table isn't exist
         Path path = Path.of(filePath);
         try {
+            Files.createFile(Path.of(IdRecordPath));
+            FileWriter writerId = new FileWriter(String.valueOf(Path.of(IdRecordPath)));
+            writerId.write("1");
+            writerId.close();
             Files.createFile(path);
             FileWriter writer = new FileWriter(String.valueOf(path));
             BufferedWriter buffer = new BufferedWriter(writer);
-            // For loop for write the attributes each time
             // Need to add the file that records the id also
+            // Always keep the id in the first column
+            attributes.add(0, "id");
+            // For loop for write the attributes each time
             for (int i = 0; i < attributes.size(); i++) {
                 writer.write(attributes.get(i));
                 if (i != attributes.size() - 1) {
@@ -65,9 +73,11 @@ public class FileProcess {
     // Try to delete file when is selected
     public String dropFile(String fileName, String databaseName) throws IOException{
         String filePath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + extension;
+        String IdRecordPath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + IdRecord;
         Path path = Path.of(filePath);
         try{
             Files.delete(path);
+            Files.delete(Path.of(IdRecordPath)); // Need to delete the id record file at the same time
             System.out.println("File deleted successfully.");
             return "[OK]File: " + fileName + " deleted successfully.";
         }catch (NoSuchFileException e) {
@@ -78,8 +88,6 @@ public class FileProcess {
             return "[ERROR]An error occurred: " + e.getMessage();
         }
     }
-
-
 
     // Try to display all files by importing java.io package and using it.
     public void displayFiles(String databaseName) throws IOException{
@@ -133,5 +141,10 @@ public class FileProcess {
     }
 
     public void storageFileContent (String fileName) throws IOException{
+    }
+
+    public String addFileContent(ArrayList<String> data){
+        DataProcess lineData = new DataProcess();
+        return lineData.dataInsert(data);
     }
 }
