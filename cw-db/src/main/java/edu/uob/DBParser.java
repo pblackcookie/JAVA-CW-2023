@@ -96,6 +96,12 @@ public class DBParser {
                 curCommandStatus = table.createFile(curToken, curDatabase);
                 return curCommandStatus;
             }else if(token.tokens.get(index).equals("(")){
+                // In here imaging a series of error may occur....Need to implement
+                if(!token.tokens.get(token.tokens.size() - 2).equals(")")){
+                    // In order to prevent the situation like 'create table test(ss, mark, kkk)deaf;' occur.
+                    curCommandStatus = "[ERROR]Invalid format: Error occurs between ')' and ';'. ";
+                    return curCommandStatus;
+                }
                 for (int i = index+1; i < token.tokens.size()-2; i++) {
                     if (!token.tokens.get(i).equals(",")) {
                         attributes.add(token.tokens.get(i));

@@ -40,7 +40,15 @@ public class FileProcess {
             Files.createFile(path);
             FileWriter writer = new FileWriter(String.valueOf(path));
             BufferedWriter buffer = new BufferedWriter(writer);
-            buffer.write(String.valueOf(attributes));
+            // For loop for write the attributes each time
+            // Need to add the file that records the id also
+            for (int i = 0; i < attributes.size(); i++) {
+                writer.write(attributes.get(i));
+                if (i != attributes.size() - 1) {
+                    writer.write("\t");
+                }
+            }
+            //buffer.write(String.valueOf(attributes));
             buffer.close();
             return "[OK]File created with attributes successful.";
         } catch (FileAlreadyExistsException e) {
