@@ -4,6 +4,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -20,6 +21,28 @@ public class FileProcess {
             Files.createFile(path);
             //System.out.println("File created successfully.");
             return "[OK]File created successfully.";
+        } catch (FileAlreadyExistsException e) {
+            System.out.println("File already exists.");
+            return "[ERROR]File already exists.";
+        } catch (IOException e) {
+            //System.out.println("An error occurred while creating the file: " + e.getMessage());
+            throw new RuntimeException("[ERROR]An error occurred while creating the file: " + e.getMessage());
+        }catch (RuntimeException rune){
+            return rune.getMessage();
+        }
+    }
+    // when the table with attributes
+    public String createFile(String fileName, String databaseName, ArrayList<String> attributes) throws IOException {
+        String filePath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + extension;
+        //Only create it if this table isn't exist
+        Path path = Path.of(filePath);
+        try {
+            Files.createFile(path);
+            FileWriter writer = new FileWriter(String.valueOf(path));
+            BufferedWriter buffer = new BufferedWriter(writer);
+            buffer.write(String.valueOf(attributes));
+            buffer.close();
+            return "[OK]File created with attributes successful.";
         } catch (FileAlreadyExistsException e) {
             System.out.println("File already exists.");
             return "[ERROR]File already exists.";

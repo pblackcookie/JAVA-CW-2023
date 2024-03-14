@@ -1,10 +1,12 @@
 package edu.uob;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class DBParser {
     private int index; // use to indicate the current token
     private String curCommandStatus;
+    ArrayList<String> attributes = new ArrayList<>();
     CommandToken token = new CommandToken(); // storage all tokens
     DatabaseProcess database = new DatabaseProcess();
     FileProcess table = new FileProcess();
@@ -17,7 +19,7 @@ public class DBParser {
     public String parserCommand() throws IOException {
         // check the ';' on the end
         if(!token.tokens.get(token.tokens.size() - 1).equals(";")){
-            return "[ERROR]Please end the command with ';'";
+            return "[ERROR]Invalid format: Please end the command with ';'";
         }else {
             return parserCommandType();
         }
@@ -68,8 +70,7 @@ public class DBParser {
                 break;
             case "TABLE":
                 index++;
-                if(token.tokens.get(index+2).equals(";")){parserCreateTable();}
-                else{parserCreateTableAtt();}
+                parserCreateTable();
                 break;
             default:
                 curCommandStatus = "[ERROR]Invalid create command. Please use [TABLE] or [DATABASE]";
@@ -83,26 +84,30 @@ public class DBParser {
         return curCommandStatus;
     }
     // Two different situation: 1. Just create the table. 2. With the attributes
-    // situation 1
+    // situation 1 "CREATE TABLE tableName ; "
+    // situation 2 "CREATE TABLE TableName ( att1 , att2 , att3 ); "
     private String parserCreateTable() throws IOException {
         String curToken = token.tokens.get(index);
         String curDatabase = GlobalMethod.getCurDatabaseName();
         System.out.println("TEST: " + curDatabase);
         if(curDatabase != null) {
-            curCommandStatus = table.createFile(curToken, curDatabase);
-            return curCommandStatus;
-        }
-        curCommandStatus = "[ERROR]Please choose use database first.";
-        return curCommandStatus;
-    }
-    // situation2
-    private String parserCreateTableAtt() throws IOException {
-        String curToken = token.tokens.get(index);
-        String curDatabase = GlobalMethod.getCurDatabaseName();
-        System.out.println("TEST: " + curDatabase);
-        if(curDatabase != null) {
-            curCommandStatus = table.createFile(curToken, curDatabase);
-            return curCommandStatus;
+            index++; // now it is in ( or ; if the syntax is correct
+            if(token.tokens.get(index).equals(";")) {
+                curCommandStatus = table.createFile(curToken, curDatabase);
+                return curCommandStatus;
+            }else if(token.tokens.get(index).equals("(")){
+                for (int i = index+1; i < token.tokens.size()-2; i++) {
+                    if (!token.tokens.get(i).equals(",")) {
+                        attributes.add(token.tokens.get(i));
+                        System.out.println(attributes);
+                    }
+                }
+                curCommandStatus = table.createFile(curToken, curDatabase, attributes);
+                return curCommandStatus;
+            }else{
+                curCommandStatus = "[ERROR]Invalid syntax in attributes";
+                return curCommandStatus;
+            }
         }
         curCommandStatus = "[ERROR]Please choose use database first.";
         return curCommandStatus;

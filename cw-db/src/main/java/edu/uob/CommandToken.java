@@ -1,7 +1,6 @@
 package edu.uob;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 // Token Class is rewrite from the provided code

@@ -59,7 +59,7 @@ public class DatabaseProcess {
         databasePath = getCurDatabasePath(databaseName);
         if (Files.exists(Path.of(databasePath))) {
             currentDatabase = setCurDatabase(databaseName);
-            return "Database [" + databaseName + "] is selected.";
+            return "[OK]Database [" + databaseName + "] is selected.";
         }else{
             return "[ERROR]:Selected database: [" +  databaseName + "] doesn't exist.\nPlease create it first";
         }
