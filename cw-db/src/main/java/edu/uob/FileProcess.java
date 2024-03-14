@@ -41,7 +41,7 @@ public class FileProcess {
         try {
             Files.createFile(Path.of(IdRecordPath));
             FileWriter writerId = new FileWriter(String.valueOf(Path.of(IdRecordPath)));
-            writerId.write("1");
+            writerId.write("0");
             writerId.close();
             Files.createFile(path);
             FileWriter writer = new FileWriter(String.valueOf(path));
@@ -56,7 +56,7 @@ public class FileProcess {
                     writer.write("\t");
                 }
             }
-            //buffer.write(String.valueOf(attributes));
+            writer.close();
             buffer.close();
             return "[OK]File created with attributes successful.";
         } catch (FileAlreadyExistsException e) {

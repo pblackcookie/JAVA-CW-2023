@@ -3,6 +3,8 @@ package edu.uob;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -180,6 +182,12 @@ public class DBParser {
             BufferedReader reader = new BufferedReader(new FileReader(IdRecordPath));
             String line = reader.readLine();
             idNumber = Integer.parseInt(line) + 1;
+            // Update the value and write back to the .id file
+            FileWriter writer = new FileWriter(IdRecordPath);
+            BufferedWriter buffer = new BufferedWriter(writer);
+            buffer.write(String.valueOf(idNumber));
+            buffer.close();
+            writer.close();
             index++; // should be the "VALUES" now
             curToken = token.tokens.get(index);
             if(!curToken.equalsIgnoreCase("VALUES")){
