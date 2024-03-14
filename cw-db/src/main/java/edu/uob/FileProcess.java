@@ -21,6 +21,9 @@ public class FileProcess {
         try {
             Files.createFile(Path.of(filePath));
             Files.createFile(Path.of(IdRecordPath));
+            FileWriter writerId = new FileWriter(String.valueOf(Path.of(IdRecordPath)));
+            writerId.write("0");
+            writerId.close();
             return "[OK]File created successfully.";
         } catch (FileAlreadyExistsException e) {
             System.out.println("File already exists.");
@@ -90,20 +93,20 @@ public class FileProcess {
     }
 
     // Try to display all files by importing java.io package and using it.
-    public void displayFiles(String databaseName) throws IOException{
+    public ArrayList<String> displayFiles(String databaseName) throws IOException{
         databasePath = curDatabasePath.getDatabasePath(databaseName);
-        System.out.println(databasePath);
+        ArrayList<String> files = new ArrayList<>();
+        //System.out.println(databasePath);
         File documentsFolder = new File(databasePath);
         File[] documents = documentsFolder.listFiles();
         if (documents != null) {
             for (File document : documents) {
-                if (document.isDirectory()) {
-                    System.out.println("Folder: " + document.getName());
-                } else {
-                    System.out.println("File: " + document.getName());
+                if (!document.isDirectory()) {
+                    files.add(document.getName());
                 }
             }
         }
+        return files;
     }
 
     // For reading the stored files in the databases.
@@ -140,11 +143,14 @@ public class FileProcess {
         }
     }
 
-    public void storageFileContent (String fileName) throws IOException{
-    }
-
+    // Insert the data line
     public String addFileContent(ArrayList<String> data, String path) throws IOException{
         DataProcess lineData = new DataProcess();
         return lineData.dataInsert(data, path);
+    }
+    public String showFileContent (String fileName) throws IOException{
+        String fileContent = null;
+
+        return fileContent;
     }
 }
