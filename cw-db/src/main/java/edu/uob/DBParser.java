@@ -22,12 +22,12 @@ public class DBParser {
     DatabaseProcess database = new DatabaseProcess();
     FileProcess table = new FileProcess();
 
-    ArrayList<String> symbol = new ArrayList<>(Arrays.asList("!", "#", "$","%","(",")","*","+",",","-",".","/", ":",";",
-            ">","=","<","?","@","[","\\","]","^","_","`","{","}","~"));
+    ArrayList<String> symbol = new ArrayList<>(Arrays.asList("!", "#", "$","%","&","(",")","*","+",",","-",".","/", ":",";",
+            ">","=","<","?","@","[","\\","]","^","_","`","{","}","~")); //29
 
     ArrayList<String> keyWords = new ArrayList<>(Arrays.asList("USE","CREATE","DROP","ALTER","INSERT","SELECT","UPDATE",
             "DELETE","JOIN","TRUE","FALSE","DATABASE","TABLE","INTO","VALUES","FROM","WHERE","SET","AND","ON","ADD",
-            "OR", "NULL","LIKE"));
+            "OR", "NULL","LIKE")); //24
 
 
     public DBParser(String command){
@@ -75,12 +75,15 @@ public class DBParser {
     }
     //When command type = 'USE'
     private String parserUse() throws IOException {
-        System.out.println("token size: " + token.tokens.size());
+        String curToken = token.tokens.get(index);
         if(token.tokens.size() != 3){
             curCommandStatus = "[ERROR]Invalid syntax.";
             return curCommandStatus;
         }
-        String curToken = token.tokens.get(index);
+        curCommandStatus = nameCheck(curToken);
+        if (curCommandStatus.contains("[ERROR]")){
+            return curCommandStatus;
+        }
         curCommandStatus = database.useDatabase(curToken);
         setCurDatabaseName(curToken);
         return curCommandStatus;
@@ -107,8 +110,12 @@ public class DBParser {
     private String parserCreateDatabase() throws IOException {
         System.out.println("token size: " + token.tokens.size());
         String curToken = token.tokens.get(index);
-        if(token.tokens.size()!=4 || !nameCheck(curToken)){
+        if(token.tokens.size()!=4){
             curCommandStatus = "[ERROR]Invalid create database command.";
+            return curCommandStatus;
+        }
+        curCommandStatus = nameCheck(curToken);
+        if(curCommandStatus.contains("[ERROR]")){
             return curCommandStatus;
         }
         curCommandStatus = database.createDatabase(curToken);
@@ -119,12 +126,15 @@ public class DBParser {
     // situation 2 "CREATE TABLE TableName ( att1 , att2 , att3 ); "
     // need to store the current table
     private String parserCreateTable() throws IOException {
-        System.out.println("token size: " + token.tokens.size());
+        String curToken = token.tokens.get(index);
         if(token.tokens.size() != 4 && token.tokens.get(index+1).equals(";")){
             curCommandStatus = "[ERROR]Invalid create table command.";
             return curCommandStatus;
         }
-        String curToken = token.tokens.get(index);
+        curCommandStatus = nameCheck(curToken);
+        if(curCommandStatus.contains("[ERROR]")){
+            return curCommandStatus;
+        }
         setCurTableName(curToken);
         String curDatabase = getCurDatabaseName();
         if(curDatabase != null) {
@@ -245,13 +255,19 @@ public class DBParser {
 
 
     // Check the database name or table name is valid or not
-    private boolean nameCheck(String curName){
+    // Contain changing
+    private String nameCheck(String curName){
         curName = curName.toUpperCase();
-        if(symbol.contains(curName)){
-            return false;
-        }else if(keyWords.contains(curName)){
-            return false;
+        for (String s :symbol) {
+            if(curName.contains(s)){
+                return "[ERROR]Name contains illegal symbol(s): " + s;
+            }
+            for(String word: keyWords){
+                if(curName.contains(word)){
+                    return "[ERROR]Name contains keyword(s): " + word;
+                }
+            }
         }
-        return true;
+        return "[OK]Valid Name";
     }
 }
