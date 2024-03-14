@@ -143,8 +143,8 @@ public class FileProcess {
     public void storageFileContent (String fileName) throws IOException{
     }
 
-    public String addFileContent(ArrayList<String> data){
+    public String addFileContent(ArrayList<String> data, String path) throws IOException{
         DataProcess lineData = new DataProcess();
-        return lineData.dataInsert(data);
+        return lineData.dataInsert(data, path);
     }
 }

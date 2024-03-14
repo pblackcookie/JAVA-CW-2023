@@ -14,6 +14,7 @@ public class DBParser {
 
     private String id = ".id";
     ArrayList<String> attributes = new ArrayList<>();
+    ArrayList<String> data = new ArrayList<>();
     CommandToken token = new CommandToken(); // storage all tokens
     DatabaseProcess database = new DatabaseProcess();
     FileProcess table = new FileProcess();
@@ -101,7 +102,7 @@ public class DBParser {
         String curToken = token.tokens.get(index);
         setCurTableName(curToken);
         String curDatabase = getCurDatabaseName();
-        System.out.println("TEST: " + curDatabase);
+        //System.out.println("TEST: " + curDatabase);
         if(curDatabase != null) {
             index++; // now it is in ( or ; if the syntax is correct
             if(token.tokens.get(index).equals(";")) {
@@ -165,6 +166,7 @@ public class DBParser {
     private String parserInsert() throws IOException {
         int idNumber;
         String curToken = token.tokens.get(index);
+        String filePath = database.getCurDatabasePath(getCurDatabaseName()) + File.separator + token.tokens.get(index+1) + ".tab";
         if(!curToken.equalsIgnoreCase("INTO")){
             curCommandStatus = "[ERROR] Missing or wrong the 'INTO'";
         }else{
@@ -201,7 +203,7 @@ public class DBParser {
                 }
             }
         }
-        curCommandStatus = table.addFileContent(attributes);
+        curCommandStatus = table.addFileContent(attributes, filePath);
         return curCommandStatus;
     }
 
