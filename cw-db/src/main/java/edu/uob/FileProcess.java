@@ -149,7 +149,7 @@ public class FileProcess {
         return lineData.dataInsert(data, path);
     }
     public String showFileContent (String fileName) throws IOException{
-        String fileContent;
+        String fileContent = null;
 
         return fileContent;
     }
