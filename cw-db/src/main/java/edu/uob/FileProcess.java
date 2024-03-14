@@ -4,46 +4,90 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 public class FileProcess {
     private String databasePath;
     String extension = ".tab";
+    String IdRecord = ".id";
     DatabaseProcess curDatabasePath = new DatabaseProcess();
     //Create an empty table
-    public void createFile(String fileName, String databaseName) throws IOException {
-
-        //fileName += extension;
+    public String createFile(String fileName, String databaseName) throws IOException {
         String filePath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + extension;
+        String IdRecordPath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + IdRecord;
+        //Only create it if this table isn't exist
+        try {
+            Files.createFile(Path.of(filePath));
+            Files.createFile(Path.of(IdRecordPath));
+            return "[OK]File created successfully.";
+        } catch (FileAlreadyExistsException e) {
+            System.out.println("File already exists.");
+            return "[ERROR]File already exists.";
+        } catch (IOException e) {
+            //System.out.println("An error occurred while creating the file: " + e.getMessage());
+            throw new RuntimeException("[ERROR]An error occurred while creating the file: " + e.getMessage());
+        }catch (RuntimeException rune){
+            return rune.getMessage();
+        }
+    }
+    // when the table with attributes
+    public String createFile(String fileName, String databaseName, ArrayList<String> attributes) throws IOException {
+        String filePath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + extension;
+        String IdRecordPath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + IdRecord;
         //Only create it if this table isn't exist
         Path path = Path.of(filePath);
         try {
+            Files.createFile(Path.of(IdRecordPath));
+            FileWriter writerId = new FileWriter(String.valueOf(Path.of(IdRecordPath)));
+            writerId.write("0");
+            writerId.close();
             Files.createFile(path);
-            System.out.println("File created successfully.");
+            FileWriter writer = new FileWriter(String.valueOf(path));
+            BufferedWriter buffer = new BufferedWriter(writer);
+            // Need to add the file that records the id also
+            // Always keep the id in the first column
+            attributes.add(0, "id");
+            // For loop for write the attributes each time
+            for (int i = 0; i < attributes.size(); i++) {
+                writer.write(attributes.get(i));
+                if (i != attributes.size() - 1) {
+                    writer.write("\t");
+                }
+            }
+            writer.close();
+            buffer.close();
+            return "[OK]File created with attributes successful.";
         } catch (FileAlreadyExistsException e) {
             System.out.println("File already exists.");
+            return "[ERROR]File already exists.";
         } catch (IOException e) {
-            System.out.println("An error occurred while creating the file: " + e.getMessage());
-            e.printStackTrace();
+            //System.out.println("An error occurred while creating the file: " + e.getMessage());
+            throw new RuntimeException("[ERROR]An error occurred while creating the file: " + e.getMessage());
+        }catch (RuntimeException rune){
+            return rune.getMessage();
         }
     }
 
     // Try to delete file when is selected
-    public void dropFile(String fileName, String databaseName) throws IOException{
+    public String dropFile(String fileName, String databaseName) throws IOException{
         String filePath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + extension;
+        String IdRecordPath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + IdRecord;
         Path path = Path.of(filePath);
         try{
             Files.delete(path);
+            Files.delete(Path.of(IdRecordPath)); // Need to delete the id record file at the same time
             System.out.println("File deleted successfully.");
+            return "[OK]File: " + fileName + " deleted successfully.";
         }catch (NoSuchFileException e) {
-            System.out.println("File does not exist: " + e.getMessage());
+            //System.out.println("File does not exist: " + e.getMessage());
+            return "[ERROR]File" + fileName + " does not exist: " + e.getMessage();
         } catch (IOException e) {
             System.out.println("An error occurred: " + e.getMessage());
+            return "[ERROR]An error occurred: " + e.getMessage();
         }
     }
-
-
 
     // Try to display all files by importing java.io package and using it.
     public void displayFiles(String databaseName) throws IOException{
@@ -97,5 +141,10 @@ public class FileProcess {
     }
 
     public void storageFileContent (String fileName) throws IOException{
+    }
+
+    public String addFileContent(ArrayList<String> data, String path) throws IOException{
+        DataProcess lineData = new DataProcess();
+        return lineData.dataInsert(data, path);
     }
 }

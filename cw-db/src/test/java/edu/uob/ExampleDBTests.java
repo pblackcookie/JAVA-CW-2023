@@ -153,19 +153,14 @@ public class ExampleDBTests {
         databaseName[0] = "q";
         databaseName[1] = "qq";
         databaseName[2] = "nomeaning";
-        String curDatabase;
         DatabaseProcess testDatabase = new DatabaseProcess();
         testDatabase.createDatabase(databaseName[0]);
         testDatabase.createDatabase(databaseName[1]);
         testDatabase.createDatabase(databaseName[2]);
         testDatabase.dropDatabase(databaseName[0]);
-        //testDatabase.dropDatabase(databaseName[1]);
         testDatabase.dropDatabase(databaseName[2]);
         testDatabase.useDatabase(databaseName[0]);
         testDatabase.useDatabase(databaseName[1]);
-        // testDatabase.useDatabase(databaseName[2]);
-        curDatabase = testDatabase.getCurDatabase();
-        System.out.println(curDatabase);
 
     }
 

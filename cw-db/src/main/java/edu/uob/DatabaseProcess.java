@@ -10,21 +10,24 @@ public class DatabaseProcess {
     private String currentDatabase;
     DBServer dbServer = new DBServer();
 
-    public void createDatabase(String databaseName) throws IOException {
+    public String createDatabase(String databaseName) throws IOException {
         //databasePath = dbServer.getStorageFolderPath() + File.separator + databaseName;
         databasePath = getCurDatabasePath(databaseName);
         try {
             if(Files.exists(Path.of(databasePath))) {
-                System.err.println("Database: " + databaseName + " already exists.");
+                //System.err.println("Database: " + databaseName + " already exists.");
+                return "[ERROR]Database: " + databaseName + " already exists.";
             }else {
                 Files.createDirectories(Path.of(databasePath));
+                return "[OK]Create " + databaseName + " successfully";
             }
         }catch (IOException ioe){
-            throw new IOException("Can't able to create database storage folder " + databaseName);
+            return "[ERROR]Can't able to create database storage folder " + databaseName;
+            //throw new IOException("Can't able to create database storage folder " + databaseName);
         }
     }
     // Drop the database if it exists
-    public void dropDatabase(String databaseName) throws IOException {
+    public String dropDatabase(String databaseName) throws IOException {
         databasePath = getCurDatabasePath(databaseName);
         if (Files.exists(Path.of(databasePath))) {
             try {
@@ -36,16 +39,18 @@ public class DatabaseProcess {
                             try {
                                 Files.deleteIfExists(path); // safer way to delete
                             } catch (IOException ioe) {
-                                System.err.println("Failed to delete: " + path.toString());
+                                throw new RuntimeException("[ERROR]The file which is need to delete doesn't exist."+ path.toString(),ioe);
                             }
                         });
-                System.out.println("Delete the database: [" + databaseName + "] successfully.");
+                //System.out.println("Delete the database: [" + databaseName + "] successfully.");
+                return "[OK]Delete the database: [" + databaseName + "] successfully.";
             } catch (IOException ioe) { // Record the error message rather than delete it.
-                System.err.println("Error deleting database folder " + databaseName + ": " + ioe.getMessage());
-                throw new IOException("Can't able to drop database folder " + databaseName);
+                return "[ERROR]Can't able to drop database folder " + databaseName;
+            }catch (RuntimeException rune){
+                return rune.getMessage(); // folder doesn't exist
             }
         }else{
-            System.out.println("Database: [" +  databaseName + "] doesn't exist.");
+            return "[ERROR]Database: [" +  databaseName + "] doesn't exist.";
         }
     }
 
@@ -54,11 +59,9 @@ public class DatabaseProcess {
         databasePath = getCurDatabasePath(databaseName);
         if (Files.exists(Path.of(databasePath))) {
             currentDatabase = setCurDatabase(databaseName);
-            System.out.println("Database [" + databaseName + "] is selected.");
-            return databaseName;
+            return "[OK]Database [" + databaseName + "] is selected.";
         }else{
-            System.out.println("Selected database: [" +  databaseName + "] doesn't exist.\nPlease create it first");
-            return "[ERROR]";
+            return "[ERROR]:Selected database: [" +  databaseName + "] doesn't exist.\nPlease create it first";
         }
     }
 
