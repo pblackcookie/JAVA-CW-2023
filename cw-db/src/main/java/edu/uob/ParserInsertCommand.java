@@ -1,0 +1,87 @@
+package edu.uob;
+
+import java.io.*;
+import java.util.ArrayList;
+
+import static edu.uob.GlobalMethod.getCurDatabaseName;
+
+public class ParserInsertCommand extends DBParser{
+    public ParserInsertCommand(String command, int index) {
+        super(command);
+        this.index = index;
+    }
+
+    // // When command type = 'INSERT'
+    // TODO implement the logic and check in the ();
+    protected String parserInsert() throws IOException {
+        // command length check
+        if(token.tokens.size() < 8){
+            curCommandStatus = "[ERROR]Invalid insert command - no completed.";
+            return curCommandStatus;
+        }
+        int idNumber;
+        String filePath = database.getCurDatabasePath(getCurDatabaseName()) + File.separator + token.tokens.get(index+1) + ".tab";
+        String curToken = token.tokens.get(index);
+        if(!curToken.equalsIgnoreCase("INTO")){
+            curCommandStatus = "[ERROR] Missing or wrong the 'INTO'";
+            return curCommandStatus;
+        }else{
+            index++; // should be the table name now
+            curToken = token.tokens.get(index);
+            ArrayList<String> curFiles;
+            curFiles = table.displayFiles(getCurDatabaseName());
+            if(!curFiles.contains(curToken + ".tab")){
+                curCommandStatus = "[ERROR]: Select file doesn't exists.";
+                return curCommandStatus;
+            }
+            // Table exists ,so Read the id file to see which id it should be now
+            String IdRecordPath = database.getCurDatabasePath(getCurDatabaseName()) + File.separator + curToken + ".id";
+            BufferedReader reader = new BufferedReader(new FileReader(IdRecordPath));
+            String line = reader.readLine();
+            idNumber = Integer.parseInt(line) + 1;
+            // Update the value and write back to the .id file
+            FileWriter writer = new FileWriter(IdRecordPath);
+            BufferedWriter buffer = new BufferedWriter(writer);
+            buffer.write(String.valueOf(idNumber));
+            buffer.close();
+            writer.close();
+            index++; // should be the "VALUES" now
+            curToken = token.tokens.get(index);
+            if(!curToken.equalsIgnoreCase("VALUES")){
+                curCommandStatus = "[ERROR] Missing or typo 'VALUES'.";
+                return curCommandStatus;
+            }
+            index++; // should be the '(' now
+            curToken = token.tokens.get(index);
+            if(!curToken.equals("(")){
+                curCommandStatus = "[ERROR] Missing or typo '('.";
+                return curCommandStatus;
+            }
+            int minicheck = index + 1;
+            System.out.println("NOW TOKEN: "+ (token.tokens.get(minicheck)));
+            if((token.tokens.get(index+1)).equals(")")){
+                curCommandStatus = "[ERROR] Missing Attributes.";
+                return curCommandStatus;
+            }
+            if(!token.tokens.get(token.tokens.size() - 2).equals(")")) {
+                // In order to prevent the situation like 'create table test(ss, mark, kkk)deaf;' occur.
+                curCommandStatus = "[ERROR]Invalid format: Error occurs between ')' and ';'. ";
+                return curCommandStatus;
+            }
+            data.add(String.valueOf(idNumber)); // Update the id file about this table(file).
+            // For loop to store the data -> need to check the number of ,
+            for (int i = index+1; i < token.tokens.size()-2; i++) { // should be the data now
+                if (!token.tokens.get(i).equals(",")) {
+                    String checkName = token.tokens.get(i);
+                    if(checkName.contains("[ERROR]")){ // Invalid attribute name
+                        curCommandStatus = checkName;
+                        return  curCommandStatus;
+                    }
+                    data.add(token.tokens.get(i));
+                }
+            }
+        }
+        curCommandStatus = table.addFileContent(data, filePath);
+        return curCommandStatus;
+    }
+}

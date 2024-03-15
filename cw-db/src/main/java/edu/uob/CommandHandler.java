@@ -15,6 +15,7 @@ public class CommandHandler {
     FileProcess table;
     public CommandHandler(String command) {
         parser = new DBParser(command);
+        this.curCommand = command;
         this.index = parser.index;
         this.token = parser.token;
         this.curCommandStatus = parser.curCommandStatus;
@@ -22,6 +23,7 @@ public class CommandHandler {
         this.data = parser.data;
         this.database = parser.database;
         this.table = parser.table;
+
     }
     public String commandHandler() throws IOException {
         return parserCommand();
@@ -42,25 +44,29 @@ public class CommandHandler {
         switch (curToken.toUpperCase()){
             case "USE":
                 index++;
-                parserUse();
+                ParserUseCommand pUse = new ParserUseCommand(curCommand,index);
+                curCommandStatus = pUse.parserUse();
                 break;
             case "CREATE":
                 index++;
-                ParserCreateCommand p = new ParserCreateCommand(curCommand,index);
-                curCommandStatus =  p.parserCreate();
+                ParserCreateCommand pCreate = new ParserCreateCommand(curCommand,index);
+                curCommandStatus =  pCreate.parserCreate();
                 break;
             case "DROP":
                 index++;
-                parserDrop();
+                ParserDropCommand pDrop = new ParserDropCommand(curCommand,index);
+                curCommandStatus =  pDrop.parserDrop();
                 break;
             case "ALTER": //parserAlter();
             case "INSERT":
                 index++;
-                parserInsert();
+                ParserInsertCommand pInsert = new ParserInsertCommand(curCommand,index);
+                curCommandStatus = pInsert.parserInsert();
                 break;
             case "SELECT":
                 index++;
-                parserSelect();
+                ParserSelectCommand pSelect = new ParserSelectCommand(curCommand,index);
+                curCommandStatus = pSelect.parserSelect();
                 break;
             case "UPDATE": //parserUpdate();
             case "DELETE": //parserDelete();
