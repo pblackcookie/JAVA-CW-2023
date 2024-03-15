@@ -43,10 +43,9 @@ public class DBServer {
     public String handleCommand(String command) throws IOException {
         // TODO implement your server logic here
         String commandStatus;
-        DBParser parser;
-        parser = new DBParser(command);
-        commandStatus = parser.parserCommand();
-        //System.out.println("command:" + commandStatus); //Just for test...
+        CommandHandler parser= new CommandHandler(command);
+        commandStatus = parser.commandHandler();
+        //System.out.println("Now command status is: " + commandStatus); //Just for test...*/
         return commandStatus;
     }
 

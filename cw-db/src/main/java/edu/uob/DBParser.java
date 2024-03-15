@@ -12,14 +12,15 @@ import java.util.Arrays;
 import static edu.uob.GlobalMethod.*;
 
 public class DBParser {
-    private int index = 0; // use to indicate the current token
-    private String curCommandStatus = "[OK]Haven't finished that function or parser.";
-
+    protected int index = 0; // use to indicate the current token
+    protected String curCommandStatus = "[OK]Haven't finished that function or parser.";
+    protected String curCommand;
     ArrayList<String> attributes = new ArrayList<>();
     ArrayList<String> data = new ArrayList<>();
     CommandToken token = new CommandToken(); // storage all tokens
     DatabaseProcess database = new DatabaseProcess();
     FileProcess table = new FileProcess();
+
 
     ArrayList<String> symbol = new ArrayList<>(Arrays.asList("!", "#", "$","%","&","(",")","*","+",",","-",".","/", ":",";",
             ">","=","<","?","@","[","\\","]","^","_","`","{","}","~")); //29
@@ -31,12 +32,14 @@ public class DBParser {
 
     public DBParser(String command){
         token.setup(command); // get all tokens from command
+        curCommand = command;
     }
 
     public String parserCommand() throws IOException {
         // check the ';' on the end -> only one simple syntax check
         if(!token.tokens.get(token.tokens.size() - 1).equals(";")){
-            return "[ERROR]Invalid format: Please end the command with ';'";
+            curCommandStatus = "[ERROR]Invalid format: Please end the command with ';'";
+            return curCommandStatus;
         } else {
             return parserCommandType();
         }
@@ -51,7 +54,8 @@ public class DBParser {
                 break;
             case "CREATE":
                 index++;
-                parserCreate();
+                ParserCreateCommand a = new ParserCreateCommand(curCommand,index);
+                curCommandStatus =  a.parserCreate();
                 break;
             case "DROP":
                 index++;
@@ -90,107 +94,8 @@ public class DBParser {
         setCurDatabaseName(curToken);
         return curCommandStatus;
     }
-    // When command type = 'CREATE'
-    // One thing need to be considered: table may with attributes.
-    private String parserCreate() throws IOException {
-        String curToken = token.tokens.get(index);
-        switch (curToken.toUpperCase()) {
-            case "DATABASE":
-                index++;
-                parserCreateDatabase();
-                break;
-            case "TABLE":
-                index++;
-                parserCreateTable();
-                break;
-            default:
-                curCommandStatus = "[ERROR]Invalid create command. Please use [TABLE] or [DATABASE]";
-        }
-        return curCommandStatus;
-    }
 
-    private String parserCreateDatabase() throws IOException {
-        System.out.println("token size: " + token.tokens.size());
-        String curToken = token.tokens.get(index);
-        if(token.tokens.size()!=4){
-            curCommandStatus = "[ERROR]Invalid create database command.";
-            return curCommandStatus;
-        }
-        curCommandStatus = nameCheck(curToken);
-        if(curCommandStatus.contains("[ERROR]")){
-            return curCommandStatus;
-        }
-        curCommandStatus = database.createDatabase(curToken);
-        return curCommandStatus;
-    }
-    // Two different situation: 1. Just create the table. 2. With the attributes
-    // situation 1 "CREATE TABLE tableName ; "
-    // situation 2 "CREATE TABLE TableName ( att1 , att2 , att3 ); "
-    // need to store the current table
-    // TODO implement the logic and check in the (); when create table with attributes
-    private String parserCreateTable() throws IOException {
-        String curToken = token.tokens.get(index);
-        if(token.tokens.size() == 3 ){
-            curCommandStatus = "[ERROR]Not have enough length";
-            return curCommandStatus;
-        }
-        if(token.tokens.size() != 4 && token.tokens.get(index+1).equals(";")){
-            curCommandStatus = "[ERROR]Invalid create table command.";
-            return curCommandStatus;
-        }
-        // Check the name firstly
-        curCommandStatus = nameCheck(curToken);
-        if(curCommandStatus.contains("[ERROR]")){
-            return curCommandStatus;
-        }
-        setCurTableName(curToken);
-        String curDatabase = getCurDatabaseName();
-        if(curDatabase != null) {
-            index++; // now it is in ( or ; if the syntax is correct
-            System.out.println(token.tokens.get(index));
-            if(token.tokens.get(index).equals(";")) {
-                curCommandStatus = table.createFile(curToken, curDatabase);
-                return curCommandStatus;
-            }else if(token.tokens.get(index).equals("(")){
-                // TODO : In here imaging a series of error may occur....Need to implement
-                // DONE : 1. Check the attribute after the symbol "("
-                // TODO : Attribute list valid check
-                ArrayList<String> InAttributes = new ArrayList<>();
-                for(int i = index+1; i < token.tokens.size()-2; i++){  // size-1: ; size-2: ) size-3: should be the attribute
-                    InAttributes.add(token.tokens.get(i)); // should not have any ( or ) now
-                    System.out.println(InAttributes);
-                }
-                curCommandStatus = attributeCheck(InAttributes);
-                if(curCommandStatus.contains("[ERROR]")){
-                    return curCommandStatus;
-                } // End of to check the valid attribute name
-                String attributeName = token.tokens.get(index+1);
-                System.out.println("EXPECT: " + attributeName);
-                curCommandStatus = nameCheck(attributeName);
-                if (curCommandStatus.contains("[ERROR]")){
-                    return curCommandStatus;
-                }
-                if(!token.tokens.get(token.tokens.size() - 2).equals(")")){
-                    // In order to prevent the situation like 'create table test(ss, mark, kkk)deaf;' occur.
-                    curCommandStatus = "[ERROR]Invalid format: Error occurs between ')' and ';'. ";
-                    return curCommandStatus;
-                }
-                // Pass all check then create the table
-                for (int i = index+1; i < token.tokens.size()-2; i++) {
-                    if (!token.tokens.get(i).equals(",")) {
-                        attributes.add(token.tokens.get(i));
-                    }
-                }
-                curCommandStatus = table.createFile(curToken, curDatabase, attributes);
-                return curCommandStatus;
-            }else{
-                curCommandStatus = "[ERROR]Invalid syntax in attributes";
-                return curCommandStatus;
-            }
-        }
-        curCommandStatus = "[ERROR]Please choose use database first.";
-        return curCommandStatus;
-    }
+
 
     // When command type = 'DROP'
     private String parserDrop() throws IOException {
@@ -344,7 +249,7 @@ public class DBParser {
 
     // Check the database name or table name is valid or not
     // Contain changing
-    private String nameCheck(String curName){
+    protected String nameCheck(String curName){
         curName = curName.toUpperCase();
         for (String s :symbol) {
             if(curName.equals(s)){
@@ -360,10 +265,10 @@ public class DBParser {
     }
 
 
-    // Check if the attributes is valid or
-    // 检测到第一个 （ 就开始写入arraylist，直到最后长度-2 -> 没错的话应该是 ）的前一个
-
-    private String attributeCheck(ArrayList<String> attributes){
+    // Check if the attributes is valid    OR
+    // check the first ( , then start write into arraylist till the length - 2
+    // If the format is correct, length - 2 should be the previous one in )
+    protected String attributeCheck(ArrayList<String> attributes){
         System.out.println("In attributes check:" + attributes);
         if(attributes.isEmpty()){
             curCommandStatus = "[ERROR]Attributes can't be the empty.";
