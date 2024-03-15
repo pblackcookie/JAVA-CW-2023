@@ -35,50 +35,40 @@ public class DBParser {
         curCommand = command;
     }
 
-    public String parserCommand() throws IOException {
-        // check the ';' on the end -> only one simple syntax check
-        if(!token.tokens.get(token.tokens.size() - 1).equals(";")){
-            curCommandStatus = "[ERROR]Invalid format: Please end the command with ';'";
-            return curCommandStatus;
-        } else {
-            return parserCommandType();
-        }
-    }
-
-    private String parserCommandType() throws IOException {
-        String curToken = token.tokens.get(index);
-        switch (curToken.toUpperCase()){
-            case "USE":
-                index++;
-                parserUse();
-                break;
-            case "CREATE":
-                index++;
-                ParserCreateCommand a = new ParserCreateCommand(curCommand,index);
-                curCommandStatus =  a.parserCreate();
-                break;
-            case "DROP":
-                index++;
-                parserDrop();
-                break;
-            case "ALTER": //parserAlter();
-            case "INSERT":
-                index++;
-                parserInsert();
-                break;
-            case "SELECT":
-                index++;
-                parserSelect();
-                break;
-            case "UPDATE": //parserUpdate();
-            case "DELETE": //parserDelete();
-            case "JOIN": //parserJoin();
-                break;
-            default:
-                curCommandStatus = "[ERROR]Invalid commandType";
-        }
-        return curCommandStatus;
-    }
+//    private String parserCommandType() throws IOException {
+//        String curToken = token.tokens.get(index);
+//        switch (curToken.toUpperCase()){
+//            case "USE":
+//                index++;
+//                parserUse();
+//                break;
+//            case "CREATE":
+//                index++;
+//                ParserCreateCommand a = new ParserCreateCommand(curCommand,index);
+//                curCommandStatus =  a.parserCreate();
+//                break;
+//            case "DROP":
+//                index++;
+//                parserDrop();
+//                break;
+//            case "ALTER": //parserAlter();
+//            case "INSERT":
+//                index++;
+//                parserInsert();
+//                break;
+//            case "SELECT":
+//                index++;
+//                parserSelect();
+//                break;
+//            case "UPDATE": //parserUpdate();
+//            case "DELETE": //parserDelete();
+//            case "JOIN": //parserJoin();
+//                break;
+//            default:
+//                curCommandStatus = "[ERROR]Invalid commandType";
+//        }
+//        return curCommandStatus;
+//    }
     //When command type = 'USE'
     private String parserUse() throws IOException {
         String curToken = token.tokens.get(index);
