@@ -6,7 +6,7 @@ import java.util.List;
 // Token Class is rewrite from the provided code
 public class CommandToken {
     String[] specialCharacters = {"(", ")", ",", ";"};
-    ArrayList<String> tokens = new ArrayList<String>();
+     ArrayList<String> tokens = new ArrayList<>();
 
     public List<String> setup(String query) {
         // Remove any whitespace at the beginning and end of the query
@@ -31,8 +31,8 @@ public class CommandToken {
     public String[] tokenise(String input) {
         // Add in some extra padding spaces around the "special characters"
         // so we can be sure that they are separated by AT LEAST one space (possibly more)
-        for (int i = 0; i < specialCharacters.length; i++) {
-            input = input.replace(specialCharacters[i], " " + specialCharacters[i] + " ");
+        for (String specialCharacter : specialCharacters) {
+            input = input.replace(specialCharacter, " " + specialCharacter + " ");
         }
         // Remove all double spaces (the previous replacements may have added some)
         // This is "blind" replacement - replacing if they exist, doing nothing if they don't

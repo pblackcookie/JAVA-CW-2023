@@ -39,7 +39,7 @@ public class DatabaseProcess {
                             try {
                                 Files.deleteIfExists(path); // safer way to delete
                             } catch (IOException ioe) {
-                                throw new RuntimeException("[ERROR]The file which is need to delete doesn't exist."+ path.toString(),ioe);
+                                throw new RuntimeException("[ERROR]The file which is need to delete doesn't exist."+ path,ioe);
                             }
                         });
                 //System.out.println("Delete the database: [" + databaseName + "] successfully.");
@@ -55,7 +55,7 @@ public class DatabaseProcess {
     }
 
     // Select the exist database(folder) to using...
-    public String useDatabase(String databaseName) throws IOException {
+    public String useDatabase(String databaseName){
         databasePath = getCurDatabasePath(databaseName);
         if (Files.exists(Path.of(databasePath))) {
             currentDatabase = setCurDatabase(databaseName);
@@ -81,5 +81,5 @@ public class DatabaseProcess {
         return databaseName;
     }
 
-    public String getCurDatabase(){ return currentDatabase;}
+    //public String getCurDatabase(){ return currentDatabase;}
 }

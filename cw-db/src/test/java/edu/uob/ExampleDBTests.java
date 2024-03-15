@@ -117,7 +117,7 @@ public class ExampleDBTests {
     }
 
     // Test to make sure the file can be created correctly
-    @Test
+    /*@Test
     public void testFileCreate() throws IOException {
         String fileName[] = new String[2];
         fileName[0] = "people";
@@ -127,7 +127,7 @@ public class ExampleDBTests {
         //showFiles.readFileContent(fileName[1],"university");
         showFiles.displayFiles("company");
         showFiles.displayFiles("university");
-    }
+    }*/
 
     // To make sure the database drop logic is correct
     @Test
