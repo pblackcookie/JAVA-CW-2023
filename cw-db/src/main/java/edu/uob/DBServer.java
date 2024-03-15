@@ -46,7 +46,7 @@ public class DBServer {
         String commandStatus = "Failed";
         DBParser parser = new DBParser(command);
         commandStatus = parser.parserCommand();
-        System.out.println("command:" + commandStatus); //Just for test...
+        //System.out.println("command:" + commandStatus); //Just for test...
         return commandStatus;
     }
 

@@ -13,7 +13,7 @@ import static edu.uob.GlobalMethod.*;
 
 public class DBParser {
     private int index = 0; // use to indicate the current token
-    private String curCommandStatus;
+    private String curCommandStatus = "false";
 
     private String id = ".id";
     ArrayList<String> attributes = new ArrayList<>();
@@ -63,7 +63,10 @@ public class DBParser {
                 index++;
                 parserInsert();
                 break;
-            case "SELECT": //parserSelect();
+            case "SELECT":
+                index++;
+                parserSelect();
+                break;
             case "UPDATE": //parserUpdate();
             case "DELETE": //parserDelete();
             case "JOIN": //parserJoin();
@@ -125,6 +128,7 @@ public class DBParser {
     // situation 1 "CREATE TABLE tableName ; "
     // situation 2 "CREATE TABLE TableName ( att1 , att2 , att3 ); "
     // need to store the current table
+    // TODO implement the logic and check in the (); when create table with attributes
     private String parserCreateTable() throws IOException {
         String curToken = token.tokens.get(index);
         if(token.tokens.size() != 4 && token.tokens.get(index+1).equals(";")){
@@ -197,7 +201,13 @@ public class DBParser {
 
 
     // // When command type = 'INSERT'
+    // TODO implement the logic and check in the ();
     private String parserInsert() throws IOException {
+        // command length check
+        if(token.tokens.size() < 8){
+            curCommandStatus = "[ERROR]Invalid insert command - no completed.";
+            return curCommandStatus;
+        }
         int idNumber;
         String filePath = database.getCurDatabasePath(getCurDatabaseName()) + File.separator + token.tokens.get(index+1) + ".tab";
         String curToken = token.tokens.get(index);
@@ -232,8 +242,14 @@ public class DBParser {
             }
             index++; // should be the '(' now
             curToken = token.tokens.get(index);
-            if(!curToken.equalsIgnoreCase("(")){
+            if(!curToken.equals("(")){
                 curCommandStatus = "[ERROR] Missing or typo '('.";
+                return curCommandStatus;
+            }
+            int minicheck = index + 1;
+            // System.out.println("NOW TOKEN: "+ (token.tokens.get(minicheck)));
+            if((token.tokens.get(index+1)).equals(")")){
+                curCommandStatus = "[ERROR] Missing Attributes.";
                 return curCommandStatus;
             }
             if(!token.tokens.get(token.tokens.size() - 2).equals(")")) {
@@ -242,9 +258,14 @@ public class DBParser {
                 return curCommandStatus;
             }
             data.add(String.valueOf(idNumber));
-            // For loop to store the data
+            // For loop to store the data -> need to check the number of ,
             for (int i = index+1; i < token.tokens.size()-2; i++) { // should be the data now
                 if (!token.tokens.get(i).equals(",")) {
+                    String checkName = token.tokens.get(i);
+                    if(checkName.contains("[ERROR]")){ // Invalid attribute name
+                        curCommandStatus = checkName;
+                        return  curCommandStatus;
+                    }
                     data.add(token.tokens.get(i));
                 }
             }
@@ -252,6 +273,45 @@ public class DBParser {
         curCommandStatus = table.addFileContent(data, filePath);
         return curCommandStatus;
     }
+    // // When command type = 'SELECT'
+    private String parserSelect() throws IOException {
+        String curToken  = token.tokens.get(index);
+        //length check
+        if(token.tokens.size() < 5){
+            curCommandStatus = "[ERROR]Invalid SELECT command - no completed.";
+            return curCommandStatus;
+        }
+        if(token.tokens.size() == 5){
+            System.out.println("TEST: In the insert valid command ");
+            if(curToken.equals("*")) { // if * show total content
+                index++;
+                curToken = token.tokens.get(index); // should be 'FROM' now
+                if (!curToken.equalsIgnoreCase("FROM")) {
+                    curCommandStatus = "[ERROR]Missing or typo FROM here.";
+                    return curCommandStatus;
+                }
+                index++;
+                curToken = token.tokens.get(index); // should be table name now
+                // TODO check it exists first then the valid name....
+                curCommandStatus = nameCheck(curToken);
+                ArrayList<String> existTables = table.displayFiles(getCurDatabaseName());
+                for (String t: existTables){
+                    if((curToken + ".tab").contains(t)){
+                        if (curCommandStatus.contains("[ERROR]")) {
+                            return curCommandStatus;
+                        }
+                        curCommandStatus = "[OK]\n" + table.showFileContent(curToken, getCurDatabaseName());
+                        return curCommandStatus;
+                    }
+                }
+                curCommandStatus = "[ERROR]Selected table dos not exist.";
+                return curCommandStatus;
+            }
+        }
+        return "[ERROR]";
+    }
+
+
 
 
     // Check the database name or table name is valid or not
