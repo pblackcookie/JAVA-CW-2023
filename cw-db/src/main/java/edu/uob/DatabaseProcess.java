@@ -11,7 +11,8 @@ public class DatabaseProcess {
     DBServer dbServer = new DBServer();
 
     public String createDatabase(String databaseName) throws IOException {
-        //databasePath = dbServer.getStorageFolderPath() + File.separator + databaseName;
+        // All the lower case when create it....
+        databaseName = databaseName.toLowerCase();
         databasePath = getCurDatabasePath(databaseName);
         try {
             if(Files.exists(Path.of(databasePath))) {

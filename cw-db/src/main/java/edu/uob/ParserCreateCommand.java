@@ -2,6 +2,7 @@ package edu.uob;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import static edu.uob.GlobalMethod.getCurDatabaseName;
 import static edu.uob.GlobalMethod.setCurTableName;
@@ -66,6 +67,8 @@ public class ParserCreateCommand extends DBParser{
         if(curCommandStatus.contains("[ERROR]")){
             return curCommandStatus;
         }
+        // check if the database already exist...
+
         setCurTableName(curToken);
         String curDatabase = getCurDatabaseName();
         if(curDatabase != null) {
@@ -77,8 +80,10 @@ public class ParserCreateCommand extends DBParser{
             }else if(token.tokens.get(index).equals("(")){
                 // TODO : In here imaging a series of error may occur....Need to implement
                 // DONE : 1. Check the attribute after the symbol "("
-                // TODO : Attribute list valid check
+                // DONE : 2. Attribute list valid check
+                // DONE : 3. Duplicates element check
                 ArrayList<String> InAttributes = new ArrayList<>();
+                HashSet<String> checkAttributes = new HashSet<>();
                 for(int i = index+1; i < token.tokens.size()-2; i++){  // size-1: ; size-2: ) size-3: should be the attribute
                     InAttributes.add(token.tokens.get(i)); // should not have any ( or ) now
                     //System.out.println(InAttributes);
@@ -98,11 +103,19 @@ public class ParserCreateCommand extends DBParser{
                     curCommandStatus = "[ERROR]Invalid format: Error occurs between ')' and ';'. ";
                     return curCommandStatus;
                 }
+                checkAttributes.add("id");
                 // Pass all check then create the table
                 for (int i = index+1; i < token.tokens.size()-2; i++) {
                     if (!token.tokens.get(i).equals(",")) {
                         attributes.add(token.tokens.get(i));
+                        checkAttributes.add(token.tokens.get(i));
                     }
+                }
+                // In here add check for duplicate attributes check
+                boolean hasDuplicates = (attributes.size() + 1) != checkAttributes.size();
+                if(hasDuplicates){
+                    curCommandStatus = "[ERROR]Duplicate attributes exist.";
+                    return curCommandStatus;
                 }
                 curCommandStatus = table.createFile(curToken, curDatabase, attributes);
                 return curCommandStatus;

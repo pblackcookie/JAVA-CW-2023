@@ -13,13 +13,15 @@ public class FileProcess {
     DatabaseProcess curDatabasePath = new DatabaseProcess();
     //Create an empty table
     public String createFile(String fileName, String databaseName) throws IOException {
+        fileName = fileName.toLowerCase();
         String filePath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + extension;
         String IdRecordPath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + IdRecord;
         //Only create it if this table isn't exist
+        Path idPath = Path.of(IdRecordPath);
         try {
             Files.createFile(Path.of(filePath));
-            Files.createFile(Path.of(IdRecordPath));
-            FileWriter writerId = new FileWriter(String.valueOf(Path.of(IdRecordPath)));
+            Files.createFile(idPath);
+            FileWriter writerId = new FileWriter(String.valueOf(idPath));
             writerId.write("0");
             writerId.close();
             return "[OK]File created successfully.";
@@ -36,13 +38,15 @@ public class FileProcess {
     }
     // when the table with attributes
     public String createFile(String fileName, String databaseName, ArrayList<String> attributes) throws IOException {
+        fileName = fileName.toLowerCase();
         String filePath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + extension;
         String IdRecordPath = curDatabasePath.getDatabasePath(databaseName) + File.separator + fileName + IdRecord;
         //Only create it if this table isn't exist
         Path path = Path.of(filePath);
+        Path idPath = Path.of(IdRecordPath);
         try {
-            Files.createFile(Path.of(IdRecordPath));
-            FileWriter writerId = new FileWriter(String.valueOf(Path.of(IdRecordPath)));
+            Files.createFile(idPath);
+            FileWriter writerId = new FileWriter(String.valueOf(idPath));
             writerId.write("0");
             writerId.close();
             Files.createFile(path);
