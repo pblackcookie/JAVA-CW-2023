@@ -130,6 +130,10 @@ public class DBParser {
     // TODO implement the logic and check in the (); when create table with attributes
     private String parserCreateTable() throws IOException {
         String curToken = token.tokens.get(index);
+        if(token.tokens.size() == 3 ){
+            curCommandStatus = "[ERROR]Not have enough length";
+            return curCommandStatus;
+        }
         if(token.tokens.size() != 4 && token.tokens.get(index+1).equals(";")){
             curCommandStatus = "[ERROR]Invalid create table command.";
             return curCommandStatus;
@@ -209,6 +213,7 @@ public class DBParser {
     private String parserDropDatabase() throws IOException {
         String curToken = token.tokens.get(index);
         curCommandStatus = database.dropDatabase(curToken);
+        setCurDatabaseName("null"); //
         return curCommandStatus;
     }
     private String parserDropTable() throws IOException {
