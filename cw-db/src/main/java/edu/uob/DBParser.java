@@ -150,6 +150,16 @@ public class DBParser {
             }else if(token.tokens.get(index).equals("(")){
                 // TODO : In here imaging a series of error may occur....Need to implement
                 // DONE : 1. Check the attribute after the symbol "("
+                // TODO : Attribute list valid check
+                ArrayList<String> InAttributes = new ArrayList<>();
+                for(int i = index+1; i < token.tokens.size()-2; i++){  // size-1: ; size-2: ) size-3: should be the attribute
+                    InAttributes.add(token.tokens.get(i)); // should not have any ( or ) now
+                    System.out.println(InAttributes);
+                }
+                curCommandStatus = attributeCheck(InAttributes);
+                if(curCommandStatus.contains("[ERROR]")){
+                    return curCommandStatus;
+                } // End of to check the valid attribute name
                 String attributeName = token.tokens.get(index+1);
                 System.out.println("EXPECT: " + attributeName);
                 curCommandStatus = nameCheck(attributeName);
@@ -161,6 +171,7 @@ public class DBParser {
                     curCommandStatus = "[ERROR]Invalid format: Error occurs between ')' and ';'. ";
                     return curCommandStatus;
                 }
+                // Pass all check then create the table
                 for (int i = index+1; i < token.tokens.size()-2; i++) {
                     if (!token.tokens.get(i).equals(",")) {
                         attributes.add(token.tokens.get(i));
@@ -331,15 +342,71 @@ public class DBParser {
     private String nameCheck(String curName){
         curName = curName.toUpperCase();
         for (String s :symbol) {
-            if(curName.contains(s)){
+            if(curName.equals(s)){
                 return "[ERROR]Name contains illegal symbol(s): " + s;
             }
             for(String word: keyWords){
-                if(curName.contains(word)){
+                if(curName.equals(word)){
                     return "[ERROR]Name contains keyword(s): " + word;
                 }
             }
         }
         return "[OK]Valid Name";
+    }
+
+
+    // Check if the attributes is valid or
+    // 检测到第一个 （ 就开始写入arraylist，直到最后长度-2 -> 没错的话应该是 ）的前一个
+
+    private String attributeCheck(ArrayList<String> attributes){
+        System.out.println("In attributes check:" + attributes);
+        if(attributes.isEmpty()){
+            curCommandStatus = "[ERROR]Attributes can't be the empty.";
+            return curCommandStatus;
+        }
+        for (String element : attributes){
+            if(element.equals("(") || element.equals(")")){
+                curCommandStatus = "[ERROR]: Invalid bracket.";
+                return curCommandStatus;
+            }
+        }
+        String checkNow = attributes.get(0);
+        System.out.println("Check out now is :" + checkNow);
+        if(!checkNow.equals(",")){ //First one need to check the valid
+            curCommandStatus= nameCheck(checkNow);
+            if (curCommandStatus.contains("[ERROR]")){
+                return curCommandStatus;
+            }
+            // After checking the name still valid.
+            attributes.remove(0);
+            if(attributes.isEmpty()){
+                curCommandStatus = "[OK]";
+                return curCommandStatus;
+            }else {
+                attributeCheck(attributes); // Continuing checking....
+            }
+            return curCommandStatus;
+        } else{
+            if(attributes.size()<2){
+                curCommandStatus = "[ERROR]Invalid length";
+                return curCommandStatus;
+            }
+            checkNow = attributes.get(1); // should be attribute name now
+            System.out.println("In the start with , , now: " + checkNow);
+            curCommandStatus= nameCheck(checkNow);
+            if (curCommandStatus.contains("[ERROR]")){
+                return curCommandStatus;
+            }
+            attributes.remove(0); // remove ,
+            attributes.remove(0); // remove name
+            System.out.println("In the , + name part:" + attributes);
+            if(attributes.isEmpty()){
+                curCommandStatus = "[OK]";
+                return curCommandStatus;
+            }else {
+                attributeCheck(attributes); // Continuing checking....
+            }
+            return curCommandStatus;
+        }
     }
 }

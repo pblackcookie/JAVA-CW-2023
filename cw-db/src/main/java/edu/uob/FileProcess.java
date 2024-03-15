@@ -25,6 +25,7 @@ public class FileProcess {
             writerId.write("0");
             writerId.close();
             return "[OK]File created successfully.";
+            //throw new IOException("File already exists.");
         } catch (FileAlreadyExistsException e) {
             System.out.println("File already exists.");
             return "[ERROR]File already exists.";
