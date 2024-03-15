@@ -58,7 +58,7 @@ public class DBParser {
     // check the first ( , then start write into arraylist till the length - 2
     // If the format is correct, length - 2 should be the previous one in )
     protected String attributeCheck(ArrayList<String> attributes){
-        System.out.println("In attributes check:" + attributes);
+        //System.out.println("In attributes check:" + attributes);
         if(attributes.isEmpty()){
             curCommandStatus = "[ERROR]Attributes can't be the empty.";
             return curCommandStatus;
@@ -70,7 +70,7 @@ public class DBParser {
             }
         }
         String checkNow = attributes.get(0);
-        System.out.println("Check out now is :" + checkNow);
+        //System.out.println("Check out now is :" + checkNow);
         if(!checkNow.equals(",")){ //First one need to check the valid
             curCommandStatus= nameCheck(checkNow);
             if (curCommandStatus.contains("[ERROR]")){
@@ -91,14 +91,14 @@ public class DBParser {
                 return curCommandStatus;
             }
             checkNow = attributes.get(1); // should be attribute name now
-            System.out.println("In the start with , , now: " + checkNow);
+            //System.out.println("In the start with , , now: " + checkNow);
             curCommandStatus= nameCheck(checkNow);
             if (curCommandStatus.contains("[ERROR]")){
                 return curCommandStatus;
             }
             attributes.remove(0); // remove ,
             attributes.remove(0); // remove name
-            System.out.println("In the , + name part:" + attributes);
+            //System.out.println("In the , + name part:" + attributes);
             if(attributes.isEmpty()){
                 curCommandStatus = "[OK]";
                 return curCommandStatus;

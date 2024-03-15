@@ -57,8 +57,8 @@ public class ParserInsertCommand extends DBParser{
                 curCommandStatus = "[ERROR] Missing or typo '('.";
                 return curCommandStatus;
             }
-            int minicheck = index + 1;
-            System.out.println("NOW TOKEN: "+ (token.tokens.get(minicheck)));
+            // int minicheck = index + 1;
+            // System.out.println("NOW TOKEN: "+ (token.tokens.get(minicheck)));
             if((token.tokens.get(index+1)).equals(")")){
                 curCommandStatus = "[ERROR] Missing Attributes.";
                 return curCommandStatus;

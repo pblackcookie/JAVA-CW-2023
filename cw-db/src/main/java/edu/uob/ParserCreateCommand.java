@@ -31,7 +31,7 @@ public class ParserCreateCommand extends DBParser{
     }
 
     private String parserCreateDatabase() throws IOException {
-        System.out.println("token size: " + token.tokens.size());
+        //System.out.println("token size: " + token.tokens.size());
         String curToken = token.tokens.get(index);
         if(token.tokens.size()!=4){
             curCommandStatus = "[ERROR]Invalid create database command.";
@@ -70,7 +70,7 @@ public class ParserCreateCommand extends DBParser{
         String curDatabase = getCurDatabaseName();
         if(curDatabase != null) {
             index++; // now it is in ( or ; if the syntax is correct
-            System.out.println(token.tokens.get(index));
+            //System.out.println(token.tokens.get(index));
             if(token.tokens.get(index).equals(";")) {
                 curCommandStatus = table.createFile(curToken, curDatabase);
                 return curCommandStatus;
@@ -81,14 +81,14 @@ public class ParserCreateCommand extends DBParser{
                 ArrayList<String> InAttributes = new ArrayList<>();
                 for(int i = index+1; i < token.tokens.size()-2; i++){  // size-1: ; size-2: ) size-3: should be the attribute
                     InAttributes.add(token.tokens.get(i)); // should not have any ( or ) now
-                    System.out.println(InAttributes);
+                    //System.out.println(InAttributes);
                 }
                 curCommandStatus = attributeCheck(InAttributes);
                 if(curCommandStatus.contains("[ERROR]")){
                     return curCommandStatus;
                 } // End of to check the valid attribute name
                 String attributeName = token.tokens.get(index+1);
-                System.out.println("EXPECT: " + attributeName);
+                //System.out.println("EXPECT: " + attributeName);
                 curCommandStatus = nameCheck(attributeName);
                 if (curCommandStatus.contains("[ERROR]")){
                     return curCommandStatus;

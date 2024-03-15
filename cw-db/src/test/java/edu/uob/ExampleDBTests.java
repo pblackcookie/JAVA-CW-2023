@@ -116,19 +116,6 @@ public class ExampleDBTests {
         testDatabase.createDatabase(databaseName[1]);
     }
 
-    // Test to make sure the file can be created correctly
-    /*@Test
-    public void testFileCreate() throws IOException {
-        String fileName[] = new String[2];
-        fileName[0] = "people";
-        fileName[1] = "test";
-        FileProcess showFiles = new FileProcess();
-        showFiles.showFileContent(fileName[0],"company");
-        //showFiles.readFileContent(fileName[1],"university");
-        showFiles.displayFiles("company");
-        showFiles.displayFiles("university");
-    }*/
-
     // To make sure the database drop logic is correct
     @Test
     public void testDatabaseDrop() throws IOException {
