@@ -11,6 +11,7 @@ public class ParserUseCommand extends DBParser{
     }
     protected String parserUse() throws IOException {
         String curToken = token.tokens.get(index);
+        curToken = curToken.toLowerCase();
         if(token.tokens.size() != 3){
             curCommandStatus = "[ERROR]Invalid syntax.";
             return curCommandStatus;

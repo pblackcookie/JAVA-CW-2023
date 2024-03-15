@@ -20,14 +20,15 @@ public class ParserInsertCommand extends DBParser{
             return curCommandStatus;
         }
         int idNumber;
-        String filePath = database.getCurDatabasePath(getCurDatabaseName()) + File.separator + token.tokens.get(index+1) + ".tab";
+        String fileName = token.tokens.get(index+1).toLowerCase();
+        String filePath = database.getCurDatabasePath(getCurDatabaseName()) + File.separator + fileName + ".tab";
         String curToken = token.tokens.get(index);
         if(!curToken.equalsIgnoreCase("INTO")){
             curCommandStatus = "[ERROR] Missing or wrong the 'INTO'";
             return curCommandStatus;
         }else{
             index++; // should be the table name now
-            curToken = token.tokens.get(index);
+            curToken = token.tokens.get(index).toLowerCase();
             ArrayList<String> curFiles;
             curFiles = table.displayFiles(getCurDatabaseName());
             if(!curFiles.contains(curToken + ".tab")){

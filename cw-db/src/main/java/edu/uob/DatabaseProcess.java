@@ -57,6 +57,7 @@ public class DatabaseProcess {
 
     // Select the exist database(folder) to using...
     public String useDatabase(String databaseName){
+        databaseName = databaseName.toLowerCase();
         databasePath = getCurDatabasePath(databaseName);
         if (Files.exists(Path.of(databasePath))) {
             currentDatabase = setCurDatabase(databaseName);

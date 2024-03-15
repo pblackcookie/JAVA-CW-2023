@@ -51,7 +51,7 @@ public class ParserCreateCommand extends DBParser{
     // situation 1 "CREATE TABLE tableName ; "
     // situation 2 "CREATE TABLE TableName ( att1 , att2 , att3 ); "
     // need to store the current table
-    // TODO implement the logic and check in the (); when create table with attributes
+    // DONE: Implement the logic and check in the (); when create table with attributes
     private String parserCreateTable() throws IOException {
         String curToken = token.tokens.get(index);
         if(token.tokens.size() == 3 ){
@@ -68,10 +68,12 @@ public class ParserCreateCommand extends DBParser{
             return curCommandStatus;
         }
         // check if the database already exist...
-
         setCurTableName(curToken);
         String curDatabase = getCurDatabaseName();
-        if(curDatabase != null) {
+        if (curDatabase == null){
+            curCommandStatus = "[ERROR]Please choose use database first.";
+            return curCommandStatus;
+        }else{
             index++; // now it is in ( or ; if the syntax is correct
             //System.out.println(token.tokens.get(index));
             if(token.tokens.get(index).equals(";")) {
@@ -81,7 +83,7 @@ public class ParserCreateCommand extends DBParser{
                 // TODO : In here imaging a series of error may occur....Need to implement
                 // DONE : 1. Check the attribute after the symbol "("
                 // DONE : 2. Attribute list valid check
-                // DONE : 3. Duplicates element check
+                // DONE : 3. Duplicates attribute check : case insensitive
                 ArrayList<String> InAttributes = new ArrayList<>();
                 HashSet<String> checkAttributes = new HashSet<>();
                 for(int i = index+1; i < token.tokens.size()-2; i++){  // size-1: ; size-2: ) size-3: should be the attribute
@@ -108,7 +110,7 @@ public class ParserCreateCommand extends DBParser{
                 for (int i = index+1; i < token.tokens.size()-2; i++) {
                     if (!token.tokens.get(i).equals(",")) {
                         attributes.add(token.tokens.get(i));
-                        checkAttributes.add(token.tokens.get(i));
+                        checkAttributes.add(token.tokens.get(i).toLowerCase());
                     }
                 }
                 // In here add check for duplicate attributes check
@@ -124,7 +126,7 @@ public class ParserCreateCommand extends DBParser{
                 return curCommandStatus;
             }
         }
-        curCommandStatus = "[ERROR]Please choose use database first.";
-        return curCommandStatus;
+
+        //return curCommandStatus;
     }
 }
