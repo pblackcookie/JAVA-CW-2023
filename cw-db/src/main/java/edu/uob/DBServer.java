@@ -2,7 +2,6 @@ package edu.uob;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -43,10 +42,11 @@ public class DBServer {
     */
     public String handleCommand(String command) throws IOException {
         // TODO implement your server logic here
-        String commandStatus = "Failed";
-        DBParser parser = new DBParser(command);
+        String commandStatus;
+        DBParser parser;
+        parser = new DBParser(command);
         commandStatus = parser.parserCommand();
-        System.out.println("command:" + commandStatus); //Just for test...
+        //System.out.println("command:" + commandStatus); //Just for test...
         return commandStatus;
     }
 

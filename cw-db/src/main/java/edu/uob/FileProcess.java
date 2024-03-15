@@ -110,9 +110,10 @@ public class FileProcess {
     }
 
     // For reading the stored files in the databases.
-    public void readFileContent (String fileName, String databaseName) throws IOException{
+    /*public String readFileContent (String fileName, String databaseName) throws IOException{
         databasePath = curDatabasePath.getDatabasePath(databaseName);
         String filePath = databasePath + File.separator + fileName;
+        StringBuilder content = new StringBuilder();
         try{
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
             String line;
@@ -132,6 +133,7 @@ public class FileProcess {
                     System.err.println("Invalid format at line " + lineNumber + ". Fixing...");
                     throw new IOException("Invalid format at line " + lineNumber);
                 }
+                content.append(line).append("\n");
             }
         }catch (IOException ioe2){
             // If server can't found the file, then will create it first.
@@ -141,16 +143,27 @@ public class FileProcess {
                 throw new IOException("Error reading file: " + ioe3.getMessage());
             }
         }
-    }
+        System.out.println("In read file"+content.toString());
+        return content.toString();
+    }*/
 
     // Insert the data line
     public String addFileContent(ArrayList<String> data, String path) throws IOException{
         DataProcess lineData = new DataProcess();
         return lineData.dataInsert(data, path);
     }
-    public String showFileContent (String fileName) throws IOException{
-        String fileContent = null;
 
-        return fileContent;
+    // Rewrite the displayFile to show the file content.
+    public String showFileContent (String fileName, String databaseName) throws IOException{
+        databasePath = curDatabasePath.getDatabasePath(databaseName);
+        String filePath = databasePath + File.separator + fileName + extension;
+        StringBuilder fileContent = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                fileContent.append(line).append("\n");
+            }
+        }
+        return fileContent.toString();
     }
 }
