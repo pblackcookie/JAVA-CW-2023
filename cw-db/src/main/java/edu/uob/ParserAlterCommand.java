@@ -1,14 +1,10 @@
 package edu.uob;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 
 public class ParserAlterCommand extends DBParser{
-    private String curToken;
-    private String database;
     private  String filePath;
     private final HashSet<String> alterationType = new HashSet<>(Arrays.asList("ADD", "DROP"));
     private final DBServer server = new DBServer();
@@ -23,12 +19,12 @@ public class ParserAlterCommand extends DBParser{
             curCommandStatus = "Invalid command length in Alter command.";
             return curCommandStatus;
         }
-        database = GlobalMethod.getCurDatabaseName();
+        String database = GlobalMethod.getCurDatabaseName();
         if(database == null){
             curCommandStatus = "Please choosing the used database first.";
             return curCommandStatus;
         }
-        curToken = token.tokens.get(index); //"TABLE"
+        String curToken = token.tokens.get(index); //"TABLE"
         if(!curToken.equalsIgnoreCase("TABLE")){
             curCommandStatus = "The [TABLE] in command is missing or typo.";
             return curCommandStatus;

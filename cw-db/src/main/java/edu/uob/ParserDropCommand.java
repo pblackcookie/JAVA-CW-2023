@@ -24,7 +24,6 @@ public class ParserDropCommand extends DBParser{
                 parserDropTable();
                 break;
             default:
-                //System.out.println("Invalid drop command. Please use [TABLE] or [DATABASE]");
                 curCommandStatus = "[ERROR]Invalid drop command. Please use [TABLE] or [DATABASE]";
         }
         return curCommandStatus;
@@ -32,8 +31,7 @@ public class ParserDropCommand extends DBParser{
     private String parserDropDatabase() throws IOException {
         String curToken = token.tokens.get(index).toLowerCase();
         curCommandStatus = database.dropDatabase(curToken);
-        setCurDatabaseName(null); //
-        //System.out.println(getCurDatabaseName());
+        setCurDatabaseName(null); // set to null when delete the database;
         return curCommandStatus;
     }
     private String parserDropTable() throws IOException {

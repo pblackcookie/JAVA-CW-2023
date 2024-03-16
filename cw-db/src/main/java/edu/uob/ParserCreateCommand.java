@@ -32,7 +32,6 @@ public class ParserCreateCommand extends DBParser{
     }
 
     private String parserCreateDatabase() throws IOException {
-        //System.out.println("token size: " + token.tokens.size());
         String curToken = token.tokens.get(index);
         if(token.tokens.size()!=4){
             curCommandStatus = "[ERROR]Invalid create database command.";
@@ -53,13 +52,10 @@ public class ParserCreateCommand extends DBParser{
     // need to store the current table
     // DONE: Implement the logic and check in the (); when create table with attributes
     private String parserCreateTable() throws IOException {
-        System.out.println("curDatabaseName: " + getCurDatabaseName());
         if (getCurDatabaseName() == null){
             curCommandStatus = "[ERROR]Please choose use database first.";
             return curCommandStatus;
         }
-
-        System.out.println("TEST IN CREATE see if null condition valid");
         String curToken = token.tokens.get(index);
         if(token.tokens.size() == 3 ){
             curCommandStatus = "[ERROR]Not have enough length";

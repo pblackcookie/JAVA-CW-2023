@@ -9,7 +9,7 @@ public class DataProcess {
     private String dataStatus;
     private String commandStatus;
 
-    private String firstElement = "id";
+    private final String firstElement = "id";
     private ArrayList<String> attributeList = new ArrayList<>();;
 
     public String dataInsert(ArrayList<String> data, String path) throws IOException {
