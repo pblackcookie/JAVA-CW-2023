@@ -63,6 +63,8 @@ public class FileProcess {
                     writer.write("\t");
                 }
             }
+            writer.close();
+            buffer.close();
             return "[OK]File created with attributes successful.";
         } catch (FileAlreadyExistsException e) {
             System.out.println("File already exists.");

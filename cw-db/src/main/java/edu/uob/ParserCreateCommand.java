@@ -52,10 +52,6 @@ public class ParserCreateCommand extends DBParser{
     // need to store the current table
     // DONE: Implement the logic and check in the (); when create table with attributes
     private String parserCreateTable() throws IOException {
-        if (getCurDatabaseName() == null){
-            curCommandStatus = "[ERROR]Please choose use database first.";
-            return curCommandStatus;
-        }
         String curToken = token.tokens.get(index);
         if(token.tokens.size() == 3 ){
             curCommandStatus = "[ERROR]Not have enough length";
@@ -73,7 +69,10 @@ public class ParserCreateCommand extends DBParser{
         // check if the database already exist...
         setCurTableName(curToken);
         String curDatabase = getCurDatabaseName();
-        if(curDatabase!=null){
+        if (getCurDatabaseName() == null){
+            curCommandStatus = "[ERROR]Please choose use database first.";
+            return curCommandStatus;
+        }else{
             index++; // now it is in ( or ; if the syntax is correct
             //System.out.println(token.tokens.get(index));
             if(token.tokens.get(index).equals(";")) {
@@ -126,6 +125,5 @@ public class ParserCreateCommand extends DBParser{
                 return curCommandStatus;
             }
         }
-        return curCommandStatus;
     }
 }
