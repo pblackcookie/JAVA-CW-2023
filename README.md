@@ -2,7 +2,7 @@
 UoB username: [vz23211]
 
 ## Assignment 1 : Databases
-1. Understand the assignment requirements first.
+### Understand the assignment requirements first.
 
 *Attention* - **running codes on Windows system**
 
@@ -22,7 +22,7 @@ Emmm.Alright.Just finding one simpler way to run them by @id
 
 `./mvnw exec:java@server` and `./mvnw exec:java@client`
 
-2. About file read / write
+### About file read / write
 
 Add the class name *FileProcess* to process various kind of operation relevant to the file and folder.
 
@@ -30,10 +30,16 @@ Finishing printing the content in the terminal when the tables are not empty.
 
 Implenment the function that create the database in folder databases and empty table in database.
 
-3. About handle command
+### About handle command
 
 Continuing implement the table/database functions.
 
 Statring to add some logic process functions into handleCommandhandle function in the DBServer class. 
+
+### Restructure all the implentment methods and class.
+
+1. Add the recursion function the check the attributes name is valid or not.
+
+2. Add the lowercase convert when storage all the data.
 
 
