@@ -22,16 +22,6 @@ public class DBParser {
     DatabaseProcess database = new DatabaseProcess();
     FileProcess table = new FileProcess();
 
-    // TODO: classify all the special symbols....for check....
-    //
-    ArrayList<String> symbol = new ArrayList<>(Arrays.asList("!", "#", "$","%","&","(",")","*","+",",","-",".","/", ":",";",
-            ">","=","<","?","@","[","\\","]","^","_","`","{","}","~")); //29
-//
-//    ArrayList<String> keyWords = new ArrayList<>(Arrays.asList("USE","CREATE","DROP","ALTER","INSERT","SELECT","UPDATE",
-//            "DELETE","JOIN","TRUE","FALSE","DATABASE","TABLE","INTO","VALUES","FROM","WHERE","SET","AND","ON","ADD",
-//            "OR", "NULL","LIKE")); //24
-
-
     public DBParser(String command){
         token.setup(command); // get all tokens from command
         curCommand = command;
@@ -42,8 +32,9 @@ public class DBParser {
     // Contain changing for symbol--using contain & for keyword using equal
     protected String nameCheck(String curName){
         curName = curName.toUpperCase();
-        for (String s :symbol) {
-            if(curName.contains(s)){
+        for (char c : curName.toCharArray()) {
+            String s = String.valueOf(c);
+            if (symbols.contains(s)) {
                 return "[ERROR]Name contains illegal symbol(s): " + s;
             }
         }

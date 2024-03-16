@@ -6,16 +6,16 @@ import java.util.HashSet;
 public class GlobalMethod {
     private static String curDatabaseName = null;
     private static String curTableName = null;
-    public static HashSet<String> symbols;
-    public static HashSet<String> keyWords;
+    protected static HashSet<String> symbols;
+    protected static HashSet<String> keyWords;
     public static HashSet<String> digits;
 
     static {
-        symbols = new HashSet<>(Arrays.asList("!", "#", "$","%","&","(",")","*","+",",","-",".","/", ":",";",
+        symbols = new HashSet<String>(Arrays.asList("!", "#", "$","%","&","(",")","*","+",",","-",".","/", ":",";",
                 ">","=","<","?","@","[","\\","]","^","_","`","{","}","~"));
         keyWords = new HashSet<>(Arrays.asList("USE","CREATE","DROP","ALTER","INSERT","SELECT","UPDATE",
                 "DELETE","JOIN","TRUE","FALSE","DATABASE","TABLE","INTO","VALUES","FROM","WHERE","SET","AND","ON","ADD",
-                "OR", "NULL","LIKE"));
+                "OR", "NULL","LIKE")); //24
     }
     // Using for store current database name.
     public static void setCurDatabaseName(String databaseName) {
