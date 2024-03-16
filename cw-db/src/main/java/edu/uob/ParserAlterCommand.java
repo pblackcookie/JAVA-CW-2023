@@ -1,10 +1,6 @@
 package edu.uob;
 
-import javax.swing.plaf.basic.BasicListUI;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -14,13 +10,17 @@ public class ParserAlterCommand extends DBParser{
     private String curToken;
     private String database;
     private  String filePath;
-    private final HashSet<String> AlterationType = new HashSet<>(Arrays.asList("ADD", "DROP"));;
-    private ArrayList<String> AttributeList = new ArrayList<>(List.of("id"));
+    private final HashSet<String> alterationType = new HashSet<>(Arrays.asList("ADD", "DROP"));
+    //private HashSet<String> attributeList = new HashSet<>(Arrays.asList(firstLineData));
+    private ArrayList<String> attributeList;
+    private final String firstElement;
 
     private final DBServer server = new DBServer();
     protected ParserAlterCommand(String command, int index) {
         super(command);
         this.index = index;
+        firstElement = "id";
+        attributeList = new ArrayList<>();
     }
 
     // <Alter>  ::=  "ALTER " "TABLE " [TableName] " " <AlterationType> " " [AttributeName]
@@ -55,7 +55,7 @@ public class ParserAlterCommand extends DBParser{
         }
         index++;
         curToken = token.tokens.get(index).toUpperCase(); // <AlterationType>
-        if(!AlterationType.contains(curToken)){
+        if(!alterationType.contains(curToken)){
             curCommandStatus = "The key word 'ADD' or 'DROP' is missing.";
             return curCommandStatus;
         }
@@ -85,16 +85,15 @@ public class ParserAlterCommand extends DBParser{
         File file = new File(filePath);
         // file is empty
         if(file.length()==0){
-            if(attributeName.equalsIgnoreCase("ID")){
+            if(attributeName.equalsIgnoreCase("id")){
                 curCommandStatus = "[ERROR]A duplicate id is added.";
                 return curCommandStatus;
             }
             // no duplicate , so adding it into the file
-            AttributeList.add(attributeName);
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-                writer.write(AttributeList.get(0));
+                writer.write(firstElement);
                 writer.write("\t");
-                writer.write(AttributeList.get(1));
+                writer.write(attributeName);
                 curCommandStatus = "Add the elements successfully";
                 return curCommandStatus;
             } catch (IOException e) {
@@ -103,11 +102,34 @@ public class ParserAlterCommand extends DBParser{
             }
         }else {// file isn't empty
             // read the file content and check the duplicate first
-            AttributeList.remove(0); // the file isn't empty so the id already exist
-            return curCommandStatus;
+            try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+                String line = reader.readLine();
+                attributeList.addAll(Arrays.asList(line.split("\t")));
+                for(String attribute: attributeList){
+                    if(attribute.equalsIgnoreCase(attributeName)){
+                        curCommandStatus = "[ERROR]Can not add the duplicate element: " + attributeName;
+                        return curCommandStatus;
+                    }
+                }
+                // No duplicate attribute name so add it.
+                // 1. remove the \n in the first line
+                // 2. add the new attribute name and \n
+                line = line.trim(); // remove the \n
+                line += "\t" + attributeName;
+                // write back to the file
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+                    writer.write(line);
+                    curCommandStatus = "[OK]Add the elements successfully";
+                    return curCommandStatus;
+                } catch (IOException e) {
+                    curCommandStatus = "[Error]Error writing to file: " + e.getMessage();
+                    return curCommandStatus;
+                }
+            } catch (IOException e) {
+                curCommandStatus = "[Error]Error occur: " + e.getMessage();
+                return curCommandStatus;
+            }
         }
-
-        //return curCommandStatus;
     }
 
     private String AlterDrop(String attributeName){
@@ -116,6 +138,7 @@ public class ParserAlterCommand extends DBParser{
             return curCommandStatus;
         }
         // Read the file and check if the attribute exists or not,
+        curCommandStatus = "[OK]But haven't finished the drop function yet";
         return curCommandStatus;
     }
 }
