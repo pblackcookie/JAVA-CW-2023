@@ -32,7 +32,8 @@ public class ParserDropCommand extends DBParser{
     private String parserDropDatabase() throws IOException {
         String curToken = token.tokens.get(index).toLowerCase();
         curCommandStatus = database.dropDatabase(curToken);
-        setCurDatabaseName("null"); //
+        setCurDatabaseName(null); //
+        //System.out.println(getCurDatabaseName());
         return curCommandStatus;
     }
     private String parserDropTable() throws IOException {

@@ -11,17 +11,10 @@ public class ParserAlterCommand extends DBParser{
     private String database;
     private  String filePath;
     private final HashSet<String> alterationType = new HashSet<>(Arrays.asList("ADD", "DROP"));
-    //private HashSet<String> attributeList = new HashSet<>(Arrays.asList(firstLineData));
-    private ArrayList<String> attributeList;
-    private final String firstElement;
-
     private final DBServer server = new DBServer();
     protected ParserAlterCommand(String command, int index) {
         super(command);
         this.index = index;
-        firstElement = "id";
-        attributeList = new ArrayList<>();
-        this.table = table;
     }
 
     // <Alter>  ::=  "ALTER " "TABLE " [TableName] " " <AlterationType> " " [AttributeName]
