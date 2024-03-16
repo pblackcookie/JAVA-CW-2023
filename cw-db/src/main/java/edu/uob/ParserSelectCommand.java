@@ -29,7 +29,7 @@ public class ParserSelectCommand extends DBParser{
                     return curCommandStatus;
                 }
                 index++;
-                curToken = token.tokens.get(index); // should be table name now
+                curToken = token.tokens.get(index).toLowerCase(); // should be table name now
                 // DONE: Check the file(table) exists first then check the valid name.
                 curCommandStatus = nameCheck(curToken);
                 ArrayList<String> existTables = table.displayFiles(getCurDatabaseName());

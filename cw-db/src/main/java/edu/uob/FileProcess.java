@@ -11,6 +11,7 @@ public class FileProcess {
     String extension = ".tab";
     String IdRecord = ".id";
     DatabaseProcess curDatabasePath = new DatabaseProcess();
+    DataProcess dataProcess;
     //Create an empty table
     public String createFile(String fileName, String databaseName) throws IOException {
         fileName = fileName.toLowerCase();
@@ -62,8 +63,6 @@ public class FileProcess {
                     writer.write("\t");
                 }
             }
-            writer.close();
-            buffer.close();
             return "[OK]File created with attributes successful.";
         } catch (FileAlreadyExistsException e) {
             System.out.println("File already exists.");
@@ -114,8 +113,8 @@ public class FileProcess {
 
     // Insert the data line
     public String addFileContent(ArrayList<String> data, String path) throws IOException{
-        DataProcess lineData = new DataProcess();
-        return lineData.dataInsert(data, path);
+        dataProcess = new DataProcess();
+        return dataProcess.dataInsert(data, path);
     }
 
     // Rewrite the displayFile to show the file content.
@@ -131,4 +130,17 @@ public class FileProcess {
         }
         return fileContent.toString();
     }
+    // Write here for add one column when checking
+    public String changeFileContent(String filePath, String curCommand, String attributeName) throws IOException{
+        dataProcess = new DataProcess();
+        if(curCommand.equalsIgnoreCase("ADD")){
+            curCommand = dataProcess.attributeAdd(filePath, attributeName);
+            return curCommand;
+        }else if(curCommand.equalsIgnoreCase("DROP")){
+            curCommand = dataProcess.attributeDrop(filePath, attributeName);
+            return curCommand;
+        }
+        curCommand = "[ERROR]Failed to add or drop the attribute in table.";
+        return  curCommand;
+     }
 }

@@ -10,8 +10,7 @@ public class ParserUseCommand extends DBParser{
         this.index = index; // Now should be the database or table
     }
     protected String parserUse() throws IOException {
-        String curToken = token.tokens.get(index);
-        curToken = curToken.toLowerCase();
+        String curToken = token.tokens.get(index).toLowerCase();
         if(token.tokens.size() != 3){
             curCommandStatus = "[ERROR]Invalid syntax.";
             return curCommandStatus;

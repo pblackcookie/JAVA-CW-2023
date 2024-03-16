@@ -21,10 +21,11 @@ public class ParserAlterCommand extends DBParser{
         this.index = index;
         firstElement = "id";
         attributeList = new ArrayList<>();
+        this.table = table;
     }
 
     // <Alter>  ::=  "ALTER " "TABLE " [TableName] " " <AlterationType> " " [AttributeName]
-    protected String parserAlter(){
+    protected String parserAlter() throws IOException {
         if(token.tokens.size()!=6){
             curCommandStatus = "Invalid command length in Alter command.";
             return curCommandStatus;
@@ -77,68 +78,22 @@ public class ParserAlterCommand extends DBParser{
 
     // 1. check the attribute name is valid
     // 2. check there has no duplicate attributes name
-    private String AlterAdd(String attributeName){
+    private String AlterAdd(String attributeName) throws IOException {
         curCommandStatus = nameCheck(attributeName);
         if(curCommandStatus.contains("[ERROR]")){
             return curCommandStatus;
         }
-        File file = new File(filePath);
-        // file is empty
-        if(file.length()==0){
-            if(attributeName.equalsIgnoreCase("id")){
-                curCommandStatus = "[ERROR]A duplicate id is added.";
-                return curCommandStatus;
-            }
-            // no duplicate , so adding it into the file
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-                writer.write(firstElement);
-                writer.write("\t");
-                writer.write(attributeName);
-                curCommandStatus = "Add the elements successfully";
-                return curCommandStatus;
-            } catch (IOException e) {
-                curCommandStatus = "Error occur: " + e.getMessage();
-                return curCommandStatus;
-            }
-        }else {// file isn't empty
-            // read the file content and check the duplicate first
-            try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-                String line = reader.readLine();
-                attributeList.addAll(Arrays.asList(line.split("\t")));
-                for(String attribute: attributeList){
-                    if(attribute.equalsIgnoreCase(attributeName)){
-                        curCommandStatus = "[ERROR]Can not add the duplicate element: " + attributeName;
-                        return curCommandStatus;
-                    }
-                }
-                // No duplicate attribute name so add it.
-                // 1. remove the \n in the first line
-                // 2. add the new attribute name and \n
-                line = line.trim(); // remove the \n
-                line += "\t" + attributeName;
-                // write back to the file
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-                    writer.write(line);
-                    curCommandStatus = "[OK]Add the elements successfully";
-                    return curCommandStatus;
-                } catch (IOException e) {
-                    curCommandStatus = "[Error]Error writing to file: " + e.getMessage();
-                    return curCommandStatus;
-                }
-            } catch (IOException e) {
-                curCommandStatus = "[Error]Error occur: " + e.getMessage();
-                return curCommandStatus;
-            }
-        }
+        curCommandStatus = table.changeFileContent(filePath, "ADD", attributeName);
+        return curCommandStatus;
     }
 
-    private String AlterDrop(String attributeName){
+    private String AlterDrop(String attributeName) throws IOException {
         curCommandStatus = nameCheck(attributeName);
         if(curCommandStatus.contains("[ERROR]")){
             return curCommandStatus;
         }
         // Read the file and check if the attribute exists or not,
-        curCommandStatus = "[OK]But haven't finished the drop function yet";
+        curCommandStatus = table.changeFileContent(filePath, "DROP", attributeName);
         return curCommandStatus;
     }
 }
