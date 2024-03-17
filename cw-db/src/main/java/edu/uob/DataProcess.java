@@ -47,10 +47,9 @@ public class DataProcess {
                     writer.write(firstElement);
                     writer.write("\t");
                     writer.write(attributeName);
-                    //writer.close();
                     try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
                         String line = reader.readLine();
-                        line = line.trim(); // remove \n if exists.
+                        // line = line.trim(); // remove \n if exists.
                     }catch (IOException e) {
                         commandStatus = "[Error]Error occur: " + e.getMessage();
                         return commandStatus;
