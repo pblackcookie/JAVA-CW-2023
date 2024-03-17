@@ -47,7 +47,7 @@ public class DataProcess {
                     writer.write(firstElement);
                     writer.write("\t");
                     writer.write(attributeName);
-                    writer.close();
+                    //writer.close();
                     try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
                         String line = reader.readLine();
                         line = line.trim(); // remove \n if exists.
@@ -109,23 +109,19 @@ public class DataProcess {
             return commandStatus;
         }// the attribute name is id.
         if(attributeName.equalsIgnoreCase("id")){
-            commandStatus = "[ERROR]A duplicate id is added.";
+            commandStatus = "[ERROR]id can not be dropped.";
             return commandStatus;
         }// Start operation for drop one column here...
         // First read the first line to see if it exists and then do operation.
+        StringBuilder contentBuilder = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            //BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
             String line = reader.readLine(); // first line operation
-            System.out.println("Now read line is:" + line);
-            if (line != null) {
-                attributeList.addAll(Arrays.asList(line.split("\t")));
-            }
-            System.out.println("LIne = null but why?" );
+            attributeList.addAll(Arrays.asList(line.split("\t")));
             for (int i = 0; i < attributeList.size(); i++) {
                 String attribute = attributeList.get(i);
                 if (attribute.equalsIgnoreCase(attributeName)) {
                     columnIndex = i;
-                    attributeList.clear();
+                    attributeList.remove(i); // remove the elements that need to delete
                     break;
                 }
             }
@@ -133,15 +129,36 @@ public class DataProcess {
                 commandStatus = "[ERROR]Can not drop the attribute:" + attributeName + ". Not found it.";
                 return commandStatus;
             }
-            BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
+            for (int i = 0; i < attributeList.size(); i++) {
+                String attribute = attributeList.get(i);
+                if(i < attributeList.size()-1) {
+                    contentBuilder.append(attribute).append("\t");
+                }else{
+                    contentBuilder.append(attribute).append("\n");
+                }
+            }
+            attributeList.clear();
+            //BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
             // if successful found it , then delete the column line according to columnIndex;
             while ((line = reader.readLine()) != null) {
-                System.out.println("Attribute list now is : " + attributeList);
                 attributeList.addAll(Arrays.asList(line.split("\t")));
+                System.out.println("Attribute list now is : " + attributeList);
                 attributeList.remove(columnIndex);
-                System.out.println("write back to file now is: " + String.valueOf(attributeList));
-                writer.write(String.valueOf(attributeList));
+                for (int i = 0; i < attributeList.size(); i++) {
+                    String attribute = attributeList.get(i);
+                    if(i < attributeList.size()-1) {
+                        contentBuilder.append(attribute).append("\t");
+                    }else{
+                        contentBuilder.append(attribute).append("\n");
+                    }
+                }
+                attributeList.clear();
             }
+            // Now write back to the file
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
+            //System.out.println("write back to file now is: " + contentBuilder);
+            writer.write(contentBuilder.toString());
+            writer.close();
             commandStatus = "[OK]Successfully drop.";
             return commandStatus;
         }catch (IOException e) {
