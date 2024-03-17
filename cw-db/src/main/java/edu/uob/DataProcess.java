@@ -14,6 +14,7 @@ public class DataProcess {
 
     public String dataInsert(ArrayList<String> data, String path) throws IOException {
         // In here process the process method
+        System.out.println(data);
         FileWriter writer = new FileWriter(String.valueOf(path), true);
         BufferedWriter buffer = new BufferedWriter(writer);
         try {
@@ -80,8 +81,16 @@ public class DataProcess {
                 // Now the processing for the first line is ending.
                 // But still needing to reading the left part for writing into the file.
                 // From here starting reading the left line...
+                boolean lastLine = false;
                 while ((line = reader.readLine()) != null) {
-                    contentBuilder.append(line).append("\tNULL\n");
+                    lastLine = (reader.readLine() == null);
+                    contentBuilder.append(line);
+                    if (!lastLine) {
+                        contentBuilder.append("\tNULL\n");
+                    }
+                }// In the last line does not need to add the \n....
+                if (lastLine) {
+                    contentBuilder.append("\tNULL");
                 }
                 // write back to the file
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {

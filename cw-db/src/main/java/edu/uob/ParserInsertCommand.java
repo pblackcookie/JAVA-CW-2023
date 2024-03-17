@@ -39,6 +39,12 @@ public class ParserInsertCommand extends DBParser{
                 curCommandStatus = "[ERROR]: Select file doesn't exists.";
                 return curCommandStatus;
             }
+            //Now see the file is empty or not
+            File file = new File(filePath);
+            if(file.length()==0){
+                curCommandStatus = "[ERROR]: Can not insert the data to the empty file.";
+                return curCommandStatus;
+            }
             // Table exists ,so Read the id file to see which id it should be now
             String IdRecordPath = database.getCurDatabasePath(getCurDatabaseName()) + File.separator + curToken + ".id";
             BufferedReader reader = new BufferedReader(new FileReader(IdRecordPath));
@@ -50,6 +56,7 @@ public class ParserInsertCommand extends DBParser{
             buffer.write(String.valueOf(idNumber));
             buffer.close();
             writer.close();
+            reader.close();
             index++; // should be the "VALUES" now
             curToken = token.tokens.get(index);
             if(!curToken.equalsIgnoreCase("VALUES")){

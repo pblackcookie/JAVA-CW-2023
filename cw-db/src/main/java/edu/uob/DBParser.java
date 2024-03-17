@@ -22,7 +22,6 @@ public class DBParser {
 
     // Check the database name or table name is valid or not
     // Contain changing for symbol--using contain & for keyword using equal
-    // "'" '''
     protected String nameCheck(String curName){
         curName = curName.toUpperCase();
         for (char c : curName.toCharArray()) {
