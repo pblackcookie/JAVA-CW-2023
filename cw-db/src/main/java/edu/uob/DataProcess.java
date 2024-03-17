@@ -34,7 +34,7 @@ public class DataProcess {
         return dataStatus;
     }
     // The function which will read the whole file contain and changing the attributes should write in here....
-    public String attributeAdd(String filePath, String attributeName) throws IOException {
+    public String attributeAdd(String filePath, String attributeName)  {
         // changing the file content in here -- add
         File file = new File(filePath);
         // file is empty
@@ -73,8 +73,7 @@ public class DataProcess {
                         return commandStatus;
                     }
                 }
-                // No duplicate attribute name so add it.
-                // 1. remove the \n in the first line
+                // No duplicate attribute name so add it. 1. remove the \n in the first line
                 // 2. add the new attribute name and \n
                 line = line.trim(); // remove the \n
                 line += "\t" + attributeName;
@@ -102,9 +101,52 @@ public class DataProcess {
 
     }
 
-    public String attributeDrop(String filePath, String attributeName) throws IOException {
-        // changing the file content in here -- drop
-        commandStatus = "[OK]In drop now";
-        return commandStatus;
+    public String attributeDrop(String filePath, String attributeName) {
+        int columnIndex = -1;
+        File file = new File(filePath);
+        if(file.length()==0){// file is empty
+            commandStatus = "[ERROR]Can not drop the attribute" + attributeName + "from one empty file.";
+            return commandStatus;
+        }// the attribute name is id.
+        if(attributeName.equalsIgnoreCase("id")){
+            commandStatus = "[ERROR]A duplicate id is added.";
+            return commandStatus;
+        }// Start operation for drop one column here...
+        // First read the first line to see if it exists and then do operation.
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            //BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
+            String line = reader.readLine(); // first line operation
+            System.out.println("Now read line is:" + line);
+            if (line != null) {
+                attributeList.addAll(Arrays.asList(line.split("\t")));
+            }
+            System.out.println("LIne = null but why?" );
+            for (int i = 0; i < attributeList.size(); i++) {
+                String attribute = attributeList.get(i);
+                if (attribute.equalsIgnoreCase(attributeName)) {
+                    columnIndex = i;
+                    attributeList.clear();
+                    break;
+                }
+            }
+            if(columnIndex == -1){
+                commandStatus = "[ERROR]Can not drop the attribute:" + attributeName + ". Not found it.";
+                return commandStatus;
+            }
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
+            // if successful found it , then delete the column line according to columnIndex;
+            while ((line = reader.readLine()) != null) {
+                System.out.println("Attribute list now is : " + attributeList);
+                attributeList.addAll(Arrays.asList(line.split("\t")));
+                attributeList.remove(columnIndex);
+                System.out.println("write back to file now is: " + String.valueOf(attributeList));
+                writer.write(String.valueOf(attributeList));
+            }
+            commandStatus = "[OK]Successfully drop.";
+            return commandStatus;
+        }catch (IOException e) {
+            commandStatus = "[Error]Error occur: " + e.getMessage();
+            return commandStatus;
+        }
     }
 }
