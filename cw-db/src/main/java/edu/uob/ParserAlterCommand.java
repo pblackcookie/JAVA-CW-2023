@@ -81,7 +81,7 @@ public class ParserAlterCommand extends DBParser{
         if(curCommandStatus.contains("[ERROR]")){
             return curCommandStatus;
         }
-        // Read the file and check if the attribute exists or not,
+        // Read the file and check if the attribute exists or not.
         curCommandStatus = table.changeFileContent(filePath, "DROP", attributeName);
         return curCommandStatus;
     }

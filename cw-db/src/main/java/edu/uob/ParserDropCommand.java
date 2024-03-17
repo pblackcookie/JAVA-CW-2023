@@ -6,7 +6,7 @@ import static edu.uob.GlobalMethod.getCurDatabaseName;
 import static edu.uob.GlobalMethod.setCurDatabaseName;
 
 public class ParserDropCommand extends DBParser{
-
+    //"DROP " "DATABASE " [DatabaseName] | "DROP " "TABLE " [TableName]
     public ParserDropCommand(String command, int index) {
         super(command);
         this.index = index;
@@ -31,9 +31,15 @@ public class ParserDropCommand extends DBParser{
     private String parserDropDatabase() throws IOException {
         String curToken = token.tokens.get(index).toLowerCase();
         curCommandStatus = database.dropDatabase(curToken);
-        setCurDatabaseName(null); // set to null when delete the database;
+        // if delete the current using database, then set the current
+        // database name equals to null. else do not need to operation
+        if(curToken.equals(getCurDatabaseName())) {
+            setCurDatabaseName(null);
+        }
         return curCommandStatus;
     }
+    // when drop table command , because it only can delete the current database table so
+    // does not need to see the current database name is what.
     private String parserDropTable() throws IOException {
         String curToken = token.tokens.get(index).toLowerCase();
         String curDatabase = getCurDatabaseName();

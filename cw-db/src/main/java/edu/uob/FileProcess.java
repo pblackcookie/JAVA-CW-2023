@@ -88,7 +88,6 @@ public class FileProcess {
             System.out.println("File deleted successfully.");
             return "[OK]File: " + fileName + " deleted successfully.";
         }catch (NoSuchFileException e) {
-            //System.out.println("File does not exist: " + e.getMessage());
             return "[ERROR]File" + fileName + " does not exist: " + e.getMessage();
         } catch (IOException e) {
             System.out.println("An error occurred: " + e.getMessage());

@@ -43,17 +43,24 @@ public class DataProcess {
                 commandStatus = "[ERROR]A duplicate id is added.";
                 return commandStatus;
             }
-            // no duplicate , so adding it into the file
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-                writer.write(firstElement);
-                writer.write("\t");
-                writer.write(attributeName);
-                commandStatus = "Add the elements successfully";
-                return commandStatus;
-            } catch (IOException e) {
-                commandStatus = "Error occur: " + e.getMessage();
-                return commandStatus;
-            }
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+                    writer.write(firstElement);
+                    writer.write("\t");
+                    writer.write(attributeName);
+                    writer.close();
+                    try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+                        String line = reader.readLine();
+                        line = line.trim(); // remove \n if exists.
+                    }catch (IOException e) {
+                        commandStatus = "[Error]Error occur: " + e.getMessage();
+                        return commandStatus;
+                    }
+                    commandStatus = "Add the elements successfully";
+                    return commandStatus;
+                } catch (IOException e) {
+                    commandStatus = "Error occur: " + e.getMessage();
+                    return commandStatus;
+                }
         }else {// file isn't empty
             // read the file content and check the duplicate first
             StringBuilder contentBuilder = new StringBuilder();
