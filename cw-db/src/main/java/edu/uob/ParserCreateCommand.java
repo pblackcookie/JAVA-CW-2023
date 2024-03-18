@@ -31,7 +31,7 @@ public class ParserCreateCommand extends DBParser{
         return curCommandStatus;
     }
 
-    private String parserCreateDatabase() throws IOException {
+    private String parserCreateDatabase() {
         String curToken = token.tokens.get(index);
         if(token.tokens.size()!=4){
             curCommandStatus = "[ERROR]Invalid create database command.";

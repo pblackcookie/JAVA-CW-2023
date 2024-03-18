@@ -73,8 +73,13 @@ public class CommandHandler {
                 curCommandStatus = pSelect.parserSelect();
                 break;
             case "UPDATE": //parserUpdate();
+                break;
             case "DELETE": //parserDelete();
+                break;
             case "JOIN": //parserJoin();
+                index++;
+                ParserJoinCommand pJoin = new ParserJoinCommand(curCommand,index);
+                curCommandStatus = pJoin.parserJoin();
                 break;
             default:
                 curCommandStatus = "[ERROR]Invalid commandType";
