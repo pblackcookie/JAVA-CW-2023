@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class ParserJoinCommand extends DBParser{
     private final DBServer server;
@@ -72,8 +73,9 @@ public class ParserJoinCommand extends DBParser{
         }
         index++; // now the current token should attribute name from table1;
         curToken = token.tokens.get(index);
+        System.out.println("table one current token:" + curToken);
         // if condition
-        if(!checkTable(filePath1,curToken)){
+        if(!checkLeftTable(filePath1,curToken)){
             curCommandStatus = "Attribute is not exist or invalid format";
             return curCommandStatus;
         }
@@ -85,35 +87,101 @@ public class ParserJoinCommand extends DBParser{
         }
         index++; // now the current token should attribute name from table2;
         curToken = token.tokens.get(index);
-        if(!checkTable(filePath1,curToken)){
+        System.out.println("table 2 current token:" + curToken);
+        if(!checkRightTable(filePath2,curToken)){
             curCommandStatus = "Attribute is not exist or invalid format";
             return curCommandStatus;
         }
         // Satisfy all the conditions so do the command in here
-        return "[OK]\n" + joinTable(filePath1,filePath2);
+        curCommandStatus = "[OK]\n" + joinTable();
+        return curCommandStatus;
     }
 
-    // Set the row and column flags
+    // Set the row and column flags & storage table messages
     // return the boolean value to indicate the attribute name is exist or not
-    private boolean checkTable(String filePath, String attributeName) throws IOException {
+    private boolean checkLeftTable(String filePath, String attributeName) throws IOException {
         boolean exist = false;
-        ArrayList<String> lineContent = new ArrayList<String>();
         BufferedReader tableReader = new BufferedReader(new FileReader(filePath));
         String line = tableReader.readLine();
-        lineContent.add(Arrays.toString(line.split("\t")));
-        for(String attribute: lineContent){
-            if(attribute.equalsIgnoreCase(attributeName)){
-                table1Col.add(false); // not show on the table
-                exist = true;
-            }else{
-                table1Col.add(true);
+        table1Content.addAll(Arrays.asList(line.split("\t")));
+        if(line != null){
+            for (String attribute : table1Content) {
+                if (attribute.equalsIgnoreCase(attributeName)) {
+                    table1Col.add(false); // not show on the table, so set the flag to false
+                    exist = true;
+                } else {
+                    table1Col.add(true);
+                }
             }
         }
+        while ((line = tableReader.readLine()) != null) {
+            table1Content.addAll(Arrays.asList(line.split("\t")));
+        }
+        for(int i = 0; i < table1Content.size()/table1Col.size(); i++) {
+            table1Row.add(true);
+        }
+        System.out.println("table1:");
+        System.out.println(table1Col);
+        System.out.println(table1Row);
+        System.out.println(table1Content);
+        tableReader.close();
+        return exist;
+    }
+
+    private boolean checkRightTable(String filePath, String attributeName) throws IOException {
+        boolean exist = false;
+        BufferedReader tableReader = new BufferedReader(new FileReader(filePath));
+        String line = tableReader.readLine();
+        table2Content.addAll(Arrays.asList(line.split("\t")));
+        if (line!=null) {
+            for (String attribute : table2Content) {
+                if (attribute.equalsIgnoreCase(attributeName)) {
+                    table2Col.add(false); // not show on the table, so set the flag to false
+                    exist = true;
+                } else {
+                    table2Col.add(true);
+                }
+            }
+        }
+        while ((line = tableReader.readLine()) != null) {
+            table2Content.addAll(Arrays.asList(line.split("\t")));
+        }
+        for(int i = 0; i < table2Content.size()/table2Col.size(); i++) {
+            table2Row.add(true);
+        }
+        System.out.println("table2:");
+        System.out.println(table2Col);
+        System.out.println(table2Row);
+        System.out.println(table2Content);
+        tableReader.close();
         return exist;
     }
     // In here do the operation to join two tables
     // just using buffer reader to change the content
-    private String joinTable(String path1, String path2){
+    private String joinTable(){
+        curCommandStatus = "";
+        for(int k = 0; k < table1Row.size(); k++){
+            for(int i = 0; i < table1Col.size(); i++){
+                if(table1Col.get(i)){
+                    curCommandStatus += table1Content.get(i) + "\t";
+                }else{
+                    if(!table2Col.get(i)){
+                        for(int j = 0; j < table2Content.size(); j++){
+                            if(table2Content.get(j).equalsIgnoreCase(table1Content.get(i))){
+                                int l;
+                                for(l=0; l <table2Col.size()-2; l++){
+                                    curCommandStatus += table2Content.get(j) + "\t";
+                                }
+                                if(l == table2Col.size()-1){
+                                    curCommandStatus += table2Content.get(j);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            curCommandStatus += "\n";
+        }
         return curCommandStatus;
     }
 }
