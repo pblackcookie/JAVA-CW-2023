@@ -10,7 +10,6 @@ public class ParserInsertCommand extends DBParser{
     public ParserInsertCommand(String command, int index) {
         super(command);
         this.index = index;
-        this.data = data;
     }
 
     // // When command type = 'INSERT'
@@ -53,6 +52,7 @@ public class ParserInsertCommand extends DBParser{
             BufferedReader tableReader = new BufferedReader(new FileReader(filePath));
             String attributeLine = tableReader.readLine();
             attributeName.addAll(Arrays.asList(attributeLine.split("\t"))); // will have one length
+            tableReader.close();
             // Table exists ,so Read the id file to see which id it should be now
             String IdRecordPath = database.getCurDatabasePath(getCurDatabaseName()) + File.separator + curToken + ".id";
             index++; // should be the "VALUES" now
@@ -106,6 +106,7 @@ public class ParserInsertCommand extends DBParser{
                 curCommandStatus = table.addFileContent(valueList, filePath);
                 return curCommandStatus;
             }else{
+                reader.close(); // need to close the id file reader.
                 curCommandStatus = "[ERROR]The attributes' number is not equals to the insert data number";
                 return curCommandStatus;
             }
