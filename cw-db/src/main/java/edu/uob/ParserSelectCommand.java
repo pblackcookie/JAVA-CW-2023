@@ -53,14 +53,14 @@ public class ParserSelectCommand extends DBParser{
                 curCommandStatus = nameCheck(curToken);
                 if(curCommandStatus.contains("[ERROR]")){
                     return curCommandStatus;
-
                 }
-                //
+                // check the attribute name is exist or not. Using flag function...
             }
         }
-        // In this situation, the SELECT must add some conditions...
+        // In this situation, the SELECT may add some conditions or the attribute name is more than one
         if(token.tokens.size() >5){
-            return "[OK]In the condition now,";
+            return "[OK]In the condition now,or the attribute name more than one";
+
         }
         curCommandStatus = "[ERROR]Select error.";
         return curCommandStatus;
