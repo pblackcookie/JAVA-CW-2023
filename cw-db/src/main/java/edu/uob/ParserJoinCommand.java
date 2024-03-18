@@ -68,7 +68,7 @@ public class ParserJoinCommand extends DBParser{
         index++; // now the current token should be "ON";
         curToken = token.tokens.get(index);
         if(!curToken.equalsIgnoreCase("ON")){
-            curCommandStatus = "Missing or typo [ON] when typing command";
+            curCommandStatus = "[ERROR]Missing or typo [ON] when typing command";
             return curCommandStatus;
         }
         index++; // now the current token should attribute name from table1;
@@ -76,20 +76,20 @@ public class ParserJoinCommand extends DBParser{
         System.out.println("table one current token:" + curToken);
         // if condition
         if(!checkLeftTable(filePath1,curToken)){
-            curCommandStatus = "Attribute is not exist or invalid format";
+            curCommandStatus = "[ERROR]Attribute is not exist or invalid format";
             return curCommandStatus;
         }
         index++; // now the current token should be "AND"
         curToken = token.tokens.get(index);
         if(!curToken.equalsIgnoreCase("AND")){
-            curCommandStatus = "Missing or typo [AND] when typing command";
+            curCommandStatus = "[ERROR]Missing or typo [AND] when typing command";
             return curCommandStatus;
         }
         index++; // now the current token should attribute name from table2;
         curToken = token.tokens.get(index);
         System.out.println("table 2 current token:" + curToken);
         if(!checkRightTable(filePath2,curToken)){
-            curCommandStatus = "Attribute is not exist or invalid format";
+            curCommandStatus = "[ERROR]Attribute is not exist or invalid format";
             return curCommandStatus;
         }
         // Satisfy all the conditions so do the command in here
@@ -107,7 +107,11 @@ public class ParserJoinCommand extends DBParser{
         if(line != null){
             for (String attribute : table1Content) {
                 if (attribute.equalsIgnoreCase(attributeName)) {
-                    table1Col.add(false); // not show on the table, so set the flag to false
+                    if(!attributeName.equalsIgnoreCase("id")) { // need to show the id line on the left
+                        table1Col.add(false); // not show on the table, so set the flag to false
+                    }else {
+                        table1Col.add(true);
+                    }
                     exist = true;
                 } else {
                     table1Col.add(true);
@@ -160,24 +164,16 @@ public class ParserJoinCommand extends DBParser{
     // just using buffer reader to change the content
     private String joinTable(){
         curCommandStatus = "";
-        for(int k = 0; k < table1Row.size(); k++){
-            for(int i = 0; i < table1Col.size(); i++){
-                if(table1Col.get(i)){
-                    curCommandStatus += table1Content.get(i) + "\t";
-                }else{
-                    if(!table2Col.get(i)){
-                        for(int j = 0; j < table2Content.size(); j++){
-                            if(table2Content.get(j).equalsIgnoreCase(table1Content.get(i))){
-                                int l;
-                                for(l=0; l <table2Col.size()-2; l++){
-                                    curCommandStatus += table2Content.get(j) + "\t";
-                                }
-                                if(l == table2Col.size()-1){
-                                    curCommandStatus += table2Content.get(j);
-                                }
-                            }
-                        }
-                    }
+        for (int i = 0; i < table1Row.size(); i++) {
+            //System.out.println(table1Row.size());
+            for (int j = 0; j < table1Col.size(); j++) {
+                //System.out.println(table1Col.size());
+                if(table1Col.get(j)){
+                    System.out.println("now the curCommandStatus is" + curCommandStatus);
+                    curCommandStatus += table1Content.get(i*table1Col.size()+j)+"\t";
+                }else {
+
+
                 }
             }
             curCommandStatus += "\n";
