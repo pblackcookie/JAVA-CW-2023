@@ -10,7 +10,7 @@ public class DatabaseProcess {
     private String currentDatabase;
     DBServer dbServer = new DBServer();
 
-    public String createDatabase(String databaseName) throws IOException {
+    public String createDatabase(String databaseName) {
         // All the lower case when create it....
         databaseName = databaseName.toLowerCase();
         databasePath = getCurDatabasePath(databaseName);
@@ -28,7 +28,7 @@ public class DatabaseProcess {
         }
     }
     // Drop the database if it exists
-    public String dropDatabase(String databaseName) throws IOException {
+    public String dropDatabase(String databaseName) {
         databasePath = getCurDatabasePath(databaseName);
         if (Files.exists(Path.of(databasePath))) {
             try {

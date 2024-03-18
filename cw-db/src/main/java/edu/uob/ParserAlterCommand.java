@@ -31,12 +31,7 @@ public class ParserAlterCommand extends DBParser{
         }
         index++;
         curToken = token.tokens.get(index).toLowerCase(); //"TABLE NAME"
-        // check if the table name valid
-        curCommandStatus = nameCheck(curToken);
-        if(curCommandStatus.contains("[ERROR]")){
-            return curCommandStatus;
-        }
-        //check if the table exist
+        //check if the table exist(no valid name should not exist at all)
         filePath = server.getStorageFolderPath() + File.separator + database + File.separator + curToken + ".tab";
         File file = new File(filePath);
         if(!file.exists()){

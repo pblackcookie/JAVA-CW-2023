@@ -7,8 +7,6 @@ import java.util.Arrays;
 public class DataProcess {
     // This class is used to process series of data when one specific table is selected
     private String dataStatus;
-    private String commandStatus;
-
     private final String firstElement = "id";
     private ArrayList<String> attributeList = new ArrayList<>();
 
@@ -41,8 +39,8 @@ public class DataProcess {
         // file is empty
         if(file.length()==0){
             if(attributeName.equalsIgnoreCase("id")){
-                commandStatus = "[ERROR]A duplicate id is added.";
-                return commandStatus;
+                dataStatus = "[ERROR]A duplicate id is added.";
+                return dataStatus;
             }
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
                     writer.write(firstElement);
@@ -52,14 +50,14 @@ public class DataProcess {
                         String line = reader.readLine();
                         // line = line.trim(); // remove \n if exists.
                     }catch (IOException e) {
-                        commandStatus = "[Error]Error occur: " + e.getMessage();
-                        return commandStatus;
+                        dataStatus = "[Error]Error occur: " + e.getMessage();
+                        return dataStatus;
                     }
-                    commandStatus = "Add the elements successfully";
-                    return commandStatus;
+                    dataStatus = "Add the elements successfully";
+                    return dataStatus;
                 } catch (IOException e) {
-                    commandStatus = "Error occur: " + e.getMessage();
-                    return commandStatus;
+                    dataStatus = "Error occur: " + e.getMessage();
+                    return dataStatus;
                 }
         }else {// file isn't empty
             // read the file content and check the duplicate first
@@ -69,56 +67,46 @@ public class DataProcess {
                 attributeList.addAll(Arrays.asList(line.split("\t")));
                 for(String attribute: attributeList){
                     if(attribute.equalsIgnoreCase(attributeName)){
-                        commandStatus = "[ERROR]Can not add the duplicate element: " + attributeName;
-                        return commandStatus;
+                        dataStatus = "[ERROR]Can not add the duplicate element: " + attributeName;
+                        return dataStatus;
                     }
-                }
-                // No duplicate attribute name so add it. 1. remove the \n in the first line
+                }// No duplicate attribute name so add it. 1. remove the \n in the first line
                 // 2. add the new attribute name and \n
                 line = line.trim(); // remove the \n
                 line += "\t" + attributeName;
                 contentBuilder.append(line).append("\n");
-                // Now the processing for the first line is ending.
-                // But still needing to reading the left part for writing into the file.
                 // From here starting reading the left line...
-                boolean lastLine = false;
                 while ((line = reader.readLine()) != null) {
-                    lastLine = (reader.readLine() == null);
                     contentBuilder.append(line);
-                    if (!lastLine) {
-                        contentBuilder.append("\tNULL\n");
-                    }
+                    contentBuilder.append("\tNULL\n");
                 }// In the last line does not need to add the \n....
-                if (lastLine) {
-                    contentBuilder.append("\tNULL");
-                }
+                contentBuilder.deleteCharAt(contentBuilder.length() - 1);
                 // write back to the file
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
                     writer.write(contentBuilder.toString());
-                    commandStatus = "[OK]Add the elements successfully";
-                    return commandStatus;
+                    dataStatus = "[OK]Add the elements successfully";
+                    return dataStatus;
                 } catch (IOException e) {
-                    commandStatus = "[Error]Error writing to file: " + e.getMessage();
-                    return commandStatus;
+                    dataStatus = "[Error]Error writing to file: " + e.getMessage();
+                    return dataStatus;
                 }
             } catch (IOException e) {
-                commandStatus = "[Error]Error occur: " + e.getMessage();
-                return commandStatus;
+                dataStatus = "[Error]Error occur: " + e.getMessage();
+                return dataStatus;
             }
         }
 
     }
-
     public String attributeDrop(String filePath, String attributeName) {
         int columnIndex = -1;
         File file = new File(filePath);
         if(file.length()==0){// file is empty
-            commandStatus = "[ERROR]Can not drop the attribute" + attributeName + "from one empty file.";
-            return commandStatus;
+            dataStatus = "[ERROR]Can not drop the attribute" + attributeName + "from one empty file.";
+            return dataStatus;
         }// the attribute name is id.
         if(attributeName.equalsIgnoreCase("id")){
-            commandStatus = "[ERROR]id can not be dropped.";
-            return commandStatus;
+            dataStatus = "[ERROR]id can not be dropped.";
+            return dataStatus;
         }// Start operation for drop one column here...
         // First read the first line to see if it exists and then do operation.
         StringBuilder contentBuilder = new StringBuilder();
@@ -134,32 +122,17 @@ public class DataProcess {
                 }
             }
             if(columnIndex == -1){
-                commandStatus = "[ERROR]Can not drop the attribute:" + attributeName + ". Not found it.";
-                return commandStatus;
+                dataStatus = "[ERROR]Can not drop the attribute:" + attributeName + ". Not found it.";
+                return dataStatus;
             }
-            for (int i = 0; i < attributeList.size(); i++) {
-                String attribute = attributeList.get(i);
-                if(i < attributeList.size()-1) {
-                    contentBuilder.append(attribute).append("\t");
-                }else{
-                    contentBuilder.append(attribute).append("\n");
-                }
-            }
+            contentBuilder = loopAttributeList(attributeList,contentBuilder);
             attributeList.clear();
-            //BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
             // if successful found it , then delete the column line according to columnIndex;
             while ((line = reader.readLine()) != null) {
                 attributeList.addAll(Arrays.asList(line.split("\t")));
                 System.out.println("Attribute list now is : " + attributeList);
                 attributeList.remove(columnIndex);
-                for (int i = 0; i < attributeList.size(); i++) {
-                    String attribute = attributeList.get(i);
-                    if(i < attributeList.size()-1) {
-                        contentBuilder.append(attribute).append("\t");
-                    }else{
-                        contentBuilder.append(attribute).append("\n");
-                    }
-                }
+                contentBuilder = loopAttributeList(attributeList,contentBuilder);
                 attributeList.clear();
             }
             // Now write back to the file
@@ -167,11 +140,22 @@ public class DataProcess {
             //System.out.println("write back to file now is: " + contentBuilder);
             writer.write(contentBuilder.toString());
             writer.close();
-            commandStatus = "[OK]Successfully drop.";
-            return commandStatus;
+            dataStatus = "[OK]Successfully drop.";
+            return dataStatus;
         }catch (IOException e) {
-            commandStatus = "[Error]Error occur: " + e.getMessage();
-            return commandStatus;
+            dataStatus = "[Error]Error occur: " + e.getMessage();
+            return dataStatus;
         }
+    }
+    private StringBuilder loopAttributeList(ArrayList<String> list, StringBuilder contentBuilder){
+        for (int i = 0; i < list.size(); i++) {
+            String attribute = list.get(i);
+            if(i < list.size()-1) {
+                contentBuilder.append(attribute).append("\t");
+            }else{
+                contentBuilder.append(attribute).append("\n");
+            }
+        }
+        return contentBuilder;
     }
 }

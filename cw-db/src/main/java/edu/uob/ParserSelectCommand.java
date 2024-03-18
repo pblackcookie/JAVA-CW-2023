@@ -6,10 +6,15 @@ import java.util.ArrayList;
 import static edu.uob.GlobalMethod.getCurDatabaseName;
 
 public class ParserSelectCommand extends DBParser{
+    // The switch for control the show or not
+    ArrayList<String> columnFlag;
+    ArrayList<String> rowFlag;
 
     public ParserSelectCommand(String command, int index) {
         super(command);
         this.index = index;
+        columnFlag = new ArrayList<>();
+        rowFlag = new ArrayList<>();
     }
 
     protected String parserSelect() throws IOException {
@@ -44,6 +49,13 @@ public class ParserSelectCommand extends DBParser{
                 }
                 curCommandStatus = "[ERROR]Selected table dos not exist.";
                 return curCommandStatus;
+            }else {// when the length = 5, current token be one attribute name;
+                curCommandStatus = nameCheck(curToken);
+                if(curCommandStatus.contains("[ERROR]")){
+                    return curCommandStatus;
+
+                }
+                //
             }
         }
         // In this situation, the SELECT must add some conditions...

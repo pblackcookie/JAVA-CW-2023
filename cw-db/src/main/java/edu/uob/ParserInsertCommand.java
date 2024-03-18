@@ -69,8 +69,9 @@ public class ParserInsertCommand extends DBParser{
                 curCommandStatus = "[ERROR] Missing or typo '('.";
                 return curCommandStatus;
             }
+
             if((token.tokens.get(index+1)).equals(")")){
-                curCommandStatus = "[ERROR] Missing Attributes.";
+                curCommandStatus = "[ERROR] Missing Values.";
                 return curCommandStatus;
             }
             if(!token.tokens.get(token.tokens.size() - 2).equals(")")) {
@@ -78,12 +79,13 @@ public class ParserInsertCommand extends DBParser{
                 curCommandStatus = "[ERROR]Invalid format: Error occurs between ')' and ';'. ";
                 return curCommandStatus;
             }
+            // from here start should add one value & format check
             data.add(String.valueOf(idNumber)); // Update the id file about this table(file).
             // For loop to store the data -> need to check the number of ,
             for (int i = index+1; i < token.tokens.size()-2; i++) { // should be the data now
                 if (!token.tokens.get(i).equals(",")) {
                     String checkName = token.tokens.get(i);
-                    if(checkName.contains("[ERROR]")){ // Invalid attribute name
+                    if(checkName.contains("[ERROR]")){ // Invalid values name
                         curCommandStatus = checkName;
                         return  curCommandStatus;
                     }
