@@ -57,7 +57,7 @@ public class CommandHandler {
                 ParserDropCommand pDrop = new ParserDropCommand(curCommand,index);
                 curCommandStatus =  pDrop.parserDrop();
                 break;
-            case "ALTER": //parserAlter();
+            case "ALTER":
                 index++;
                 ParserAlterCommand pAlter = new ParserAlterCommand(curCommand,index);
                 curCommandStatus = pAlter.parserAlter();

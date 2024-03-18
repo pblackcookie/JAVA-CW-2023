@@ -42,4 +42,8 @@ Statring to add some logic process functions into handleCommandhandle function i
 
 2. Add the lowercase convert when storage all the data.
 
+### Implement the alter function and insert function.
 
+1. Add the value list check fucntion to see whether the insert data is valid or not. If all the values valid, check it length is valid or not.
+
+2. Rewrite some codes from alter command.
