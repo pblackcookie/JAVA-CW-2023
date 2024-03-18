@@ -70,10 +70,10 @@ public class ParserInsertCommand extends DBParser{
                 return curCommandStatus;
             }
             // from here start should add one value & format check
-            /*for (int i = index+1; i < token.tokens.size()-2; i++) { // should be the data now
+            for (int i = index+1; i < token.tokens.size()-2; i++) { // should be the data now
                 valueList.add(token.tokens.get(i));
             }// value list check in here
-            curCommandStatus = valueListCheck(valueList);*/
+            curCommandStatus = valueListCheck(valueList);
             if(curCommandStatus.contains("[ERROR]")){
                 return curCommandStatus;
             }// only if the check is ok then open the id and insert the data...
@@ -98,15 +98,78 @@ public class ParserInsertCommand extends DBParser{
         curCommandStatus = table.addFileContent(data, filePath);
         return curCommandStatus;
     }
-
-    private String valueListCheck(ArrayList<String> valueList){
-
-
-
-        curCommandStatus = "[ERROR]Error occur in valueListCheck function.";
-        return curCommandStatus;
+    // very similar to the attribute list check but the individual value
+    // check is different.
+    private String valueListCheck(ArrayList<String> valueList) {
+        System.out.println("Now valueList is: " + valueList);
+        if (valueList.isEmpty()) {
+            curCommandStatus = "[ERROR]Data can't be the empty.";
+            return curCommandStatus;
+        }
+        for (String s : valueList) {
+            if (s.equals("(") || s.equals(")")) {
+                curCommandStatus = "[ERROR]: Invalid bracket.";
+                return curCommandStatus;
+            }
+        }
+        String dataNow = valueList.get(0);
+        if (!dataNow.equals(",")) { //First one need to check the valid
+            curCommandStatus = valueCheck(dataNow);
+            if (curCommandStatus.contains("[ERROR]")) {
+                return curCommandStatus;
+            }
+            // After checking the name still valid.
+            valueList.remove(0);
+            if (valueList.isEmpty()) {
+                curCommandStatus = "[OK]Finish value list checking.";
+                return curCommandStatus;
+            } else {
+                valueListCheck(valueList); // Continuing checking....
+            }
+            return curCommandStatus;
+        } else {
+            if (valueList.size() < 2) {
+                curCommandStatus = "[ERROR]Invalid value list length";
+                return curCommandStatus;
+            }
+            dataNow = valueList.get(1); // should be insert value now
+            curCommandStatus = valueCheck(dataNow);
+            if (curCommandStatus.contains("[ERROR]")) {
+                return curCommandStatus;
+            }
+            valueList.remove(0); // remove ,
+            valueList.remove(0); // remove values
+            if (valueList.isEmpty()) {
+                curCommandStatus = "[OK]Finish value list checking.";
+                return curCommandStatus;
+            } else {
+                valueListCheck(valueList); // Continuing checking....
+            }
+            //curCommandStatus = "[ERROR]Error occur in valueListCheck function.";
+            return curCommandStatus;
+        }
     }
 
-    //private String valueCheck()
+    private String valueCheck(String value){
+        // check it value type in here
+        System.out.println("Now check is:" + value);
+        if (value.matches("[+-]?\\d+")){
+            curCommandStatus = "[OK]Integer format valid";
+            return curCommandStatus;
+        }else if(value.matches("[+-]?\\d+(\\.\\d+)?")){
+            curCommandStatus = "[OK]Float format valid";
+            return curCommandStatus;
+
+        }else if(value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")){
+            curCommandStatus = "[OK]Boolean format valid";
+            return curCommandStatus;
+        }else if(value.startsWith("'") && value.endsWith("'")){
+            curCommandStatus = "[OK]String format valid";
+            return curCommandStatus;
+        } else {
+            curCommandStatus= "[ERROR]The insert type is invalid.";
+            return curCommandStatus;
+        }
+    }
 }
 
