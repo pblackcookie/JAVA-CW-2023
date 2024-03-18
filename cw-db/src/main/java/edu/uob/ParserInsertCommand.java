@@ -2,6 +2,7 @@ package edu.uob;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static edu.uob.GlobalMethod.getCurDatabaseName;
 
@@ -9,6 +10,7 @@ public class ParserInsertCommand extends DBParser{
     public ParserInsertCommand(String command, int index) {
         super(command);
         this.index = index;
+        this.data = data;
     }
 
     // // When command type = 'INSERT'
@@ -16,6 +18,7 @@ public class ParserInsertCommand extends DBParser{
     protected String parserInsert() throws IOException {
         // command length check
         ArrayList<String> valueList = new ArrayList<>();
+        ArrayList<String> attributeName = new ArrayList<>();
         if(token.tokens.size() < 8){
             curCommandStatus = "[ERROR]Invalid insert command - no completed.";
             return curCommandStatus;
@@ -46,6 +49,10 @@ public class ParserInsertCommand extends DBParser{
                 curCommandStatus = "[ERROR]: Can not insert the data to the empty file.";
                 return curCommandStatus;
             }
+            // Table exists and not the empty, read it to store the attribute number (contains id)
+            BufferedReader tableReader = new BufferedReader(new FileReader(filePath));
+            String attributeLine = tableReader.readLine();
+            attributeName.addAll(Arrays.asList(attributeLine.split("\t"))); // will have one length
             // Table exists ,so Read the id file to see which id it should be now
             String IdRecordPath = database.getCurDatabasePath(getCurDatabaseName()) + File.separator + curToken + ".id";
             index++; // should be the "VALUES" now
@@ -77,31 +84,36 @@ public class ParserInsertCommand extends DBParser{
             if(curCommandStatus.contains("[ERROR]")){
                 return curCommandStatus;
             }// only if the check is ok then open the id and insert the data...
+            valueList.clear();
             BufferedReader reader = new BufferedReader(new FileReader(IdRecordPath));
             String line = reader.readLine();
-            idNumber = Integer.parseInt(line) + 1;
-            // Update the value and write back to the .id file
-            FileWriter writer = new FileWriter(IdRecordPath);
-            BufferedWriter buffer = new BufferedWriter(writer);
-            buffer.write(String.valueOf(idNumber));
-            buffer.close();
-            writer.close();
-            reader.close();
-            data.add(String.valueOf(idNumber)); // Update the id file about this table(file).
+            idNumber = Integer.parseInt(line) + 1;// Update the value
+            valueList.add(String.valueOf(idNumber)); // Update the id file about this table(file).
             // For loop to store the data -> need to check the number of ,
             for (int i = index+1; i < token.tokens.size()-2; i++) { // should be the data now
                 if (!token.tokens.get(i).equals(",")) {
-                    data.add(token.tokens.get(i));
+                    valueList.add(token.tokens.get(i));
                 }
             }
+            // Compare the insert value number , it should be equals to the attribute name
+            if(attributeName.size() == valueList.size()){
+                FileWriter writer = new FileWriter(IdRecordPath);
+                BufferedWriter buffer = new BufferedWriter(writer); // write id value back to the .id file
+                buffer.write(String.valueOf(idNumber));
+                buffer.close();
+                writer.close();
+                reader.close();
+                curCommandStatus = table.addFileContent(valueList, filePath);
+                return curCommandStatus;
+            }else{
+                curCommandStatus = "[ERROR]The attributes' number is not equals to the insert data number";
+                return curCommandStatus;
+            }
         }
-        curCommandStatus = table.addFileContent(data, filePath);
-        return curCommandStatus;
     }
     // very similar to the attribute list check but the individual value
     // check is different.
     private String valueListCheck(ArrayList<String> valueList) {
-        System.out.println("Now valueList is: " + valueList);
         if (valueList.isEmpty()) {
             curCommandStatus = "[ERROR]Data can't be the empty.";
             return curCommandStatus;
@@ -145,7 +157,6 @@ public class ParserInsertCommand extends DBParser{
             } else {
                 valueListCheck(valueList); // Continuing checking....
             }
-            //curCommandStatus = "[ERROR]Error occur in valueListCheck function.";
             return curCommandStatus;
         }
     }
@@ -167,7 +178,7 @@ public class ParserInsertCommand extends DBParser{
             curCommandStatus = "[OK]String format valid";
             return curCommandStatus;
         } else {
-            curCommandStatus= "[ERROR]The insert type is invalid.";
+            curCommandStatus= "[ERROR]The insert type of:" + value + " is invalid.";
             return curCommandStatus;
         }
     }
