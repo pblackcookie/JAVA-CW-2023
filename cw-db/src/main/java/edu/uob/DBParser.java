@@ -172,15 +172,21 @@ public class DBParser {
             for (int i = 0; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if(tableCol.get(j)!= -1){
-                        curCommandStatus += tableContent.get(i*tableCol.size()+j) + "\t";
+                        if(j == tableCol.size()-1) {
+                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
+                        }else{
+                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
+                        }
                     }
                 }
-                curCommandStatus += "\n";
             }
         return curCommandStatus;
     }
 
     protected void rowIndexStorage(String demand){
+        if(demand.startsWith("'") && demand.endsWith("'")){
+            demand = demand.substring(1, demand.length() - 1); // remove "'"
+        }
         for (int i = 0; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if(tableContent.get(i*tableCol.size()+j).equalsIgnoreCase(demand)){
@@ -198,11 +204,27 @@ public class DBParser {
             for (int i = 0; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if(tableRow.get(i)!= -1){
-                        curCommandStatus += tableContent.get(i*tableCol.size()+j) + "\t";
+                        if(j == tableCol.size()-1) {
+                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
+                        }else{
+                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
+                        }
                     }
                 }
-                curCommandStatus += "\n";
             }
+        } else if (operation.equalsIgnoreCase("!=")) {
+            for (int i = 0; i < tableRow.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+                    if(tableRow.get(i).equals(-1) || (i == 0)){// table head
+                        if(j == tableCol.size()-1) {
+                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
+                        }else{
+                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
+                        }
+                    }
+                }
+            }
+
         }
         curCommandStatus = curCommandStatus.trim();
         return curCommandStatus;
