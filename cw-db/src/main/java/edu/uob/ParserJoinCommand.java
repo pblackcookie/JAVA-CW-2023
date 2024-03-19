@@ -61,7 +61,6 @@ public class ParserJoinCommand extends DBParser{
         curToken = token.tokens.get(index).toLowerCase();
         String filePath2 = server.getStorageFolderPath() + File.separator + GlobalMethod.getCurDatabaseName()
                 + File.separator +curToken + ".tab";
-        System.out.println(filePath2);
         Path path2 = Paths.get(filePath2);
         if (!Files.exists(path2)){
             curCommandStatus = "[ERROR]Can't find the second table: " + curToken;
@@ -76,7 +75,6 @@ public class ParserJoinCommand extends DBParser{
         }
         index++; // now the current token should attribute name from table1;
         curToken = token.tokens.get(index);
-        System.out.println("table one current token:" + curToken);
         // if condition
         if(!checkLeftTable(filePath1,curToken,tableName1)){
             curCommandStatus = "[ERROR]Attribute is not exist or invalid format";
@@ -90,7 +88,6 @@ public class ParserJoinCommand extends DBParser{
         }
         index++; // now the current token should attribute name from table2;
         curToken = token.tokens.get(index);
-        System.out.println("table 2 current token:" + curToken);
         if(!checkRightTable(filePath2,curToken,tableName2)){
             curCommandStatus = "[ERROR]Attribute is not exist or invalid format";
             return curCommandStatus;
@@ -165,22 +162,35 @@ public class ParserJoinCommand extends DBParser{
     // just using buffer reader to change the content
     private String joinTable(){
         curCommandStatus = "";
-        for (int i = 0; i < table1Row.size(); i++) {
+        // Attribute message
+        for (int t1 = 0; t1 < table1Col.size(); t1++){
+            if(table1Col.get(t1)) {
+                curCommandStatus += table1Content.get(t1) + "\t";
+            }
+        }
+        for (int t2 = 0; t2 < table2Col.size(); t2++) {
+            if(table2Col.get(t2)) {
+                curCommandStatus += table2Content.get(t2) + "\t";
+            }
+        }
+        curCommandStatus = curCommandStatus.trim() + "\n";
+        // table information message
+        for (int i = 1; i < table1Row.size(); i++) {
             for (int j = 0; j < table1Col.size(); j++) {
                 if(table1Col.get(j)){
                     curCommandStatus += table1Content.get(i*table1Col.size()+j) + "\t";
                 }else { // table1 false -> not print out it to the terminal
-                    for (int k = 0; k < table2Row.size(); k++) {
+                    for (int k = 1; k < table2Row.size(); k++) {
                         for (int l = 0; l <table2Col.size() ; l++) {
                             if (Objects.equals(table1Content.get(i * table1Col.size() + j), table2Content.get(k * table2Col.size() + l))){
-                                System.out.println("test now");
-                                System.out.println("now the k is" + k + " and the l is: " + l);
-                                for (int m = (k*table2Col.size()+l); m < ((k*table2Col.size()+l)+table2Col.size()); m++) {
-                                    if(m==((k*table2Col.size()+l)+table2Col.size()-1)){
-                                        curCommandStatus += table2Content.get(m);
-                                    }else {
-                                        curCommandStatus += table2Content.get(m) + "\t";
-                                    }
+                                for (int m = (k*table2Col.size()+l+1); m < ((k*table2Col.size()+l)+table2Col.size()); m++) {
+                                        // l column false --> so l+1 and left right column all were true.
+                                        if (m == ((k * table2Col.size() + l) + table2Col.size() - 1)) {
+                                            curCommandStatus += table2Content.get(m);
+                                        } else {
+                                            curCommandStatus += table2Content.get(m) + "\t";
+                                        }
+
                                 }
                             }
                         }
