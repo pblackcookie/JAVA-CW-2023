@@ -1,5 +1,6 @@
 package edu.uob;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -7,14 +8,12 @@ import static edu.uob.GlobalMethod.getCurDatabaseName;
 
 public class ParserSelectCommand extends DBParser{
     // The switch for control the show or not
-    ArrayList<String> columnFlag;
-    ArrayList<String> rowFlag;
+    DBServer server;
 
     public ParserSelectCommand(String command, int index) {
         super(command);
         this.index = index;
-        columnFlag = new ArrayList<>();
-        rowFlag = new ArrayList<>();
+        server = new DBServer();
     }
 
     protected String parserSelect() throws IOException {
@@ -55,15 +54,81 @@ public class ParserSelectCommand extends DBParser{
                     return curCommandStatus;
                 }
                 // check the attribute name is exist or not. Using flag function...
+                ArrayList<String> attributeNames = new ArrayList<>();
+                attributeNames.add(curToken); // add the attributes
                 // need to know table name first
+                index++;
+                curToken = token.tokens.get(index); // should be 'FROM' now
+                if (!curToken.equalsIgnoreCase("FROM")) {
+                    curCommandStatus = "[ERROR]Missing or typo FROM here.";
+                    return curCommandStatus;
+                }
+                index++;
+                curToken = token.tokens.get(index).toLowerCase(); // should be table name now
+                String filePath = server.getStorageFolderPath() + File.separator + GlobalMethod.getCurDatabaseName()
+                        + File.separator +curToken + ".tab";
+                boolean exist = colIndexStorage(filePath,attributeNames);
+                if(!exist){
+                    curCommandStatus = "[ERROR]Attribute Name does not exist.";
+                    return curCommandStatus;
+                }
+                // show the content
+                curCommandStatus = showTheContent();
+                curCommandStatus = "[OK]\n" + curCommandStatus;
+//                System.out.println("test :" + exist);
+//                System.out.println("tableContent" + tableContent);
+//                System.out.println("tableCol" + tableCol);
+//                System.out.println("tableRow" + tableRow);
+                return curCommandStatus;
             }
         }
         // In this situation, the SELECT may add some conditions or the attribute name is more than one
         if(token.tokens.size() >5){
-            return "[OK]In the condition now,or the attribute name more than one";
+            // Situation 1 : consider the attribute name more than one
+            ArrayList<String> attributes = new ArrayList<>();
+            if(!curToken.equals("*")){ // attributes
+                while(!token.tokens.get(index).equalsIgnoreCase("FROM")){
+                    attributes.add(token.tokens.get(index));
+                    System.out.println("Current toke in loop: " + token.tokens.get(index));
+                    index++; // until equals from
+                }
+                curCommandStatus = attributeCheck(attributes);
+                if(curCommandStatus.contains("[ERROR]")){
+                    curCommandStatus = "[ERROR]Attribute or format error";
+                    return curCommandStatus;
+                }
+                System.out.println("attributes now:"+attributes);
+                for (int i = 0; i < attributes.size(); i++) {
+                    String attribute = attributes.get(i);
+                    if(attribute.equals(",")){
+                        attributes.remove(i);
+                        i--; // after remove
+                    }
+                }
+                index++; // should be table name now
+                curToken = token.tokens.get(index).toLowerCase(); // should be table name now
+                System.out.println("current token now:"+curToken);
+                System.out.println("attributes now:"+attributes);
+                String filePath = server.getStorageFolderPath() + File.separator + GlobalMethod.getCurDatabaseName()
+                        + File.separator +curToken + ".tab";
+                boolean exist = colIndexStorage(filePath,attributes);
+                if(!exist){
+                    curCommandStatus = "[ERROR]Attribute Name does not exist.";
+                    return curCommandStatus;
+                }
+                // show the content
+                curCommandStatus = showTheContent();
+                curCommandStatus = "[OK]\n" + curCommandStatus;
+                System.out.println("attributes now: " + attributes);
+            }
+            // Situation 2 : it brings some condition
+            //if(curToken.equals("*"))
+
+
+            //return "[OK]In the condition now,or the attribute name more than one";
+            return curCommandStatus;
 
         }
-        curCommandStatus = "[ERROR]Select error.";
         return curCommandStatus;
     }
 }

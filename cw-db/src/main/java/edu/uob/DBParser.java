@@ -101,7 +101,7 @@ public class DBParser {
     }
     // use one int array --> for print out inordered result
     // changing the variable in the function
-    // return the boolean to indicate if this arraylist valid..
+    // return the boolean to indicate if this arraylist valid.
     protected boolean colIndexStorage(String filePath, ArrayList<String> attributeNames) throws IOException {
         boolean exist = false;
         BufferedReader tableReader = new BufferedReader(new FileReader(filePath));
@@ -112,24 +112,46 @@ public class DBParser {
             for (int j = 0; j < tableContent.size(); j++) {
                 if (tableContent.get(j).equalsIgnoreCase(attributeNames.get(i))) {
                     tableCol.add(j);
+                }else{
+                    tableCol.add(-1);
+
                 }
             }
         }
         while ((line = tableReader.readLine()) != null) {
             tableContent.addAll(Arrays.asList(line.split("\t")));
         }
+        System.out.println("table Col now" + tableCol);
         for(int i = 0; i < tableContent.size()/tableCol.size(); i++) {
             tableRow.add(i);
         }
         tableReader.close();
-        // add condition to
-        if(tableCol.size()<attributeNames.size()){
-            // attribute name does not exist or like 1/2
-            return exist;
-        }else { // all needed attributes are exist.
+        int condition = 0;
+        for (int i = 0; i < tableCol.size(); i++) {
+            if(tableCol.get(i)== -1) {
+                condition++;
+            }
+        }
+        if(condition == (tableCol.size()-attributeNames.size())){
             exist = true;
             return exist;
+        }else {
+            return exist;
         }
+    }
+
+    protected String showTheContent (){
+        curCommandStatus = "";
+        for (int i = 0; i < tableRow.size(); i++) {
+            for (int j = 0; j < tableCol.size(); j++) {
+                if(tableCol.get(j)!= -1){
+                    curCommandStatus += tableContent.get(i*tableCol.size()+j) + "\t";
+                }
+            }
+            curCommandStatus += "\n";
+        }
+        curCommandStatus.trim();
+        return curCommandStatus;
     }
 
 }
