@@ -163,7 +163,11 @@ public class ParserJoinCommand extends DBParser{
                                 System.out.println("test now");
                                 System.out.println("now the k is" + k + " and the l is: " + l);
                                 for (int m = (k*table2Col.size()+l); m < ((k*table2Col.size()+l)+table2Col.size()); m++) {
-                                    curCommandStatus += table2Content.get(m) + "\t";
+                                    if(m==((k*table2Col.size()+l)+table2Col.size()-1)){
+                                        curCommandStatus += table2Content.get(m);
+                                    }else {
+                                        curCommandStatus += table2Content.get(m) + "\t";
+                                    }
                                 }
                             }
                         }
