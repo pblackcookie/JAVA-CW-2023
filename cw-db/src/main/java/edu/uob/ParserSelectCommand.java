@@ -149,10 +149,41 @@ public class ParserSelectCommand extends DBParser{
                     if (curToken.equalsIgnoreCase("WHERE")){
                         curCommandStatus ="[ERROR]Missing or typo 'where'.";
                     } // where attribute operation message
-                    index++; // should be where now
+                    index++; // should be attribute now
                     curToken = token.tokens.get(index);
-
-
+                    ArrayList<String> check = new ArrayList<>();
+                    check.add(curToken);
+                    curCommandStatus = attributeCheck(check);
+                    if(curCommandStatus.contains("[ERROR]")){
+                        return curCommandStatus;
+                    }
+                    attributes.add(curToken);
+                    boolean exist = colIndexStorage(filePath,attributes);
+                    if(!exist){
+                        curCommandStatus = "[ERROR]Attribute Name does not exist.";
+                        return curCommandStatus;
+                    }
+                    index++; // should be operation now -> check operation
+                    curToken = token.tokens.get(index);
+                    boolean valid = checkOperation(curToken);
+                    if(!valid){
+                        curCommandStatus = "[ERROR]Invalid operator.";
+                    }
+                    String nowOperation = curToken; // storage the operation
+                    index++;// now the demand
+                    curToken = token.tokens.get(index);
+                    curCommandStatus = valueCheck(curToken);
+                    if(curCommandStatus.contains("[ERROR]")){
+                        curCommandStatus = "[ERROR]Invalid format";
+                        return curCommandStatus;
+                    }
+                    String nowDemand = curToken;
+                    rowIndexStorage(nowDemand);
+                    System.out.println("tablecol" + tableCol);
+                    System.out.println("tablerow" + tableRow);
+                    // assume only has one condition
+                    curCommandStatus = showTheContent(attributes,nowOperation,nowDemand);
+                    return curCommandStatus;
                 }
             }
             //return "[OK]In the condition now,or the attribute name more than one";

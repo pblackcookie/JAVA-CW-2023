@@ -8,7 +8,9 @@ public class GlobalMethod {
     private static String curTableName = null;
     protected static HashSet<String> symbols;
     protected static HashSet<String> keyWords;
-    public static HashSet<Boolean> booleanLiteral;
+    protected static HashSet<Boolean> booleanLiteral;
+
+    protected static HashSet<String> conditionAll;
 
     static {
         symbols = new HashSet<String>(Arrays.asList("!", "#", "$","%","&","(",")","*","+",",","-",".","/", ":",";",
@@ -17,6 +19,8 @@ public class GlobalMethod {
                 "DELETE","JOIN","TRUE","FALSE","DATABASE","TABLE","INTO","VALUES","FROM","WHERE","SET","AND","ON","ADD",
                 "OR", "NULL","LIKE")); //24
         booleanLiteral = new HashSet<Boolean>(Arrays.asList(true,false));
+
+        conditionAll = new HashSet<String>(Arrays.asList("==" , ">" , "<" , ">=" , "<=" , "!=" , " LIKE ","AND","OR"));
     }
     // Using for store current database name.
     public static void setCurDatabaseName(String databaseName) {

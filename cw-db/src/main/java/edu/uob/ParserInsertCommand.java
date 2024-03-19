@@ -164,26 +164,5 @@ public class ParserInsertCommand extends DBParser{
         }
     }
 
-    private String valueCheck(String value){
-        // check it value type in here
-        System.out.println("Now check is:" + value);
-        if (value.matches("[+-]?\\d+")){
-            curCommandStatus = "[OK]Integer format valid";
-            return curCommandStatus;
-        }else if(value.matches("[+-]?\\d+(\\.\\d+)?")){
-            curCommandStatus = "[OK]Float format valid";
-            return curCommandStatus;
-
-        }else if(value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")){
-            curCommandStatus = "[OK]Boolean format valid";
-            return curCommandStatus;
-        }else if(value.startsWith("'") && value.endsWith("'")){
-            curCommandStatus = "[OK]String format valid";
-            return curCommandStatus;
-        } else {
-            curCommandStatus= "[ERROR]The insert type of:" + value + " is invalid.";
-            return curCommandStatus;
-        }
-    }
 }
 
