@@ -152,29 +152,20 @@ public class ParserJoinCommand extends DBParser{
     // just using buffer reader to change the content
     private String joinTable(){
         curCommandStatus = "";
-        int index = 0;
         for (int i = 0; i < table1Row.size(); i++) {
             for (int j = 0; j < table1Col.size(); j++) {
                 if(table1Col.get(j)){
                     curCommandStatus += table1Content.get(i*table1Col.size()+j) + "\t";
                 }else { // table1 false -> not print out it to the terminal
-                    for (int k = 0; k < table2Row.size(); k++) {
+                    for (int k = 1; k < table2Row.size(); k++) {
                         for (int l = 0; l <table2Col.size() ; l++) {
-//                            //if (table2Col.get(l)) {
-//                                if (Objects.equals(table1Content.get(i * table1Col.size() + j), table2Content.get(k * table2Col.size() + l))) {
-//                                    if (table2Col.get(l)) {
-//                                        for (int m = l; m < table2Col.size() - 1; m++) {
-//                                            if (m == table2Col.size() - 2) {
-//                                                curCommandStatus += table2Content.get(k * table1Col.size() + l);
-//                                            } else {
-//                                                curCommandStatus += table1Content.get(k * table1Col.size() + l) + "\t";
-//                                            }
-//                                        }
-//                                    }
-//
-//                                }
-//                            //}
-
+                            if (Objects.equals(table1Content.get(i * table1Col.size() + j), table2Content.get(k * table2Col.size() + l))){
+                                System.out.println("test now");
+                                System.out.println("now the k is" + k + " and the l is: " + l);
+                                for (int m = (k*table2Col.size()+l); m < ((k*table2Col.size()+l)+table2Col.size()); m++) {
+                                    curCommandStatus += table2Content.get(m) + "\t";
+                                }
+                            }
                         }
                     }
                 }
