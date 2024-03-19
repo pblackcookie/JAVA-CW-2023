@@ -145,8 +145,13 @@ public class DBParser {
         }
         System.out.println("table Col now" + tableCol);
         for(int i = 0; i < tableContent.size()/tableCol.size(); i++) {
-            tableRow.add(-1);
+            if(i == 0){
+                tableRow.add(0); // table head information
+            }else {
+                tableRow.add(-1);
+            }
         }
+        System.out.println("table Row now" + tableRow);
         tableReader.close();
         int condition = 0;
         for (int i = 0; i < tableCol.size(); i++) {
@@ -176,29 +181,30 @@ public class DBParser {
     }
 
     protected void rowIndexStorage(String demand){
-        for (int i = 0; i < tableCol.size(); i++) {
-            for (int j = 0; j < tableRow.size(); j++) {
+        for (int i = 0; i < tableRow.size(); i++) {
+            for (int j = 0; j < tableCol.size(); j++) {
                 if(tableContent.get(i*tableCol.size()+j).equalsIgnoreCase(demand)){
-                    tableRow.set(j,0);
+                    tableRow.set(i,0);
                 }
             }
-
         }
+
     }
 
     protected String showTheContent (ArrayList<String> attributes, String operation, String demand){
-        curCommandStatus = "";
+        curCommandStatus = "[OK]\n";
         System.out.println(attributes + operation + demand);
         if(operation.equalsIgnoreCase("==")){
             for (int i = 0; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
-                    if(tableCol.get(j)!= -1 && tableRow.get(i)!= -1){
+                    if(tableRow.get(i)!= -1){
                         curCommandStatus += tableContent.get(i*tableCol.size()+j) + "\t";
                     }
                 }
                 curCommandStatus += "\n";
             }
         }
+        curCommandStatus = curCommandStatus.trim();
         return curCommandStatus;
     }
 
