@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Objects;
 
 public class ParserJoinCommand extends DBParser{
     private final DBServer server;
@@ -25,12 +25,12 @@ public class ParserJoinCommand extends DBParser{
         super(command);
         this.index = index;
         server = new DBServer();
-        table1Col = new ArrayList<Boolean>();
-        table1Row = new ArrayList<Boolean>();
-        table1Content = new ArrayList<String>();
-        table2Col = new ArrayList<Boolean>();
-        table2Row = new ArrayList<Boolean>();
-        table2Content = new ArrayList<String>();
+        table1Col = new ArrayList<>();
+        table1Row = new ArrayList<>();
+        table1Content = new ArrayList<>();
+        table2Col = new ArrayList<>();
+        table2Row = new ArrayList<>();
+        table2Content = new ArrayList<>();
 
     }
     // <Join> ::=  "JOIN " [TableName] " AND " [TableName] " ON " [AttributeName] " AND " [AttributeName]
@@ -104,7 +104,6 @@ public class ParserJoinCommand extends DBParser{
         BufferedReader tableReader = new BufferedReader(new FileReader(filePath));
         String line = tableReader.readLine();
         table1Content.addAll(Arrays.asList(line.split("\t")));
-        if(line != null){
             for (String attribute : table1Content) {
                 if (attribute.equalsIgnoreCase(attributeName)) {
                     if(!attributeName.equalsIgnoreCase("id")) { // need to show the id line on the left
@@ -117,17 +116,12 @@ public class ParserJoinCommand extends DBParser{
                     table1Col.add(true);
                 }
             }
-        }
         while ((line = tableReader.readLine()) != null) {
             table1Content.addAll(Arrays.asList(line.split("\t")));
         }
         for(int i = 0; i < table1Content.size()/table1Col.size(); i++) {
             table1Row.add(true);
         }
-        System.out.println("table1:");
-        System.out.println(table1Col);
-        System.out.println(table1Row);
-        System.out.println(table1Content);
         tableReader.close();
         return exist;
     }
@@ -137,7 +131,6 @@ public class ParserJoinCommand extends DBParser{
         BufferedReader tableReader = new BufferedReader(new FileReader(filePath));
         String line = tableReader.readLine();
         table2Content.addAll(Arrays.asList(line.split("\t")));
-        if (line!=null) {
             for (String attribute : table2Content) {
                 if (attribute.equalsIgnoreCase(attributeName)) {
                     table2Col.add(false); // not show on the table, so set the flag to false
@@ -146,17 +139,12 @@ public class ParserJoinCommand extends DBParser{
                     table2Col.add(true);
                 }
             }
-        }
         while ((line = tableReader.readLine()) != null) {
             table2Content.addAll(Arrays.asList(line.split("\t")));
         }
         for(int i = 0; i < table2Content.size()/table2Col.size(); i++) {
             table2Row.add(true);
         }
-        System.out.println("table2:");
-        System.out.println(table2Col);
-        System.out.println(table2Row);
-        System.out.println(table2Content);
         tableReader.close();
         return exist;
     }
@@ -164,16 +152,31 @@ public class ParserJoinCommand extends DBParser{
     // just using buffer reader to change the content
     private String joinTable(){
         curCommandStatus = "";
+        int index = 0;
         for (int i = 0; i < table1Row.size(); i++) {
-            //System.out.println(table1Row.size());
             for (int j = 0; j < table1Col.size(); j++) {
-                //System.out.println(table1Col.size());
                 if(table1Col.get(j)){
-                    System.out.println("now the curCommandStatus is" + curCommandStatus);
-                    curCommandStatus += table1Content.get(i*table1Col.size()+j)+"\t";
-                }else {
+                    curCommandStatus += table1Content.get(i*table1Col.size()+j) + "\t";
+                }else { // table1 false -> not print out it to the terminal
+                    for (int k = 0; k < table2Row.size(); k++) {
+                        for (int l = 0; l <table2Col.size() ; l++) {
+//                            //if (table2Col.get(l)) {
+//                                if (Objects.equals(table1Content.get(i * table1Col.size() + j), table2Content.get(k * table2Col.size() + l))) {
+//                                    if (table2Col.get(l)) {
+//                                        for (int m = l; m < table2Col.size() - 1; m++) {
+//                                            if (m == table2Col.size() - 2) {
+//                                                curCommandStatus += table2Content.get(k * table1Col.size() + l);
+//                                            } else {
+//                                                curCommandStatus += table1Content.get(k * table1Col.size() + l) + "\t";
+//                                            }
+//                                        }
+//                                    }
+//
+//                                }
+//                            //}
 
-
+                        }
+                    }
                 }
             }
             curCommandStatus += "\n";
