@@ -2,6 +2,7 @@ package edu.uob;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 import static edu.uob.GlobalMethod.getCurDatabaseName;
@@ -109,18 +110,50 @@ public class ParserSelectCommand extends DBParser{
                 curToken = token.tokens.get(index).toLowerCase(); // should be table name now
                 String filePath = server.getStorageFolderPath() + File.separator + GlobalMethod.getCurDatabaseName()
                         + File.separator +curToken + ".tab";
+                File file = new File(filePath);
+                if(!file.exists()){
+                    curCommandStatus = "[ERROR]File does not exists.";
+                    return curCommandStatus;
+                }
                 boolean exist = colIndexStorage(filePath,attributes);
                 if(!exist){
                     curCommandStatus = "[ERROR]Attribute Name does not exist.";
                     return curCommandStatus;
                 }
                 // show the content
+                // todo : add where condition in here
                 curCommandStatus = showTheContent();
                 curCommandStatus = "[OK]\n" + curCommandStatus;
                 System.out.println("attributes now: " + attributes);
             }else {
                 // Situation 2 : it brings some condition
-                //if(curToken.equals("*"))
+                // "SELECT " <WildAttribList> " FROM " [TableName] " WHERE " <Condition>
+                if(curToken.equals("*")){
+                    index++;
+                    curToken = token.tokens.get(index);
+                    if (!curToken.equalsIgnoreCase("FROM")){
+                        curCommandStatus = "[ERROR]Missing or typo 'from'.";
+                        return curCommandStatus;
+                    }
+                    index++; // table name now
+                    curToken = token.tokens.get(index).toLowerCase();
+                    String filePath = server.getStorageFolderPath() + File.separator + GlobalMethod.getCurDatabaseName()
+                            + File.separator +curToken + ".tab";
+                    File file = new File(filePath);
+                    if(!file.exists()){
+                        curCommandStatus = "[ERROR]File does not exists.";
+                        return curCommandStatus;
+                    }
+                    index++; // should be where now
+                    curToken = token.tokens.get(index);
+                    if (curToken.equalsIgnoreCase("WHERE")){
+                        curCommandStatus ="[ERROR]Missing or typo 'where'.";
+                    } // where attribute operation message
+                    index++; // should be where now
+                    curToken = token.tokens.get(index);
+
+
+                }
             }
             //return "[OK]In the condition now,or the attribute name more than one";
             return curCommandStatus;

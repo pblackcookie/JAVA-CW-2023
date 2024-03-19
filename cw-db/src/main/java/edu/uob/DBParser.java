@@ -142,17 +142,14 @@ public class DBParser {
 
     protected String showTheContent (){
         curCommandStatus = "";
-        for (int i = 0; i < tableRow.size(); i++) {
-            for (int j = 0; j < tableCol.size(); j++) {
-                if(tableCol.get(j)!= -1){
-                    System.out.println("now content: " + tableContent.get(i*tableCol.size()+j));
-                    curCommandStatus += tableContent.get(i*tableCol.size()+tableCol.get(j)) + "\t";
+            for (int i = 0; i < tableRow.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+                    if(tableCol.get(j)!= -1){
+                        curCommandStatus += tableContent.get(i*tableCol.size()+j) + "\t";
+                    }
                 }
+                curCommandStatus += "\n";
             }
-            curCommandStatus += "\n";
-        }
-        curCommandStatus.trim();
         return curCommandStatus;
     }
-
 }
