@@ -182,13 +182,14 @@ public class DBParser {
             for (int i = 0; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if(tableCol.get(j)!= -1){
-                        if(j == tableCol.size()-1) {
-                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
+                        if(j == tableRow.size()-1) {
+                            curCommandStatus += tableContent.get(i * tableCol.size() + j);
                         }else{
                             curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
                         }
                     }
                 }
+                curCommandStatus += "\n";
             }
         return curCommandStatus;
     }

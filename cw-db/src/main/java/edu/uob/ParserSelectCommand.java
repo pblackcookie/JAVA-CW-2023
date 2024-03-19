@@ -187,7 +187,6 @@ public class ParserSelectCommand extends DBParser{
                     return curCommandStatus;
                 }
             }
-            //return "[OK]In the condition now,or the attribute name more than one";
             return curCommandStatus;
         }
         return curCommandStatus;
