@@ -47,3 +47,9 @@ Statring to add some logic process functions into handleCommandhandle function i
 1. Add the value list check fucntion to see whether the insert data is valid or not. If all the values valid, check it length is valid or not.
 
 2. Rewrite some codes from alter command.
+
+### Implement the join function and the join command parser.
+
+1. now the database can join two different tables now.
+
+2. Fix some bugs that the insert will insert the 'String' type with "'". --> remove it.
