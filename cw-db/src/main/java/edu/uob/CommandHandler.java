@@ -72,9 +72,15 @@ public class CommandHandler {
                 ParserSelectCommand pSelect = new ParserSelectCommand(curCommand,index);
                 curCommandStatus = pSelect.parserSelect();
                 break;
-            case "UPDATE": //parserUpdate();
+            case "UPDATE":
+//                index++;
+//                ParserUpdateCommand parserUpdateCommand = new ParserUpdateCommand(curCommand,index);
+//                curCommandStatus = pUpdate.parserUpdate();
                 break;
             case "DELETE": //parserDelete();
+                index++;
+                ParserDeleteCommand pDelete = new ParserDeleteCommand(curCommand,index);
+                curCommandStatus = pDelete.parserDelete();
                 break;
             case "JOIN":
                 index++;
