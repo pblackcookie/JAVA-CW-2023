@@ -79,7 +79,6 @@ public class ParserCreateCommand extends DBParser{
                 curCommandStatus = table.createFile(curToken, curDatabase);
                 return curCommandStatus;
             }else if(token.tokens.get(index).equals("(")){
-                // TODO : In here imaging a series of error may occur....Need to implement
                 // DONE : 1. Check the attribute after the symbol "("
                 // DONE : 2. Attribute list valid check
                 // DONE : 3. Duplicates attribute check : case insensitive

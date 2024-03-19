@@ -55,6 +55,7 @@ public class ParserSelectCommand extends DBParser{
                     return curCommandStatus;
                 }
                 // check the attribute name is exist or not. Using flag function...
+                // need to know table name first
             }
         }
         // In this situation, the SELECT may add some conditions or the attribute name is more than one

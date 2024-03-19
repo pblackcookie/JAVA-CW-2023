@@ -76,7 +76,7 @@ public class CommandHandler {
                 break;
             case "DELETE": //parserDelete();
                 break;
-            case "JOIN": //parserJoin();
+            case "JOIN":
                 index++;
                 ParserJoinCommand pJoin = new ParserJoinCommand(curCommand,index);
                 curCommandStatus = pJoin.parserJoin();
