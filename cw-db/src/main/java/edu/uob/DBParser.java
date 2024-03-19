@@ -108,13 +108,13 @@ public class DBParser {
         String line = tableReader.readLine();
         tableContent.addAll(Arrays.asList(line.split("\t")));
         // for loop for storage the information that need to be shown
+        for (int i = 0; i < tableContent.size(); i++) {
+            tableCol.add(-1);
+        }
         for (int i = 0; i < attributeNames.size(); i++) {
             for (int j = 0; j < tableContent.size(); j++) {
                 if (tableContent.get(j).equalsIgnoreCase(attributeNames.get(i))) {
-                    tableCol.add(j);
-                }else{
-                    tableCol.add(-1);
-
+                    tableCol.set(j,i);
                 }
             }
         }
@@ -145,7 +145,8 @@ public class DBParser {
         for (int i = 0; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if(tableCol.get(j)!= -1){
-                    curCommandStatus += tableContent.get(i*tableCol.size()+j) + "\t";
+                    System.out.println("now content: " + tableContent.get(i*tableCol.size()+j));
+                    curCommandStatus += tableContent.get(i*tableCol.size()+tableCol.get(j)) + "\t";
                 }
             }
             curCommandStatus += "\n";

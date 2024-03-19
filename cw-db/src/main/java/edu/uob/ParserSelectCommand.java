@@ -85,19 +85,19 @@ public class ParserSelectCommand extends DBParser{
         // In this situation, the SELECT may add some conditions or the attribute name is more than one
         if(token.tokens.size() >5){
             // Situation 1 : consider the attribute name more than one
+            ArrayList<String> attributesCheck = new ArrayList<>();
             ArrayList<String> attributes = new ArrayList<>();
             if(!curToken.equals("*")){ // attributes
                 while(!token.tokens.get(index).equalsIgnoreCase("FROM")){
+                    attributesCheck.add(token.tokens.get(index));
                     attributes.add(token.tokens.get(index));
-                    System.out.println("Current toke in loop: " + token.tokens.get(index));
                     index++; // until equals from
                 }
-                curCommandStatus = attributeCheck(attributes);
+                curCommandStatus = attributeCheck(attributesCheck);
                 if(curCommandStatus.contains("[ERROR]")){
                     curCommandStatus = "[ERROR]Attribute or format error";
                     return curCommandStatus;
                 }
-                System.out.println("attributes now:"+attributes);
                 for (int i = 0; i < attributes.size(); i++) {
                     String attribute = attributes.get(i);
                     if(attribute.equals(",")){
@@ -107,8 +107,6 @@ public class ParserSelectCommand extends DBParser{
                 }
                 index++; // should be table name now
                 curToken = token.tokens.get(index).toLowerCase(); // should be table name now
-                System.out.println("current token now:"+curToken);
-                System.out.println("attributes now:"+attributes);
                 String filePath = server.getStorageFolderPath() + File.separator + GlobalMethod.getCurDatabaseName()
                         + File.separator +curToken + ".tab";
                 boolean exist = colIndexStorage(filePath,attributes);
@@ -120,14 +118,12 @@ public class ParserSelectCommand extends DBParser{
                 curCommandStatus = showTheContent();
                 curCommandStatus = "[OK]\n" + curCommandStatus;
                 System.out.println("attributes now: " + attributes);
+            }else {
+                // Situation 2 : it brings some condition
+                //if(curToken.equals("*"))
             }
-            // Situation 2 : it brings some condition
-            //if(curToken.equals("*"))
-
-
             //return "[OK]In the condition now,or the attribute name more than one";
             return curCommandStatus;
-
         }
         return curCommandStatus;
     }
