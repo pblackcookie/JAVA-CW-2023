@@ -183,6 +183,7 @@ public class ParserSelectCommand extends DBParser{
                     System.out.println("tablerow" + tableRow);
                     // assume only has one condition
                     curCommandStatus = showTheContent(attributes,nowOperation,nowDemand);
+                    curCommandStatus = "[OK]\n" + curCommandStatus;
                     return curCommandStatus;
                 }
             }

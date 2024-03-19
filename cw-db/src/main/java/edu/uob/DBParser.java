@@ -168,6 +168,16 @@ public class DBParser {
     }
 
     protected String showTheContent (){
+        int checknum = 0;
+        for (int i = 0; i < tableCol.size(); i++) {
+            if(tableCol.get(i).equals(-1)){
+                checknum++;
+            }
+        }
+        if(checknum == tableCol.size()){
+            curCommandStatus ="[ERROR]No attribute in this table";
+            return curCommandStatus;
+        }
         curCommandStatus = "";
             for (int i = 0; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
@@ -198,7 +208,17 @@ public class DBParser {
     }
 
     protected String showTheContent (ArrayList<String> attributes, String operation, String demand){
-        curCommandStatus = "[OK]\n";
+        int checknum = 0;
+        for (int i = 0; i < tableCol.size(); i++) {
+            if(tableCol.get(i).equals(-1)){
+                checknum++;
+            }
+        }
+        if(checknum == tableCol.size()){
+            curCommandStatus ="[ERROR]No attribute in this table";
+            return curCommandStatus;
+        }
+        curCommandStatus = "";
         System.out.println(attributes + operation + demand);
         if(operation.equalsIgnoreCase("==")){
             for (int i = 0; i < tableRow.size(); i++) {

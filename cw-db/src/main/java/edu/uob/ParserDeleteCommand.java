@@ -1,6 +1,10 @@
 package edu.uob;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class ParserDeleteCommand extends DBParser{
     DBServer server = new DBServer();
@@ -9,7 +13,7 @@ public class ParserDeleteCommand extends DBParser{
         this.index = index;
     }
     //<Delete> :: =  "DELETE " "FROM " [TableName] " WHERE " <Condition>
-    protected String parserDelete(){
+    protected String parserDelete() throws IOException {
         if(token.tokens.size()<6){
             System.out.println(token.tokens.size());
             curCommandStatus = "[ERROR]Invalid length for delete command";
@@ -37,8 +41,72 @@ public class ParserDeleteCommand extends DBParser{
             return curCommandStatus;
         }
         index++; // should be condition now - attribute
+        // DELETE FROM marks WHERE name == 'Sion';
         curToken = token.tokens.get(index);
-        curCommandStatus = "[OK]In delete command now";
+        ArrayList<String> check = new ArrayList<String>();
+        check.add(curToken);
+        curCommandStatus = attributeCheck(check);
+        if(curCommandStatus.contains("[ERROR]")){
+            return curCommandStatus;
+        }
+        check.add(curToken);
+        colIndexStorage(filePath,check);
+        index++; // should be operation now
+        curToken = token.tokens.get(index);
+        String operationNow = curToken;
+        index++; // should be the demand now
+        curToken = token.tokens.get(index);
+        curCommandStatus = valueCheck(curToken);
+        if(curCommandStatus.contains("[ERROR]")){
+            curCommandStatus = "[ERROR]Invalid format";
+            return curCommandStatus;
+        }
+        String demandNow = curToken;
+        rowIndexStorage(demandNow);
+        curCommandStatus = showTheContent(check,operationNow,demandNow);
+        if(curCommandStatus.contains("[ERROR]")){
+            return curCommandStatus;
+        }
+        updateContent(curCommandStatus,filePath);
+        curCommandStatus = "[OK]";
+        return curCommandStatus;
+    }
+
+    private void updateContent(String content,String filePath) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
+        writer.write(content);
+        writer.close();
+    }
+    @Override
+    protected String showTheContent (ArrayList<String> attributes, String operation, String demand){
+        System.out.println("tableROw" + tableRow);
+        System.out.println("tableROw" + tableCol);
+        System.out.println("tableContent" + tableContent);
+        int checknum = 0;
+        for (int i = 0; i < tableCol.size(); i++) {
+            if(tableCol.get(i).equals(-1)){
+                checknum++;
+            }
+        }
+        if(checknum == tableCol.size()){
+            curCommandStatus ="[ERROR]No attribute in this table";
+            return curCommandStatus;
+        }
+        curCommandStatus = "";
+        if(operation.equalsIgnoreCase("==")){
+            for (int i = 0; i < tableRow.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+                    if(tableRow.get(i).equals(-1) || i == 0){
+                        if(j == tableCol.size()-1) {
+                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
+                        }else{
+                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
+                        }
+                    }
+                }
+            }
+        }
+        curCommandStatus = curCommandStatus.trim();
         return curCommandStatus;
     }
 }
