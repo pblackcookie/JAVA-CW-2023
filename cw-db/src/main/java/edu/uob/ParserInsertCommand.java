@@ -91,8 +91,10 @@ public class ParserInsertCommand extends DBParser{
             valueList.add(String.valueOf(idNumber)); // Update the id file about this table(file).
             // For loop to store the data -> need to check the number of ,
             for (int i = index+1; i < token.tokens.size()-2; i++) { // should be the data now
-                if (!token.tokens.get(i).equals(",")) {
+                if (!token.tokens.get(i).equals(",") && !(token.tokens.get(i).startsWith("'")&&token.tokens.get(i).endsWith("'"))) {
                     valueList.add(token.tokens.get(i));
+                }else if(token.tokens.get(i).startsWith("'")&&token.tokens.get(i).endsWith("'")) { // remove the ' ' surrounding
+                    valueList.add(token.tokens.get(i).substring(1, token.tokens.get(i).length() - 1));
                 }
             }
             // Compare the insert value number , it should be equals to the attribute name
