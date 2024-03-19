@@ -154,8 +154,8 @@ public class DBParser {
         System.out.println("table Row now" + tableRow);
         tableReader.close();
         int condition = 0;
-        for (int i = 0; i < tableCol.size(); i++) {
-            if(tableCol.get(i)== -1) {
+        for (Integer integer : tableCol) {
+            if (integer == -1) {
                 condition++;
             }
         }
@@ -169,8 +169,8 @@ public class DBParser {
 
     protected String showTheContent (){
         int checknum = 0;
-        for (int i = 0; i < tableCol.size(); i++) {
-            if(tableCol.get(i).equals(-1)){
+        for (Integer integer : tableCol) {
+            if (integer.equals(-1)) {
                 checknum++;
             }
         }
@@ -210,8 +210,8 @@ public class DBParser {
 
     protected String showTheContent (ArrayList<String> attributes, String operation, String demand){
         int checknum = 0;
-        for (int i = 0; i < tableCol.size(); i++) {
-            if(tableCol.get(i).equals(-1)){
+        for (Integer integer : tableCol) {
+            if (integer.equals(-1)) {
                 checknum++;
             }
         }
@@ -252,9 +252,6 @@ public class DBParser {
     }
 
     protected boolean checkOperation(String operation){
-        if(keyWords.contains(operation)){
-            return true;
-        }
-        return false;
+        return keyWords.contains(operation);
     }
 }
