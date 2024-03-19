@@ -39,16 +39,18 @@ public class ParserJoinCommand extends DBParser{
             curCommandStatus = "Invalid command cause the incorrect length";
             return curCommandStatus;
         }
+        String tableName1;
+        String tableName2;
         String curToken = token.tokens.get(index).toLowerCase(); // Table1 now
         //Already check the format when create the table
         String filePath1 = server.getStorageFolderPath() + File.separator + GlobalMethod.getCurDatabaseName()
                 + File.separator +curToken + ".tab";
-        System.out.println(filePath1);
         Path path1 = Paths.get(filePath1);
         if (!Files.exists(path1)){
             curCommandStatus = "[ERROR]Can't find the first table: " + curToken;
             return curCommandStatus;
         }
+        tableName1 = curToken;
         index++; // now the current token should be "AND"
         curToken = token.tokens.get(index);
         if(!curToken.equalsIgnoreCase("AND")){
@@ -65,6 +67,7 @@ public class ParserJoinCommand extends DBParser{
             curCommandStatus = "[ERROR]Can't find the second table: " + curToken;
             return curCommandStatus;
         }
+        tableName2 = curToken;
         index++; // now the current token should be "ON";
         curToken = token.tokens.get(index);
         if(!curToken.equalsIgnoreCase("ON")){
@@ -75,7 +78,7 @@ public class ParserJoinCommand extends DBParser{
         curToken = token.tokens.get(index);
         System.out.println("table one current token:" + curToken);
         // if condition
-        if(!checkLeftTable(filePath1,curToken)){
+        if(!checkLeftTable(filePath1,curToken,tableName1)){
             curCommandStatus = "[ERROR]Attribute is not exist or invalid format";
             return curCommandStatus;
         }
@@ -88,7 +91,7 @@ public class ParserJoinCommand extends DBParser{
         index++; // now the current token should attribute name from table2;
         curToken = token.tokens.get(index);
         System.out.println("table 2 current token:" + curToken);
-        if(!checkRightTable(filePath2,curToken)){
+        if(!checkRightTable(filePath2,curToken,tableName2)){
             curCommandStatus = "[ERROR]Attribute is not exist or invalid format";
             return curCommandStatus;
         }
@@ -99,7 +102,7 @@ public class ParserJoinCommand extends DBParser{
 
     // Set the row and column flags & storage table messages
     // return the boolean value to indicate the attribute name is exist or not
-    private boolean checkLeftTable(String filePath, String attributeName) throws IOException {
+    private boolean checkLeftTable(String filePath, String attributeName, String tableName) throws IOException {
         boolean exist = false;
         BufferedReader tableReader = new BufferedReader(new FileReader(filePath));
         String line = tableReader.readLine();
@@ -116,6 +119,11 @@ public class ParserJoinCommand extends DBParser{
                     table1Col.add(true);
                 }
             }
+            for (int i = 0; i < table1Content.size(); i++) {
+                if(!table1Content.get(i).equals("id") && table1Col.get(i)){
+                    table1Content.set(i, tableName + "." + table1Content.get(i));
+                }
+            }
         while ((line = tableReader.readLine()) != null) {
             table1Content.addAll(Arrays.asList(line.split("\t")));
         }
@@ -126,7 +134,7 @@ public class ParserJoinCommand extends DBParser{
         return exist;
     }
 
-    private boolean checkRightTable(String filePath, String attributeName) throws IOException {
+    private boolean checkRightTable(String filePath, String attributeName, String tableName) throws IOException {
         boolean exist = false;
         BufferedReader tableReader = new BufferedReader(new FileReader(filePath));
         String line = tableReader.readLine();
@@ -137,6 +145,11 @@ public class ParserJoinCommand extends DBParser{
                     exist = true;
                 } else {
                     table2Col.add(true);
+                }
+            }
+            for (int i = 0; i < table2Content.size(); i++) {
+                if(table2Col.get(i)){
+                    table2Content.set(i, tableName + "." + table2Content.get(i));
                 }
             }
         while ((line = tableReader.readLine()) != null) {
@@ -157,7 +170,7 @@ public class ParserJoinCommand extends DBParser{
                 if(table1Col.get(j)){
                     curCommandStatus += table1Content.get(i*table1Col.size()+j) + "\t";
                 }else { // table1 false -> not print out it to the terminal
-                    for (int k = 1; k < table2Row.size(); k++) {
+                    for (int k = 0; k < table2Row.size(); k++) {
                         for (int l = 0; l <table2Col.size() ; l++) {
                             if (Objects.equals(table1Content.get(i * table1Col.size() + j), table2Content.get(k * table2Col.size() + l))){
                                 System.out.println("test now");
