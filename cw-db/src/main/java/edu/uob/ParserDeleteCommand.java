@@ -41,34 +41,7 @@ public class ParserDeleteCommand extends DBParser{
             return curCommandStatus;
         }
         index++; // should be condition now - attribute
-        // DELETE FROM marks WHERE name == 'Sion';
-        curToken = token.tokens.get(index);
-        ArrayList<String> check = new ArrayList<String>();
-        check.add(curToken);
-        curCommandStatus = attributeCheck(check);
-        if(curCommandStatus.contains("[ERROR]")){
-            return curCommandStatus;
-        }
-        check.add(curToken);
-        // update the row column
-        boolean attributeCheck = colIndexStorage(filePath,check);
-        if(!attributeCheck){
-            curCommandStatus = "[ERROR]Does not exist attribute.";
-            return curCommandStatus;
-        } // col for check the table attribute
-        index++; // should be operation now
-        curToken = token.tokens.get(index);
-        String operationNow = curToken;
-        index++; // should be the demand now
-        curToken = token.tokens.get(index);
-        curCommandStatus = valueCheck(curToken);
-        if(curCommandStatus.contains("[ERROR]")){
-            curCommandStatus = "[ERROR]Invalid format";
-            return curCommandStatus;
-        }
-        String demandNow = curToken;
-        rowIndexStorage(demandNow);
-        curCommandStatus = showTheContent(check,operationNow,demandNow);
+        conditionCheck(filePath); // using condition for checking
         if(curCommandStatus.contains("[ERROR]")){
             return curCommandStatus;
         }
@@ -83,7 +56,7 @@ public class ParserDeleteCommand extends DBParser{
         writer.close();
     }
     @Override
-    protected String showTheContent (ArrayList<String> attributes, String operation, String demand){
+    protected String showTheContent (String operation, String demand){
         curCommandStatus = "";
         int rowCount = 0;
         for (int i = 1; i < tableRow.size(); i++) {

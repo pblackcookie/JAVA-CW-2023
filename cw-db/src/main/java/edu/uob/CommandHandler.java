@@ -77,7 +77,7 @@ public class CommandHandler {
                 ParserUpdateCommand pUpdate = new ParserUpdateCommand(curCommand,index);
                 curCommandStatus = pUpdate.parserUpdate();
                 break;
-            case "DELETE": //parserDelete();
+            case "DELETE":
                 index++;
                 ParserDeleteCommand pDelete = new ParserDeleteCommand(curCommand,index);
                 curCommandStatus = pDelete.parserDelete();

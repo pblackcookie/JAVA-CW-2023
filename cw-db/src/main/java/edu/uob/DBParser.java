@@ -198,7 +198,8 @@ public class DBParser {
             }
         return curCommandStatus;
     }
-
+    // need to rewrite
+    // different symbols will lead different reslut
     protected void rowIndexStorage(String demand){
         System.out.println("demand now" + demand);
         if(demand.startsWith("'") && demand.endsWith("'")){
@@ -214,9 +215,8 @@ public class DBParser {
         }
     }
 
-    protected String showTheContent (ArrayList<String> attributes, String operation, String demand){
+    protected String showTheContent ( String operation, String demand){
         curCommandStatus = "";
-        System.out.println(attributes + operation + demand);
         if(operation.equalsIgnoreCase("==")){
             for (int i = 0; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
@@ -251,7 +251,7 @@ public class DBParser {
         return keyWords.contains(operation);
     }
     // for condition check (only one condition)
-    protected String conditionCheck(){
+    protected String conditionCheck(String filePath) throws IOException {
         // assume only one condition now
         String symbol;
         String curToken = token.tokens.get(index); // ( or attribute
@@ -267,6 +267,11 @@ public class DBParser {
             return curCommandStatus;
         }
         attributes.add(curToken);
+        boolean exist = colIndexStorage(filePath,attributes);
+        if(!exist){
+            curCommandStatus ="[ERROR]Attributes not exist.";
+            return curCommandStatus;
+        }
         // symbol check
         index++;
         curToken = token.tokens.get(index);
@@ -287,9 +292,9 @@ public class DBParser {
         }
         rowIndexStorage(curToken);
         System.out.println("In the update now");
-        System.out.println(attributes+" " + symbol + " " + curToken);
+        System.out.println(attributes+ " " + symbol + " " + curToken);
         rowIndexStorage(curToken);
-        curCommandStatus = showTheContent(attributes,symbol,curToken);
+        curCommandStatus = showTheContent(symbol,curToken);
         return curCommandStatus;
     }
 }

@@ -74,7 +74,7 @@ public class ParserUpdateCommand extends DBParser{
         }
         index++; // from here the condition start
         // UPDATE marks SET age = 35 WHERE name == 'Simon';
-        curCommandStatus = conditionCheck();
+        curCommandStatus = conditionCheck(filePath);
         System.out.println("tableCol now: " +tableCol);
         System.out.println("tableRow now: " + tableRow);
         curCommandStatus = readContend(filePath);
