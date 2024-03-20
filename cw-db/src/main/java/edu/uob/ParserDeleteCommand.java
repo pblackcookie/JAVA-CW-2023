@@ -64,20 +64,17 @@ public class ParserDeleteCommand extends DBParser{
                 rowCount++;
             }
         }
-        if(operation.equalsIgnoreCase("==")){
-            // check the information exist first
             if(tableRow.size()-1 == rowCount){
                 curCommandStatus = "[ERROR]Value does not exist";
                 return curCommandStatus;
             }
-            for (int i = 0; i < tableRow.size(); i++) {
-                for (int j = 0; j < tableCol.size(); j++) {
-                    if(tableRow.get(i).equals(-1) || i == 0){
-                        if(j == tableCol.size()-1) {
-                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
-                        }else{
-                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
-                        }
+        for (int i = 0; i < tableRow.size(); i++) {
+            for (int j = 0; j < tableCol.size(); j++) {
+                if(tableRow.get(i).equals(-1) || i == 0){
+                    if(j == tableCol.size()-1) {
+                        curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
+                    }else{
+                        curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
                     }
                 }
             }
