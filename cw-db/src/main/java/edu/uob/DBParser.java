@@ -287,7 +287,7 @@ public class DBParser {
         }
         rowIndexStorage(curToken);
         System.out.println("In the update now");
-        System.out.println(attributes+symbol+curToken);
+        System.out.println(attributes+" " + symbol + " " + curToken);
         rowIndexStorage(curToken);
         curCommandStatus = showTheContent(attributes,symbol,curToken);
         return curCommandStatus;

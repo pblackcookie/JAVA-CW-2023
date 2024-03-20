@@ -1,6 +1,8 @@
 package edu.uob;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -75,6 +77,38 @@ public class ParserUpdateCommand extends DBParser{
         curCommandStatus = conditionCheck();
         System.out.println("tableCol now: " +tableCol);
         System.out.println("tableRow now: " + tableRow);
+        curCommandStatus = readContend(filePath);
+        System.out.println(curCommandStatus);
+        updateContent(curCommandStatus,filePath);
+        curCommandStatus = "[OK]";
         return curCommandStatus;
+    }
+
+    private void updateContent(String content,String filePath) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
+        writer.write(content);
+        writer.close();
+    }
+
+    private String readContend(String filePath){
+        curCommandStatus = "";
+        for (int i = 0; i < tableRow.size(); i++) {
+            for (int j = 0; j < tableCol.size(); j++) {
+                if(tableRow.get(i).equals(-1) || i == 0|| tableCol.get(j).equals(-1) ){
+                    if(j == tableCol.size()-1) {
+                        curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
+                    }else{
+                        curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
+                    }
+                }else{
+                    if(j == tableCol.size()-1) {
+                        curCommandStatus += keyValueMap.get((tableContent.get(j).toLowerCase())) + "\n";
+                    }else{
+                        curCommandStatus += keyValueMap.get((tableContent.get(j).toLowerCase())) + "\t";
+                    }
+                }
+            }
+        }
+        return  curCommandStatus;
     }
 }
