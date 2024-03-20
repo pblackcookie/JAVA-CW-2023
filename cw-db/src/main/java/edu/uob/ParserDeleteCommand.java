@@ -79,19 +79,6 @@ public class ParserDeleteCommand extends DBParser{
     }
     @Override
     protected String showTheContent (ArrayList<String> attributes, String operation, String demand){
-        System.out.println("tableROw" + tableRow);
-        System.out.println("tableROw" + tableCol);
-        System.out.println("tableContent" + tableContent);
-        int checknum = 0;
-        for (int i = 0; i < tableCol.size(); i++) {
-            if(tableCol.get(i).equals(-1)){
-                checknum++;
-            }
-        }
-        if(checknum == tableCol.size()){
-            curCommandStatus ="[ERROR]No attribute in this table";
-            return curCommandStatus;
-        }
         curCommandStatus = "";
         if(operation.equalsIgnoreCase("==")){
             for (int i = 0; i < tableRow.size(); i++) {

@@ -128,10 +128,19 @@ public class DBParser {
         boolean exist = false;
         BufferedReader tableReader = new BufferedReader(new FileReader(filePath));
         String line = tableReader.readLine();
+        int duplicate = 0;
         tableContent.addAll(Arrays.asList(line.split("\t")));
         // for loop for storage the information that need to be shown
         for (int i = 0; i < tableContent.size(); i++) {
             tableCol.add(-1);
+        }// for loop for record the duplicate elements
+        for (int i = 0; i < attributeNames.size(); i++) {
+            String attributeNow = attributeNames.get(i);
+            for (int j = i+1; j < attributeNames.size(); j++) {
+                if(attributeNow.equalsIgnoreCase(attributeNames.get(j))){
+                    duplicate++;
+                }
+            }
         }
         for (int i = 0; i < attributeNames.size(); i++) {
             for (int j = 0; j < tableContent.size(); j++) {
@@ -158,8 +167,8 @@ public class DBParser {
             if (integer == -1) {
                 condition++;
             }
-        }
-        if(condition == (tableCol.size()-attributeNames.size())){
+        }// solve the problem when duplicate same name.
+        if(condition == (tableCol.size()-(attributeNames.size()-duplicate))){
             exist = true;
             return exist;
         }else {
@@ -168,16 +177,6 @@ public class DBParser {
     }
 
     protected String showTheContent (){
-        int checknum = 0;
-        for (Integer integer : tableCol) {
-            if (integer.equals(-1)) {
-                checknum++;
-            }
-        }
-        if(checknum == tableCol.size()){
-            curCommandStatus ="[ERROR]No attribute in this table";
-            return curCommandStatus;
-        }
         curCommandStatus = "";
             for (int i = 0; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
@@ -209,16 +208,6 @@ public class DBParser {
     }
 
     protected String showTheContent (ArrayList<String> attributes, String operation, String demand){
-        int checknum = 0;
-        for (Integer integer : tableCol) {
-            if (integer.equals(-1)) {
-                checknum++;
-            }
-        }
-        if(checknum == tableCol.size()){
-            curCommandStatus ="[ERROR]No attribute in this table";
-            return curCommandStatus;
-        }
         curCommandStatus = "";
         System.out.println(attributes + operation + demand);
         if(operation.equalsIgnoreCase("==")){
