@@ -10,7 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ParserUpdateCommand extends DBParser{
-    Map<String, String> keyValueMap = new HashMap<>();
+    ArrayList<String> setAttribute = new ArrayList<>();
+    ArrayList<String> setValue = new ArrayList<>();
     public ParserUpdateCommand(String command, int index) {
         super(command);
         this.index = index;
@@ -43,14 +44,15 @@ public class ParserUpdateCommand extends DBParser{
             curCommandStatus = "Attributes invalid.";
             return curCommandStatus;
         }
-        String key = curToken.toLowerCase();
+        curToken = curToken.toLowerCase();
+        setAttribute.add(curToken);
         attributes.add(curToken);
         // update the row column
-        boolean attributeCheck = colIndexStorage(filePath,attributes);
-        if(!attributeCheck){
-            curCommandStatus = "[ERROR]Does not exist attribute.";
-            return curCommandStatus;
-        }
+//        boolean attributeCheck = colIndexStorage(filePath,attributes);
+//        if(!attributeCheck){
+//            curCommandStatus = "[ERROR]Does not exist attribute.";
+//            return curCommandStatus;
+//        }
         index++; // must be = in here
         curToken =  token.tokens.get(index);
         if(!curToken.equalsIgnoreCase("=")){
@@ -64,8 +66,8 @@ public class ParserUpdateCommand extends DBParser{
             curCommandStatus = "[ERROR]Invalid value type.";
             return curCommandStatus;
         }
-        String value = curToken.toLowerCase();
-        keyValueMap.put(key,value); // like age : 35
+        curToken = curToken.toLowerCase();
+        setValue.add(curToken);
         index++;
         curToken = token.tokens.get(index); // must be 'where' in here
         if(!curToken.equalsIgnoreCase("WHERE")){
@@ -94,17 +96,26 @@ public class ParserUpdateCommand extends DBParser{
         curCommandStatus = "";
         for (int i = 0; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
-                if(tableRow.get(i).equals(-1) || i == 0|| tableCol.get(j).equals(-1) ){
+                if(tableRow.get(i).equals(-1) || i == 0){
                     if(j == tableCol.size()-1) {
                         curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
                     }else{
                         curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
                     }
-                }else{
-                    if(j == tableCol.size()-1) {
-                        curCommandStatus += keyValueMap.get((tableContent.get(j).toLowerCase())) + "\n";
+                }
+                if(!tableRow.get(i).equals(-1) && i != 0){
+                    if(tableContent.get(j).equalsIgnoreCase(setAttribute.get(0))){
+                        if(j == tableCol.size()-1) {
+                            curCommandStatus += setValue.get(0) + "\n";
+                        }else{
+                            curCommandStatus += setValue.get(0) + "\t";
+                        }
                     }else{
-                        curCommandStatus += keyValueMap.get((tableContent.get(j).toLowerCase())) + "\t";
+                        if(j == tableCol.size()-1) {
+                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
+                        }else{
+                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
+                        }
                     }
                 }
             }

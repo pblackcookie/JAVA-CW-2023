@@ -237,10 +237,10 @@ public class ExampleDBTests {
         assertTrue(response.contains("[OK]"));
         assertFalse(response.contains("[ERROR]"));
         assertFalse(response.contains("Sion"));
-//        response=sendCommandToServer("SELECT * FROM marks WHERE (pass == FALSE) AND (mark > 35);");
-//        assertTrue(response.contains("[OK]"));
-//        assertFalse(response.contains("[ERROR]"));
-//        assertTrue(response.contains("Chris"));
+        response=sendCommandToServer("SELECT * FROM marks WHERE (pass == FALSE) AND (mark > 35);");
+        assertTrue(response.contains("[OK]"));
+        assertFalse(response.contains("[ERROR]"));
+        assertTrue(response.contains("Chris"));
         response=sendCommandToServer("SELECT * FROM marks WHERE name LIKE 'i';");
         assertTrue(response.contains("[OK]"));
         assertFalse(response.contains("[ERROR]"));

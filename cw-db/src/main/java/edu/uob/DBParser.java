@@ -133,9 +133,11 @@ public class DBParser {
         int duplicate = 0;
         tableContent.addAll(Arrays.asList(line.split("\t")));
         // for loop for storage the information that need to be shown
-        for (int i = 0; i < tableContent.size(); i++) {
-            if(tableCol.size()<=tableContent.size()) { // prevent many times adding
-                tableCol.add(-1);
+        if(tableCol.size() == 0) {
+            for (int i = 0; i < tableContent.size(); i++) {
+                if (tableCol.size() <= tableContent.size()) { // prevent many times adding
+                    tableCol.add(-1);
+                }
             }
         }// for loop for record the duplicate elements
         for (int i = 0; i < attributeNames.size(); i++) {
@@ -172,14 +174,14 @@ public class DBParser {
                 condition++;
             }
         }// solve the problem when duplicate same name.
-        /*if(condition == (tableCol.size()-(attributeNames.size()-duplicate))){
+        if(condition == (tableCol.size()-(attributeNames.size()-duplicate))){
             exist = true;
             return exist;
         }else {
             return exist;
-        }*/ // check can not be the here
-        exist = true;
-        return exist;
+        } // check can not be the here
+//        exist = true;
+//        return exist;
     }
 
 
