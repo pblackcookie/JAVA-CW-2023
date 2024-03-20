@@ -21,6 +21,8 @@ public class DBParser {
     DatabaseProcess database = new DatabaseProcess();
     FileProcess table = new FileProcess();
 
+    DBServer server = new DBServer();
+
 
 
     public DBParser(String command){

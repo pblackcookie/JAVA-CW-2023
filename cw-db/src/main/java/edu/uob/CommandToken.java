@@ -5,7 +5,8 @@ import java.util.List;
 
 // Token Class is rewrite from the provided code
 public class CommandToken {
-    String[] specialCharacters = {"(", ")", ",", ";"};
+    String[] specialCharacters = {"(", ")", ",", ";",">","<","=","!"};
+    //String[] specialCharacters = {"(", ")", ",", ";"};
      ArrayList<String> tokens = new ArrayList<>();
 
     public List<String> setup(String query) {
