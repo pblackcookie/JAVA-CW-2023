@@ -215,15 +215,51 @@ public class DBParser {
         }else if(symbol.equals(">")){
             for (int i = 0; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
-
+                    if (!tableCol.get(j).equals(-1)) {
+                        float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                        float demandNow = Float.parseFloat(demand);
+                        if(numberNow > demandNow){
+                            tableRow.set(i, 0);
+                        }
+                    }
                 }
             }
         }else if(symbol.equals("<")){
-
+            for (int i = 0; i < tableRow.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+                    if (!tableCol.get(j).equals(-1)) {
+                        float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                        float demandNow = Float.parseFloat(demand);
+                        if(numberNow < demandNow){
+                            tableRow.set(i, 0);
+                        }
+                    }
+                }
+            }
         }else if(symbol.equals(">=")){
-
+            for (int i = 0; i < tableRow.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+                    if (!tableCol.get(j).equals(-1)) {
+                        float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                        float demandNow = Float.parseFloat(demand);
+                        if(numberNow >= demandNow){
+                            tableRow.set(i, 0);
+                        }
+                    }
+                }
+            }
         }else if(symbol.equals("<=")){
-
+            for (int i = 0; i < tableRow.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+                    if (!tableCol.get(j).equals(-1)) {
+                        float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                        float demandNow = Float.parseFloat(demand);
+                        if(numberNow <= demandNow){
+                            tableRow.set(i, 0);
+                        }
+                    }
+                }
+            }
         }else if(symbol.equalsIgnoreCase("LIKE")){
             for (int i = 0; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
