@@ -186,14 +186,15 @@ public class DBParser {
     // need to rewrite
     // different symbols will lead different result
     // col now -> then row : ordered
-    protected void rowIndexStorage(String symbol,String demand){
+    protected boolean rowIndexStorage(String symbol,String demand){
+        boolean valid = true;
         System.out.println("symbol now" + symbol);
         System.out.println("demand now" + demand);
         if(demand.startsWith("'") && demand.endsWith("'")){
             demand = demand.substring(1, demand.length() - 1); // remove "'"
         }
         if(symbol.equals("==")) {
-            for (int i = 0; i < tableRow.size(); i++) {
+            for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1)) {
                         if (tableContent.get(i * tableCol.size() + j).equalsIgnoreCase(demand)) {
@@ -202,8 +203,9 @@ public class DBParser {
                     }
                 }
             }
+            return valid;
         }else if(symbol.equals("!=")){
-            for (int i = 0; i < tableRow.size(); i++) {
+            for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1)) {
                         if (!tableContent.get(i * tableCol.size() + j).equalsIgnoreCase(demand)) {
@@ -212,8 +214,9 @@ public class DBParser {
                     }
                 }
             }
+            return valid;
         }else if(symbol.equals(">")){
-            for (int i = 0; i < tableRow.size(); i++) {
+            for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1)) {
                         float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
@@ -224,8 +227,9 @@ public class DBParser {
                     }
                 }
             }
+            return valid;
         }else if(symbol.equals("<")){
-            for (int i = 0; i < tableRow.size(); i++) {
+            for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1)) {
                         float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
@@ -236,8 +240,9 @@ public class DBParser {
                     }
                 }
             }
+            return valid;
         }else if(symbol.equals(">=")){
-            for (int i = 0; i < tableRow.size(); i++) {
+            for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1)) {
                         float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
@@ -248,8 +253,9 @@ public class DBParser {
                     }
                 }
             }
+            return valid;
         }else if(symbol.equals("<=")){
-            for (int i = 0; i < tableRow.size(); i++) {
+            for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1)) {
                         float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
@@ -260,8 +266,9 @@ public class DBParser {
                     }
                 }
             }
+            return valid;
         }else if(symbol.equalsIgnoreCase("LIKE")){
-            for (int i = 0; i < tableRow.size(); i++) {
+            for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1)) {
                         String element = tableContent.get(i * tableCol.size() + j);
@@ -271,9 +278,11 @@ public class DBParser {
                     }
                 }
             }
+            return valid;
         }
+        valid = false;
+        return valid;
     }
-
 
     protected String showTheContent (){
         curCommandStatus = "";
@@ -293,37 +302,22 @@ public class DBParser {
     }
 
 
-    protected String showTheContent ( String operation, String demand){
-        curCommandStatus = "";
-        if(operation.equalsIgnoreCase("==")){
-            for (int i = 0; i < tableRow.size(); i++) {
-                for (int j = 0; j < tableCol.size(); j++) {
-                    if(tableRow.get(i)!= -1){
-                        if(j == tableCol.size()-1) {
-                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
-                        }else{
-                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
-                        }
+protected String showTheContent (String operation, String demand){
+    curCommandStatus = "";
+        for (int i = 0; i < tableRow.size(); i++) {
+            for (int j = 0; j < tableCol.size(); j++) {
+                if(tableRow.get(i)!= -1){
+                    if(j == tableCol.size()-1) {
+                        curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
+                    }else{
+                        curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
                     }
                 }
             }
-        } else if (operation.equalsIgnoreCase("!=")) {
-            for (int i = 0; i < tableRow.size(); i++) {
-                for (int j = 0; j < tableCol.size(); j++) {
-                    if(tableRow.get(i).equals(-1) || (i == 0)){// table head
-                        if(j == tableCol.size()-1) {
-                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
-                        }else{
-                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
-                        }
-                    }
-                }
-            }
-
         }
-        curCommandStatus = curCommandStatus.trim();
-        return curCommandStatus;
-    }
+    curCommandStatus = curCommandStatus.trim();
+    return curCommandStatus;
+}
 
     protected boolean checkOperation(String operation){
         return keyWords.contains(operation);
@@ -369,7 +363,11 @@ public class DBParser {
             return curCommandStatus;
         }
         System.out.println(attributes+ " " + symbol + " " + curToken);
-        rowIndexStorage(symbol,curToken);
+        boolean symbolValid = rowIndexStorage(symbol,curToken);
+        if(!symbolValid){
+            curCommandStatus = "[ERROR]Detected the invalid symbol:" + symbol;
+            return curCommandStatus;
+        }
         curCommandStatus = showTheContent(symbol,curToken);
         return curCommandStatus;
     }
