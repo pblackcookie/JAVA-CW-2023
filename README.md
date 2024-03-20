@@ -53,3 +53,11 @@ Statring to add some logic process functions into handleCommandhandle function i
 1. now the database can join two different tables now.
 
 2. Fix some bugs that the insert will insert the 'String' type with "'". --> remove it.
+
+### Implement the update and delete function for the simplest test.
+
+1. Create delete class and update successfully.
+
+2. Add only one condition check.
+
+3. Add current database use check when in select command.
