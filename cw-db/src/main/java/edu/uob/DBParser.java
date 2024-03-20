@@ -182,6 +182,63 @@ public class DBParser {
         return exist;
     }
 
+
+    // need to rewrite
+    // different symbols will lead different result
+    // col now -> then row : ordered
+    protected void rowIndexStorage(String symbol,String demand){
+        System.out.println("symbol now" + symbol);
+        System.out.println("demand now" + demand);
+        if(demand.startsWith("'") && demand.endsWith("'")){
+            demand = demand.substring(1, demand.length() - 1); // remove "'"
+        }
+        if(symbol.equals("==")) {
+            for (int i = 0; i < tableRow.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+                    if (!tableCol.get(j).equals(-1)) {
+                        if (tableContent.get(i * tableCol.size() + j).equalsIgnoreCase(demand)) {
+                            tableRow.set(i, 0);
+                        }
+                    }
+                }
+            }
+        }else if(symbol.equals("!=")){
+            for (int i = 0; i < tableRow.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+                    if (!tableCol.get(j).equals(-1)) {
+                        if (!tableContent.get(i * tableCol.size() + j).equalsIgnoreCase(demand)) {
+                            tableRow.set(i, 0);
+                        }
+                    }
+                }
+            }
+        }else if(symbol.equals(">")){
+            for (int i = 0; i < tableRow.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+
+                }
+            }
+        }else if(symbol.equals("<")){
+
+        }else if(symbol.equals(">=")){
+
+        }else if(symbol.equals("<=")){
+
+        }else if(symbol.equalsIgnoreCase("LIKE")){
+            for (int i = 0; i < tableRow.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+                    if (!tableCol.get(j).equals(-1)) {
+                        String element = tableContent.get(i * tableCol.size() + j);
+                        if (element.contains(demand)) {
+                            tableRow.set(i, 0);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
     protected String showTheContent (){
         curCommandStatus = "";
             for (int i = 0; i < tableRow.size(); i++) {
@@ -198,22 +255,7 @@ public class DBParser {
             }
         return curCommandStatus;
     }
-    // need to rewrite
-    // different symbols will lead different reslut
-    protected void rowIndexStorage(String demand){
-        System.out.println("demand now" + demand);
-        if(demand.startsWith("'") && demand.endsWith("'")){
-            demand = demand.substring(1, demand.length() - 1); // remove "'"
-        }
-        System.out.println("demand now" + demand);
-        for (int i = 0; i < tableRow.size(); i++) {
-            for (int j = 0; j < tableCol.size(); j++) {
-                if(tableContent.get(i*tableCol.size()+j).equalsIgnoreCase(demand)){
-                    tableRow.set(i,0);
-                }
-            }
-        }
-    }
+
 
     protected String showTheContent ( String operation, String demand){
         curCommandStatus = "";
@@ -290,10 +332,8 @@ public class DBParser {
             curCommandStatus = "[ERROR]Value format invalid";
             return curCommandStatus;
         }
-        rowIndexStorage(curToken);
-        System.out.println("In the update now");
         System.out.println(attributes+ " " + symbol + " " + curToken);
-        rowIndexStorage(curToken);
+        rowIndexStorage(symbol,curToken);
         curCommandStatus = showTheContent(symbol,curToken);
         return curCommandStatus;
     }

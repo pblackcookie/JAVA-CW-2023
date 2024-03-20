@@ -178,7 +178,7 @@ public class ParserSelectCommand extends DBParser{
                         return curCommandStatus;
                     }
                     String nowDemand = curToken;
-                    rowIndexStorage(nowDemand);
+                    //rowIndexStorage(nowDemand);
                     System.out.println("tablecol" + tableCol);
                     System.out.println("tablerow" + tableRow);
                     // assume only has one condition
