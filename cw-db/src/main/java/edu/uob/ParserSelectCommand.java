@@ -48,6 +48,10 @@ public class ParserSelectCommand extends DBParser{
                     }
                 }
                 curCommandStatus = "[ERROR]Selected table dos not exist.";
+                if(GlobalMethod.getCurDatabaseName() == null){
+                    curCommandStatus = "[ERROR]Database does not set.";
+                    return curCommandStatus;
+                }
                 return curCommandStatus;
             }else {// when the length = 5, current token be one attribute name;
                 curCommandStatus = nameCheck(curToken);
@@ -65,7 +69,11 @@ public class ParserSelectCommand extends DBParser{
                     return curCommandStatus;
                 }
                 index++;
-                curToken = token.tokens.get(index).toLowerCase(); // should be table name now
+                curToken = token.tokens.get(index).toLowerCase(); // should be table name now'
+                if(GlobalMethod.getCurDatabaseName() == null){
+                    curCommandStatus = "[ERROR]Database does not set.";
+                    return curCommandStatus;
+                }
                 String filePath = server.getStorageFolderPath() + File.separator + GlobalMethod.getCurDatabaseName()
                         + File.separator +curToken + ".tab";
                 boolean exist = colIndexStorage(filePath,attributeNames);
