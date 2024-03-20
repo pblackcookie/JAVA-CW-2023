@@ -50,7 +50,11 @@ public class ParserDeleteCommand extends DBParser{
             return curCommandStatus;
         }
         check.add(curToken);
-        colIndexStorage(filePath,check);
+        boolean attributeCheck = colIndexStorage(filePath,check);
+        if(!attributeCheck){
+            curCommandStatus = "[ERROR]Does not exist attribute.";
+            return curCommandStatus;
+        } // col for check the table attribute
         index++; // should be operation now
         curToken = token.tokens.get(index);
         String operationNow = curToken;
@@ -80,7 +84,18 @@ public class ParserDeleteCommand extends DBParser{
     @Override
     protected String showTheContent (ArrayList<String> attributes, String operation, String demand){
         curCommandStatus = "";
+        int rowCount = 0;
+        for (int i = 1; i < tableRow.size(); i++) {
+            if(tableRow.get(i).equals(-1)){
+                rowCount++;
+            }
+        }
         if(operation.equalsIgnoreCase("==")){
+            // check the information exist first
+            if(tableRow.size()-1 == rowCount){
+                curCommandStatus = "[ERROR]Value does not exist";
+                return curCommandStatus;
+            }
             for (int i = 0; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if(tableRow.get(i).equals(-1) || i == 0){

@@ -204,7 +204,6 @@ public class DBParser {
                 }
             }
         }
-
     }
 
     protected String showTheContent (ArrayList<String> attributes, String operation, String demand){
