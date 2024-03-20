@@ -1,17 +1,20 @@
 package edu.uob;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ParserUpdateCommand extends DBParser{
-
+    Map<String, String> keyValueMap = new HashMap<>();
     public ParserUpdateCommand(String command, int index) {
         super(command);
         this.index = index;
     }
 //<Update> ::=  "UPDATE " [TableName] " SET " <NameValueList> " WHERE " <Condition>
-    protected String parserUpdate(){
+    protected String parserUpdate() throws IOException {
         String curToken = token.tokens.get(index).toLowerCase(); // table name now
         String filePath = server.getStorageFolderPath() + File.separator + GlobalMethod.getCurDatabaseName()
                 + File.separator + curToken + ".tab";
@@ -38,7 +41,14 @@ public class ParserUpdateCommand extends DBParser{
             curCommandStatus = "Attributes invalid.";
             return curCommandStatus;
         }
+        String key = curToken.toLowerCase();
         attributes.add(curToken);
+        // update the row column
+        boolean attributeCheck = colIndexStorage(filePath,attributes);
+        if(!attributeCheck){
+            curCommandStatus = "[ERROR]Does not exist attribute.";
+            return curCommandStatus;
+        }
         index++; // must be = in here
         curToken =  token.tokens.get(index);
         if(!curToken.equalsIgnoreCase("=")){
@@ -52,6 +62,8 @@ public class ParserUpdateCommand extends DBParser{
             curCommandStatus = "[ERROR]Invalid value type.";
             return curCommandStatus;
         }
+        String value = curToken.toLowerCase();
+        keyValueMap.put(key,value); // like age : 35
         index++;
         curToken = token.tokens.get(index); // must be 'where' in here
         if(!curToken.equalsIgnoreCase("WHERE")){
@@ -59,7 +71,10 @@ public class ParserUpdateCommand extends DBParser{
             return curCommandStatus;
         }
         index++; // from here the condition start
-
+        // UPDATE marks SET age = 35 WHERE name == 'Simon';
+        curCommandStatus = conditionCheck();
+        System.out.println("tableCol now: " +tableCol);
+        System.out.println("tableRow now: " + tableRow);
         return curCommandStatus;
     }
 }

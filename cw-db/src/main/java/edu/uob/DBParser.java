@@ -134,7 +134,9 @@ public class DBParser {
         tableContent.addAll(Arrays.asList(line.split("\t")));
         // for loop for storage the information that need to be shown
         for (int i = 0; i < tableContent.size(); i++) {
-            tableCol.add(-1);
+            if(tableCol.size()<=tableContent.size()) { // prevent many times adding
+                tableCol.add(-1);
+            }
         }// for loop for record the duplicate elements
         for (int i = 0; i < attributeNames.size(); i++) {
             String attributeNow = attributeNames.get(i);
@@ -170,12 +172,14 @@ public class DBParser {
                 condition++;
             }
         }// solve the problem when duplicate same name.
-        if(condition == (tableCol.size()-(attributeNames.size()-duplicate))){
+        /*if(condition == (tableCol.size()-(attributeNames.size()-duplicate))){
             exist = true;
             return exist;
         }else {
             return exist;
-        }
+        }*/ // check can not be the here
+        exist = true;
+        return exist;
     }
 
     protected String showTheContent (){
@@ -196,9 +200,11 @@ public class DBParser {
     }
 
     protected void rowIndexStorage(String demand){
+        System.out.println("demand now" + demand);
         if(demand.startsWith("'") && demand.endsWith("'")){
             demand = demand.substring(1, demand.length() - 1); // remove "'"
         }
+        System.out.println("demand now" + demand);
         for (int i = 0; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if(tableContent.get(i*tableCol.size()+j).equalsIgnoreCase(demand)){
@@ -243,5 +249,47 @@ public class DBParser {
 
     protected boolean checkOperation(String operation){
         return keyWords.contains(operation);
+    }
+    // for condition check (only one condition)
+    protected String conditionCheck(){
+        // assume only one condition now
+        String symbol;
+        String curToken = token.tokens.get(index); // ( or attribute
+        if(curToken.equalsIgnoreCase("(")){
+            index++; //ignore
+            curToken = token.tokens.get(index); // attribute
+        }
+        ArrayList<String> attributes = new ArrayList<>() ;
+        attributes.add(curToken);
+        curCommandStatus = attributeCheck(attributes);
+        if(curCommandStatus.contains("[ERROR]")){
+            curCommandStatus = "[ERROR]Attribute error.";
+            return curCommandStatus;
+        }
+        attributes.add(curToken);
+        // symbol check
+        index++;
+        curToken = token.tokens.get(index);
+        symbol = curToken;
+        if(symbol.equals("=")||symbol.equals("!")||symbol.equals("<")||symbol.equals(">")){
+            index++; // may be the values or another symbol.
+            curToken = token.tokens.get(index);
+            if(curToken.equals("=")){
+                symbol = symbol + curToken;
+                index++;
+                curToken = token.tokens.get(index); // one values in here
+            }
+        }// make sure after this if-condition the current token is the
+        curCommandStatus = valueCheck(curToken);
+        if(curCommandStatus.contains("[ERROR]")){
+            curCommandStatus = "[ERROR]Value format invalid";
+            return curCommandStatus;
+        }
+        rowIndexStorage(curToken);
+        System.out.println("In the update now");
+        System.out.println(attributes+symbol+curToken);
+        rowIndexStorage(curToken);
+        curCommandStatus = showTheContent(attributes,symbol,curToken);
+        return curCommandStatus;
     }
 }

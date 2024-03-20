@@ -50,6 +50,7 @@ public class ParserDeleteCommand extends DBParser{
             return curCommandStatus;
         }
         check.add(curToken);
+        // update the row column
         boolean attributeCheck = colIndexStorage(filePath,check);
         if(!attributeCheck){
             curCommandStatus = "[ERROR]Does not exist attribute.";
