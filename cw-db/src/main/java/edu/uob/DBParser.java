@@ -348,7 +348,7 @@ protected String showTheContent (String operation, String demand){
         index++;
         curToken = token.tokens.get(index);
         symbol = curToken;
-        if(symbol.equals("=")||symbol.equals("!")||symbol.equals("<")||symbol.equals(">")){
+        if(symbol.equals("=")||symbol.equals("!")||symbol.equals("<")||symbol.equals(">")||symbol.equalsIgnoreCase("LIKE")){
             index++; // may be the values or another symbol.
             curToken = token.tokens.get(index);
             if(curToken.equals("=")){
