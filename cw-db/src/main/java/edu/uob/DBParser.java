@@ -19,6 +19,8 @@ public class DBParser {
     ArrayList<String> data = new ArrayList<>();
 
     ArrayList<String> selectAttributes = new ArrayList<>();
+
+
     CommandToken token = new CommandToken(); // storage all tokens
     DatabaseProcess database = new DatabaseProcess();
     FileProcess table = new FileProcess();
@@ -48,7 +50,6 @@ public class DBParser {
         }
         return "[OK]Valid Name";
     }
-
 
     // Check if the attributes is valid -- using Recursion method
     // <AttributeList>   ::=  [AttributeName] | [AttributeName] "," <AttributeList>
@@ -167,35 +168,35 @@ public class DBParser {
 
     // different symbols will lead different result
     // col now -> then row : ordered
-    protected boolean rowIndexStorage(String symbol,String demand){
+    protected boolean rowIndexStorage(String symbol,String demand, ArrayList<String> rowIndex){
         if(demand.startsWith("'") && demand.endsWith("'")){
             demand = demand.substring(1, demand.length() - 1); // remove "'"
         }
         switch(symbol){
             case "==":
-                rowIndexStorageEquals(demand);break;
+                rowIndexStorageEquals(demand,rowIndex);break;
             case "!=":
-                rowIndexStorageNotEquals(demand); break;
+                rowIndexStorageNotEquals(demand,rowIndex); break;
             case ">" :
-                if(!rowIndexStorageMoreThan(demand)){return false;}
+                if(!rowIndexStorageMoreThan(demand,rowIndex)){return false;}
                 break;
             case ">=":
-                if(!rowIndexStorageMoreThanEquals(demand)){return false;}
+                if(!rowIndexStorageMoreThanEquals(demand,rowIndex)){return false;}
                 break;
             case "<":
-                if(!rowIndexStorageLessThan(demand)){return false;}
+                if(!rowIndexStorageLessThan(demand,rowIndex)){return false;}
                 break;
             case "<=":
-                if(!rowIndexStorageLessThanEquals(demand)){return false;}
+                if(!rowIndexStorageLessThanEquals(demand,rowIndex)){return false;}
                 break;
             case "LIKE":
-                rowIndexStorageLike(demand);
+                rowIndexStorageLike(demand,rowIndex);
                 break;
             default: return false;
         }
         return true;
     }
-    protected void rowIndexStorageEquals(String demand){ //==
+    protected void rowIndexStorageEquals(String demand,ArrayList<String> rowIndex){ //==
         for (int i = 1; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
@@ -214,7 +215,7 @@ public class DBParser {
             }
         }
     }
-    protected void rowIndexStorageNotEquals(String demand) { //!=
+    protected void rowIndexStorageNotEquals(String demand,ArrayList<String> rowIndex) { //!=
         for (int i = 1; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
@@ -233,7 +234,7 @@ public class DBParser {
             }
         }
     }
-    protected boolean rowIndexStorageMoreThan(String demand) { // >
+    protected boolean rowIndexStorageMoreThan(String demand,ArrayList<String> rowIndex) { // >
         try{
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
@@ -261,7 +262,7 @@ public class DBParser {
         }
         return true;
     }
-    protected boolean rowIndexStorageLessThan(String demand) { //<
+    protected boolean rowIndexStorageLessThan(String demand,ArrayList<String> rowIndex) { //<
         try {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
@@ -289,7 +290,7 @@ public class DBParser {
         }
         return true;
     }
-    protected boolean rowIndexStorageMoreThanEquals(String demand) { // >=
+    protected boolean rowIndexStorageMoreThanEquals(String demand,ArrayList<String> rowIndex) { // >=
         try{
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
@@ -317,7 +318,7 @@ public class DBParser {
         }
         return true;
     }
-    protected boolean rowIndexStorageLessThanEquals(String demand){  //<=
+    protected boolean rowIndexStorageLessThanEquals(String demand,ArrayList<String> rowIndex){  //<=
         try {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
@@ -345,7 +346,7 @@ public class DBParser {
         }
         return true;
     }
-    protected void rowIndexStorageLike(String demand){ // LIKE
+    protected void rowIndexStorageLike(String demand,ArrayList<String> rowIndex){ // LIKE
         for (int i = 1; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
@@ -406,53 +407,119 @@ protected String showTheContent (String operation, String demand){
     return curCommandStatus;
 }
     // for condition check (only one condition)
-    protected String conditionCheck(String filePath) throws IOException {
-        // assume only one condition now
-        String symbol;
-        String curToken = token.tokens.get(index); // ( or attribute
-        if(curToken.equalsIgnoreCase("(")){
-            index++; //ignore
-            curToken = token.tokens.get(index); // attribute
+//    protected String conditionCheck(String filePath) throws IOException {
+//        // assume only one condition now
+//        String symbol;
+//        String curToken = token.tokens.get(index); // ( or attribute
+//        if(curToken.equalsIgnoreCase("(")){
+//            index++; //ignore
+//            curToken = token.tokens.get(index); // attribute
+//        }
+//        ArrayList<String> attributes = new ArrayList<>() ;
+//        attributes.add(curToken);
+//        curCommandStatus = attributeCheck(attributes);
+//        if(curCommandStatus.contains("[ERROR]")){
+//            curCommandStatus = "[ERROR]Attribute error.";
+//            return curCommandStatus;
+//        }
+//        attributes.add(curToken);
+//        boolean exist = colIndexStorage(filePath,attributes);
+//        if(!exist){
+//            curCommandStatus ="[ERROR]Attributes not exist.";
+//            return curCommandStatus;
+//        }
+//        // symbol check
+//        index++;
+//        curToken = token.tokens.get(index);
+//        symbol = curToken;
+//        if(symbol.equals("=")||symbol.equals("!")||symbol.equals("<")||symbol.equals(">")||symbol.equalsIgnoreCase("LIKE")){
+//            index++; // may be the values or another symbol.
+//            curToken = token.tokens.get(index);
+//            if(curToken.equals("=")){
+//                symbol = symbol + curToken;
+//                index++;
+//                curToken = token.tokens.get(index); // one values in here
+//            }
+//        }// make sure after this if-condition the current token is the
+//        curCommandStatus = valueCheck(curToken);
+//        if(curCommandStatus.contains("[ERROR]")){
+//            curCommandStatus = "[ERROR]Value format invalid";
+//            return curCommandStatus;
+//        }
+//        boolean symbolValid = rowIndexStorage(symbol,curToken,rowIndex);
+//        if(!symbolValid){
+//            curCommandStatus = "[ERROR]Detected the invalid symbol:" + symbol;
+//            return curCommandStatus;
+//        }
+//        curCommandStatus = showTheContent(symbol,curToken);
+//        return curCommandStatus;
+//    }
+    // <Condition>       ::=  "(" <Condition> <BoolOperator> <Condition> ")" | <Condition> <BoolOperator> <Condition> |
+    // "(" [AttributeName] <Comparator> [Value] ")" | [AttributeName] <Comparator> [Value]
+    // Try to recursion the Condition -> assume first token is next the "WHERE"
+    protected ArrayList<Integer> MultipleConditionCheck(String filePath) throws Exception {
+        String curToken = token.tokens.get(index); // Assume this is the first token after where
+        if(curToken.equals("(")){
+            index++;
+            curToken = token.tokens.get(index);
         }
-        ArrayList<String> attributes = new ArrayList<>() ;
-        attributes.add(curToken);
-        curCommandStatus = attributeCheck(attributes);
-        if(curCommandStatus.contains("[ERROR]")){
-            curCommandStatus = "[ERROR]Attribute error.";
-            return curCommandStatus;
+        if(!checkInCondition(curToken,filePath)){throw new Exception("[ERROR]");}
+        curToken = token.tokens.get(index); // may be AND or OR | ) |;
+        if(curToken.equalsIgnoreCase("AND") || curToken.equalsIgnoreCase("OR")) {
+            //andOrOperation(curToken);
+            MultipleConditionCheck(filePath); // call itself
         }
-        attributes.add(curToken);
-        boolean exist = colIndexStorage(filePath,attributes);
-        if(!exist){
-            curCommandStatus ="[ERROR]Attributes not exist.";
-            return curCommandStatus;
-        }
-        // symbol check
         index++;
         curToken = token.tokens.get(index);
-        symbol = curToken;
+        if(curToken.equals(")")){
+            index++; // check the next index
+            curToken = token.tokens.get(index); // may be AND or OR | ) |;
+            if(curToken.equalsIgnoreCase("AND") || curToken.equalsIgnoreCase("OR")) {
+                //andOrOperation(curToken);
+                MultipleConditionCheck(filePath); // call itself
+            }
+            if(curToken.equals(";")){ // end of the command
+                curCommandStatus = showTheContent();
+                return curCommandStatus;
+            }
+        }
+        if(curToken.equals(";")){ // end of the command
+            curCommandStatus = showTheContent();
+            return curCommandStatus;
+        }
+        return curCommandStatus;
+    }
+
+    // [AttributeName] <Comparator> [Value]
+    protected boolean checkInCondition(String attributeName, String filePath) throws Exception {
+        ArrayList<String> conditionAttribute = new ArrayList<>();
+        conditionAttribute.add(attributeName);
+        if(attributeCheck(conditionAttribute).contains("[ERROR]")){ return false;} // check attribute format valid
+        conditionAttribute.add(attributeName);
+        if(!colIndexStorage(filePath,conditionAttribute)){ return false;} // check attribute exist in the table
+        index++; // expect be the <Comparator> in here
+        String comparator = token.tokens.get(index); // check now : <Comparator> [Value]
+        return comparatorValueCheck(comparator);
+    }
+
+    protected boolean comparatorValueCheck(String symbol){ //
+        String curToken;
         if(symbol.equals("=")||symbol.equals("!")||symbol.equals("<")||symbol.equals(">")||symbol.equalsIgnoreCase("LIKE")){
-            index++; // may be the values or another symbol.
+            index++; // may be the values or another symbol.  ->
             curToken = token.tokens.get(index);
             if(curToken.equals("=")){
                 symbol = symbol + curToken;
                 index++;
-                curToken = token.tokens.get(index); // one values in here
+                curToken = token.tokens.get(index);
             }
-        }// make sure after this if-condition the current token is the
-        curCommandStatus = valueCheck(curToken);
-        if(curCommandStatus.contains("[ERROR]")){
-            curCommandStatus = "[ERROR]Value format invalid";
-            return curCommandStatus;
+            valueCheck(curToken); // In here value check
+            rowIndexStorage(symbol,curToken); // also check demand(?) and set the row Index
+        }else{
+            return false;
         }
-        boolean symbolValid = rowIndexStorage(symbol,curToken);
-        if(!symbolValid){
-            curCommandStatus = "[ERROR]Detected the invalid symbol:" + symbol;
-            return curCommandStatus;
-        }
-        curCommandStatus = showTheContent(symbol,curToken);
-        return curCommandStatus;
+        return true;
     }
+
     public void setSelectAttribute(ArrayList<String> value){
         selectAttributes.addAll(value);
     }
