@@ -61,3 +61,15 @@ Statring to add some logic process functions into handleCommandhandle function i
 2. Add only one condition check.
 
 3. Add current database use check when in select command.
+
+### Fix some warnings on IDEA
+
+1. Now it can basically implement most of the functions.
+
+### Unimplemented features include till now
+
+1. Random selection in SELECT command.
+
+2. Multiple sets in UPDATE command. 
+
+3. Multiple conditions.
