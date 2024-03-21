@@ -15,7 +15,6 @@ public class ParserDeleteCommand extends DBParser{
     //<Delete> :: =  "DELETE " "FROM " [TableName] " WHERE " <Condition>
     protected String parserDelete() throws IOException {
         if(token.tokens.size()<6){
-            System.out.println(token.tokens.size());
             curCommandStatus = "[ERROR]Invalid length for delete command";
             return curCommandStatus;
         }

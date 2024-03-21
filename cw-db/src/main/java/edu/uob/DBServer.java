@@ -45,7 +45,6 @@ public class DBServer {
         String commandStatus;
         CommandHandler parser= new CommandHandler(command);
         commandStatus = parser.commandHandler();
-        //System.out.println("Now command status is: " + commandStatus); //Just for test...*/
         return commandStatus;
     }
 

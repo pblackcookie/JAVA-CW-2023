@@ -43,7 +43,6 @@ public class DatabaseProcess {
                                 throw new RuntimeException("[ERROR]The file which is need to delete doesn't exist."+ path,ioe);
                             }
                         });
-                //System.out.println("Delete the database: [" + databaseName + "] successfully.");
                 return "[OK]Delete the database: [" + databaseName + "] successfully.";
             } catch (IOException ioe) { // Record the error message rather than delete it.
                 return "[ERROR]Can't able to drop database folder " + databaseName;

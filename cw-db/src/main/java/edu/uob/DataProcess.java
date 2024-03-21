@@ -12,7 +12,6 @@ public class DataProcess {
 
     public String dataInsert(ArrayList<String> data, String path) throws IOException {
         // In here process the process method
-        System.out.println(data);
         FileWriter writer = new FileWriter(String.valueOf(path), true);
         BufferedWriter buffer = new BufferedWriter(writer);
         try {
@@ -130,14 +129,12 @@ public class DataProcess {
             // if successful found it , then delete the column line according to columnIndex;
             while ((line = reader.readLine()) != null) {
                 attributeList.addAll(Arrays.asList(line.split("\t")));
-                System.out.println("Attribute list now is : " + attributeList);
                 attributeList.remove(columnIndex);
                 contentBuilder = loopAttributeList(attributeList,contentBuilder);
                 attributeList.clear();
             }
             // Now write back to the file
             BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
-            //System.out.println("write back to file now is: " + contentBuilder);
             writer.write(contentBuilder.toString());
             writer.close();
             dataStatus = "[OK]Successfully drop.";

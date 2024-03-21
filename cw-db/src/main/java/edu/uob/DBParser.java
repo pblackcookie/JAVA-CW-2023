@@ -53,7 +53,6 @@ public class DBParser {
     // Check if the attributes is valid -- using Recursion method
     // <AttributeList>   ::=  [AttributeName] | [AttributeName] "," <AttributeList>
     protected String attributeCheck(ArrayList<String> attributes){
-        //System.out.println("In attributes check:" + attributes);
         if(attributes.isEmpty()){
             curCommandStatus = "[ERROR]Attributes can't be the empty.";
             return curCommandStatus;
@@ -65,7 +64,6 @@ public class DBParser {
             }
         }
         String checkNow = attributes.get(0);
-        //System.out.println("Check out now is :" + checkNow);
         if(!checkNow.equals(",")){ //First one need to check the valid
             curCommandStatus= nameCheck(checkNow);
             if (curCommandStatus.contains("[ERROR]")){
@@ -86,14 +84,12 @@ public class DBParser {
                 return curCommandStatus;
             }
             checkNow = attributes.get(1); // should be attribute name now
-            //System.out.println("In the start with , , now: " + checkNow);
             curCommandStatus= nameCheck(checkNow);
             if (curCommandStatus.contains("[ERROR]")){
                 return curCommandStatus;
             }
             attributes.remove(0); // remove ,
             attributes.remove(0); // remove name
-            //System.out.println("In the , + name part:" + attributes);
             if(attributes.isEmpty()){
                 curCommandStatus = "[OK]Finish checking.";
                 return curCommandStatus;
@@ -105,7 +101,6 @@ public class DBParser {
     }
     protected String valueCheck(String value){
         // check it value type in here
-        System.out.println("Now check is:" + value);
         if (value.matches("[+-]?\\d+")){
             curCommandStatus = "[OK]Integer format valid";
             return curCommandStatus;
@@ -151,7 +146,6 @@ public class DBParser {
                 }
             }
         }
-        System.out.println("content now is" + tableContent);
         for (int i = 0; i < attributeNames.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if (tableContent.get(j).equalsIgnoreCase(attributeNames.get(i))) {
@@ -162,7 +156,6 @@ public class DBParser {
         while ((line = tableReader.readLine()) != null) {
             tableContent.addAll(Arrays.asList(line.split("\t")));
         }
-        System.out.println("table Col now" + tableCol);
         if(tableRow.size() == 0) {
             for (int i = 0; i < tableContent.size() / tableCol.size(); i++) {
                 if (i == 0) {
@@ -172,7 +165,6 @@ public class DBParser {
                 }
             }
         }
-        System.out.println("table Row now" + tableRow);
         tableReader.close();
         // check if the attribute name exist
         int count = 0;
@@ -192,9 +184,6 @@ public class DBParser {
     // col now -> then row : ordered
     protected boolean rowIndexStorage(String symbol,String demand){
         boolean valid = true;
-        System.out.println("symbol now" + symbol);
-        System.out.println("demand now" + demand);
-        System.out.println("Select attribute now is:" + selectAttributes);
         if(demand.startsWith("'") && demand.endsWith("'")){
             demand = demand.substring(1, demand.length() - 1); // remove "'"
         }
@@ -373,7 +362,7 @@ public class DBParser {
 
 
 protected String showTheContent (String operation, String demand){
-    System.out.println("this parent method is call.");
+
     curCommandStatus = "";
         for (int i = 0; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
@@ -429,7 +418,6 @@ protected String showTheContent (String operation, String demand){
             curCommandStatus = "[ERROR]Value format invalid";
             return curCommandStatus;
         }
-        System.out.println(attributes+ " " + symbol + " " + curToken);
         boolean symbolValid = rowIndexStorage(symbol,curToken);
         if(!symbolValid){
             curCommandStatus = "[ERROR]Detected the invalid symbol:" + symbol;

@@ -28,10 +28,8 @@ public class FileProcess {
             return "[OK]File created successfully.";
             //throw new IOException("File already exists.");
         } catch (FileAlreadyExistsException e) {
-            System.out.println("File already exists.");
             return "[ERROR]File already exists.";
         } catch (IOException e) {
-            //System.out.println("An error occurred while creating the file: " + e.getMessage());
             throw new RuntimeException("[ERROR]An error occurred while creating the file: " + e.getMessage());
         }catch (RuntimeException rune){
             return rune.getMessage();
@@ -67,10 +65,8 @@ public class FileProcess {
             buffer.close();
             return "[OK]File created with attributes successful.";
         } catch (FileAlreadyExistsException e) {
-            System.out.println("File already exists.");
             return "[ERROR]File already exists.";
         } catch (IOException e) {
-            //System.out.println("An error occurred while creating the file: " + e.getMessage());
             throw new RuntimeException("[ERROR]An error occurred while creating the file: " + e.getMessage());
         }catch (RuntimeException rune){
             return rune.getMessage();
@@ -85,12 +81,10 @@ public class FileProcess {
         try{
             Files.delete(path);
             Files.delete(Path.of(IdRecordPath)); // Need to delete the id record file at the same time
-            System.out.println("File deleted successfully.");
             return "[OK]File: " + fileName + " deleted successfully.";
         }catch (NoSuchFileException e) {
             return "[ERROR] File" + fileName + " does not exist: " + e.getMessage();
         } catch (IOException e) {
-            System.out.println("An error occurred: " + e.getMessage());
             return "[ERROR]An error occurred: " + e.getMessage();
         }
     }
@@ -99,7 +93,6 @@ public class FileProcess {
     public ArrayList<String> displayFiles(String databaseName) throws IOException{
         databasePath = curDatabasePath.getDatabasePath(databaseName);
         ArrayList<String> files = new ArrayList<>();
-        //System.out.println(databasePath);
         File documentsFolder = new File(databasePath);
         File[] documents = documentsFolder.listFiles();
         if (documents != null) {
