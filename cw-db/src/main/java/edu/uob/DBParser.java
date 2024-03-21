@@ -17,6 +17,8 @@ public class DBParser {
     protected ArrayList<String> tableContent = new ArrayList<>();
     ArrayList<String> attributes = new ArrayList<>();
     ArrayList<String> data = new ArrayList<>();
+
+    ArrayList<String> selectAttributes = new ArrayList<>();
     CommandToken token = new CommandToken(); // storage all tokens
     DatabaseProcess database = new DatabaseProcess();
     FileProcess table = new FileProcess();
@@ -127,6 +129,7 @@ public class DBParser {
     // changing the variable in the function
     // return the boolean to indicate if this arraylist valid.
     protected boolean colIndexStorage(String filePath, ArrayList<String> attributeNames) throws IOException {
+        selectAttributes.addAll(attributes);
         boolean exist = false;
         BufferedReader tableReader = new BufferedReader(new FileReader(filePath));
         String line = tableReader.readLine();
@@ -148,8 +151,9 @@ public class DBParser {
                 }
             }
         }
+        System.out.println("content now is" + tableContent);
         for (int i = 0; i < attributeNames.size(); i++) {
-            for (int j = 0; j < tableContent.size(); j++) {
+            for (int j = 0; j < tableCol.size(); j++) {
                 if (tableContent.get(j).equalsIgnoreCase(attributeNames.get(i))) {
                     tableCol.set(j,i);
                 }
@@ -159,11 +163,13 @@ public class DBParser {
             tableContent.addAll(Arrays.asList(line.split("\t")));
         }
         System.out.println("table Col now" + tableCol);
-        for(int i = 0; i < tableContent.size()/tableCol.size(); i++) {
-            if(i == 0){
-                tableRow.add(0); // table head information
-            }else {
-                tableRow.add(-1);
+        if(tableRow.size() == 0) {
+            for (int i = 0; i < tableContent.size() / tableCol.size(); i++) {
+                if (i == 0) {
+                    tableRow.add(0); // table head information
+                } else {
+                    tableRow.add(-1);
+                }
             }
         }
         System.out.println("table Row now" + tableRow);
@@ -174,18 +180,16 @@ public class DBParser {
                 condition++;
             }
         }// solve the problem when duplicate same name.
-        if(condition == (tableCol.size()-(attributeNames.size()-duplicate))){
-            exist = true;
-            return exist;
-        }else {
-            return exist;
-        } // check can not be the here
-//        exist = true;
-//        return exist;
+//        if(condition == (tableCol.size()-(attributeNames.size()-duplicate))){
+//            exist = true;
+//            return exist;
+//        }else {
+//            return exist;
+//        } // check can not be the here
+        exist = true;
+        return exist;
     }
 
-
-    // need to rewrite
     // different symbols will lead different result
     // col now -> then row : ordered
     protected boolean rowIndexStorage(String symbol,String demand){
@@ -199,8 +203,12 @@ public class DBParser {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1)) {
-                        if (tableContent.get(i * tableCol.size() + j).equalsIgnoreCase(demand)) {
-                            tableRow.set(i, 0);
+                        for (int k = 0; k < selectAttributes.size(); k++) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
+                                if (tableContent.get(i * tableCol.size() + j).equalsIgnoreCase(demand)) {
+                                    tableRow.set(i, 0);
+                                }
+                            }
                         }
                     }
                 }
@@ -210,8 +218,12 @@ public class DBParser {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1)) {
-                        if (!tableContent.get(i * tableCol.size() + j).equalsIgnoreCase(demand)) {
-                            tableRow.set(i, 0);
+                        for (int k = 0; k < selectAttributes.size(); k++) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
+                                if (!tableContent.get(i * tableCol.size() + j).equalsIgnoreCase(demand)) {
+                                    tableRow.set(i, 0);
+                                }
+                            }
                         }
                     }
                 }
@@ -221,10 +233,14 @@ public class DBParser {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1)) {
-                        float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
-                        float demandNow = Float.parseFloat(demand);
-                        if(numberNow > demandNow){
-                            tableRow.set(i, 0);
+                        for (int k = 0; k < selectAttributes.size(); k++) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
+                                float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                                float demandNow = Float.parseFloat(demand);
+                                if (numberNow > demandNow) {
+                                    tableRow.set(i, 0);
+                                }
+                            }
                         }
                     }
                 }
@@ -234,10 +250,14 @@ public class DBParser {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1)) {
-                        float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
-                        float demandNow = Float.parseFloat(demand);
-                        if(numberNow < demandNow){
-                            tableRow.set(i, 0);
+                        for (int k = 0; k < selectAttributes.size(); k++) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
+                                float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                                float demandNow = Float.parseFloat(demand);
+                                if (numberNow < demandNow) {
+                                    tableRow.set(i, 0);
+                                }
+                            }
                         }
                     }
                 }
@@ -247,10 +267,14 @@ public class DBParser {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1)) {
-                        float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
-                        float demandNow = Float.parseFloat(demand);
-                        if(numberNow >= demandNow){
-                            tableRow.set(i, 0);
+                        for (int k = 0; k < selectAttributes.size(); k++) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
+                                float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                                float demandNow = Float.parseFloat(demand);
+                                if (numberNow >= demandNow) {
+                                    tableRow.set(i, 0);
+                                }
+                            }
                         }
                     }
                 }
@@ -260,10 +284,14 @@ public class DBParser {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1)) {
-                        float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
-                        float demandNow = Float.parseFloat(demand);
-                        if(numberNow <= demandNow){
-                            tableRow.set(i, 0);
+                        for (int k = 0; k < selectAttributes.size(); k++) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
+                                float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                                float demandNow = Float.parseFloat(demand);
+                                if (numberNow <= demandNow) {
+                                    tableRow.set(i, 0);
+                                }
+                            }
                         }
                     }
                 }
@@ -290,7 +318,7 @@ public class DBParser {
         curCommandStatus = "";
             for (int i = 0; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
-                    if(tableCol.get(j)!= -1){
+                    if(!tableCol.get(j).equals(-1)){
                         if(j == tableRow.size()-1) {
                             curCommandStatus += tableContent.get(i * tableCol.size() + j);
                         }else{
@@ -305,10 +333,11 @@ public class DBParser {
 
 
 protected String showTheContent (String operation, String demand){
+    System.out.println("this parent method is call.");
     curCommandStatus = "";
         for (int i = 0; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
-                if(tableRow.get(i)!= -1){
+                if(!tableRow.get(i).equals(-1)){
                     if(j == tableCol.size()-1) {
                         curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
                     }else{
@@ -320,10 +349,6 @@ protected String showTheContent (String operation, String demand){
     curCommandStatus = curCommandStatus.trim();
     return curCommandStatus;
 }
-
-    protected boolean checkOperation(String operation){
-        return keyWords.contains(operation);
-    }
     // for condition check (only one condition)
     protected String conditionCheck(String filePath) throws IOException {
         // assume only one condition now
@@ -372,5 +397,9 @@ protected String showTheContent (String operation, String demand){
         }
         curCommandStatus = showTheContent(symbol,curToken);
         return curCommandStatus;
+    }
+
+    public void setSelectAttribute(ArrayList<String> value){
+        selectAttributes.addAll(value);
     }
 }

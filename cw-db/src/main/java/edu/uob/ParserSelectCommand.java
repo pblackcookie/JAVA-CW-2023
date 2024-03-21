@@ -10,6 +10,7 @@ import static edu.uob.GlobalMethod.getCurDatabaseName;
 public class ParserSelectCommand extends DBParser{
     // The switch for control the show or not
     DBServer server;
+    ArrayList<String> attributes = new ArrayList<>();
 
     public ParserSelectCommand(String command, int index) {
         super(command);
@@ -91,7 +92,7 @@ public class ParserSelectCommand extends DBParser{
         if(token.tokens.size() >5){
             // Situation 1 : consider the attribute name more than one
             ArrayList<String> attributesCheck = new ArrayList<>();
-            ArrayList<String> attributes = new ArrayList<>();
+            
             if(!curToken.equals("*")){ // attributes
                 while(!token.tokens.get(index).equalsIgnoreCase("FROM")){
                     attributesCheck.add(token.tokens.get(index));
@@ -110,6 +111,7 @@ public class ParserSelectCommand extends DBParser{
                         i--; // after remove
                     }
                 }
+                setSelectAttribute(attributes);
                 index++; // should be table name now
                 curToken = token.tokens.get(index).toLowerCase(); // should be table name now
                 String filePath = server.getStorageFolderPath() + File.separator + GlobalMethod.getCurDatabaseName()
@@ -125,10 +127,28 @@ public class ParserSelectCommand extends DBParser{
                     return curCommandStatus;
                 }
                 // show the content
-                // todo : add where condition in here
-                curCommandStatus = showTheContent();
-                curCommandStatus = "[OK]\n" + curCommandStatus;
-                System.out.println("attributes now: " + attributes);
+                if(token.tokens.size()-2 == index){ // no where condition on here
+                    curCommandStatus = "[OK]\n" + showTheContent();
+                    return curCommandStatus;
+                }else {
+                    // todo : add WHERE CONDITION in here
+                    System.out.println("NOW IN THE SELECT WHERE CONDITION");
+                    index++; // now check is where
+                    if (curToken.equalsIgnoreCase("WHERE")){
+                        curCommandStatus ="[ERROR]Missing or typo 'where'.";
+                    } // where attribute operation message
+                    index++; // should be attribute now
+                    curToken = token.tokens.get(index);
+                    System.out.println("CUR TOKEN NOW:  " + token.tokens.get(index));
+                    curCommandStatus = conditionCheck(filePath);
+                    // add error situation here
+                    if(curCommandStatus.contains("[ERROR]")){
+                        return curCommandStatus;
+                    }
+                    curCommandStatus = "[OK]\n" + strictShowTheContent();
+                    return curCommandStatus;
+
+                }
             }else {
                 // Situation 2 : it brings some condition
                 // "SELECT " <WildAttribList> " FROM " [TableName] " WHERE " <Condition>
@@ -155,7 +175,8 @@ public class ParserSelectCommand extends DBParser{
                     } // where attribute operation message
                     index++; // should be attribute now
                     curToken = token.tokens.get(index);
-                    conditionCheck(filePath);
+                    curCommandStatus = conditionCheck(filePath);
+                    System.out.println("cur commandstatus: " + curCommandStatus);
                     System.out.println("tablecol" + tableCol);
                     System.out.println("tablerow" + tableRow);
                     if(curCommandStatus.contains("[ERROR]")){
@@ -166,6 +187,29 @@ public class ParserSelectCommand extends DBParser{
                 }
             }
             return curCommandStatus;
+        }
+        return curCommandStatus;
+    }
+
+    private String strictShowTheContent (){
+        System.out.println("this child method is call.");
+        curCommandStatus = "";
+        System.out.println("In select attributes:" + attributes);
+        for (int i = 0; i < tableRow.size(); i++) {
+            for (int j = 0; j < tableCol.size(); j++) {
+                if(!tableRow.get(i).equals(-1)&& !tableCol.get(j).equals(-1)) {
+                    for (int k = 0; k < attributes.size(); k++) {
+                        if (tableContent.get(j).equalsIgnoreCase(attributes.get(k))) {
+                            if (j == tableRow.size() - 1) {
+                                curCommandStatus += tableContent.get(i * tableCol.size() + j)+ "\n";;
+                            } else {
+                                curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
+                            }
+                        }
+                    }
+                }
+            }
+            curCommandStatus += "\n";
         }
         return curCommandStatus;
     }
