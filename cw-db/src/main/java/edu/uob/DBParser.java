@@ -174,20 +174,18 @@ public class DBParser {
         }
         System.out.println("table Row now" + tableRow);
         tableReader.close();
-        int condition = 0;
-        for (Integer integer : tableCol) {
-            if (integer == -1) {
-                condition++;
-            }
-        }// solve the problem when duplicate same name.
-//        if(condition == (tableCol.size()-(attributeNames.size()-duplicate))){
-//            exist = true;
-//            return exist;
-//        }else {
-//            return exist;
-//        } // check can not be the here
-        exist = true;
-        return exist;
+        // check if the attribute name exist
+        int count = 0;
+        for (int i = 0; i < tableCol.size(); i++) {
+          if(tableCol.get(i) == -1){
+              count++;
+          }
+        }
+        if(count == tableCol.size()){ // not exists...
+            return false;
+        }else {
+            return true;
+        }
     }
 
     // different symbols will lead different result
@@ -196,19 +194,24 @@ public class DBParser {
         boolean valid = true;
         System.out.println("symbol now" + symbol);
         System.out.println("demand now" + demand);
+        System.out.println("Select attribute now is:" + selectAttributes);
         if(demand.startsWith("'") && demand.endsWith("'")){
             demand = demand.substring(1, demand.length() - 1); // remove "'"
         }
         if(symbol.equals("==")) {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
-                    if (!tableCol.get(j).equals(-1)) {
+                    if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
                         for (int k = 0; k < selectAttributes.size(); k++) {
                             if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
                                 if (tableContent.get(i * tableCol.size() + j).equalsIgnoreCase(demand)) {
                                     tableRow.set(i, 0);
                                 }
                             }
+                        }
+                    }else if(!tableCol.get(j).equals(-1)){
+                        if (tableContent.get(i * tableCol.size() + j).equalsIgnoreCase(demand)) {
+                            tableRow.set(i, 0);
                         }
                     }
                 }
@@ -217,13 +220,17 @@ public class DBParser {
         }else if(symbol.equals("!=")){
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
-                    if (!tableCol.get(j).equals(-1)) {
+                    if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
                         for (int k = 0; k < selectAttributes.size(); k++) {
                             if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
                                 if (!tableContent.get(i * tableCol.size() + j).equalsIgnoreCase(demand)) {
                                     tableRow.set(i, 0);
                                 }
                             }
+                        }
+                    }else if(!tableCol.get(j).equals(-1)){
+                        if (!tableContent.get(i * tableCol.size() + j).equalsIgnoreCase(demand)) {
+                            tableRow.set(i, 0);
                         }
                     }
                 }
@@ -232,7 +239,7 @@ public class DBParser {
         }else if(symbol.equals(">")){
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
-                    if (!tableCol.get(j).equals(-1)) {
+                    if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
                         for (int k = 0; k < selectAttributes.size(); k++) {
                             if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
                                 float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
@@ -242,6 +249,12 @@ public class DBParser {
                                 }
                             }
                         }
+                    }else if(!tableCol.get(j).equals(-1)){
+                        float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                        float demandNow = Float.parseFloat(demand);
+                        if (numberNow > demandNow) {
+                            tableRow.set(i, 0);
+                        }
                     }
                 }
             }
@@ -249,7 +262,7 @@ public class DBParser {
         }else if(symbol.equals("<")){
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
-                    if (!tableCol.get(j).equals(-1)) {
+                    if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
                         for (int k = 0; k < selectAttributes.size(); k++) {
                             if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
                                 float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
@@ -259,6 +272,12 @@ public class DBParser {
                                 }
                             }
                         }
+                    }else if(!tableCol.get(j).equals(-1)){
+                        float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                        float demandNow = Float.parseFloat(demand);
+                        if (numberNow < demandNow) {
+                            tableRow.set(i, 0);
+                        }
                     }
                 }
             }
@@ -266,7 +285,7 @@ public class DBParser {
         }else if(symbol.equals(">=")){
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
-                    if (!tableCol.get(j).equals(-1)) {
+                    if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
                         for (int k = 0; k < selectAttributes.size(); k++) {
                             if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
                                 float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
@@ -276,6 +295,12 @@ public class DBParser {
                                 }
                             }
                         }
+                    }else if(!tableCol.get(j).equals(-1)){
+                        float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                        float demandNow = Float.parseFloat(demand);
+                        if (numberNow >= demandNow) {
+                            tableRow.set(i, 0);
+                        }
                     }
                 }
             }
@@ -283,7 +308,7 @@ public class DBParser {
         }else if(symbol.equals("<=")){
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
-                    if (!tableCol.get(j).equals(-1)) {
+                    if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
                         for (int k = 0; k < selectAttributes.size(); k++) {
                             if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
                                 float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
@@ -293,6 +318,12 @@ public class DBParser {
                                 }
                             }
                         }
+                    }else if(!tableCol.get(j).equals(-1)){
+                        float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                        float demandNow = Float.parseFloat(demand);
+                        if (numberNow <= demandNow) {
+                            tableRow.set(i, 0);
+                        }
                     }
                 }
             }
@@ -300,7 +331,16 @@ public class DBParser {
         }else if(symbol.equalsIgnoreCase("LIKE")){
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
-                    if (!tableCol.get(j).equals(-1)) {
+                    if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
+                        for (int k = 0; k < selectAttributes.size(); k++) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
+                                String element = tableContent.get(i * tableCol.size() + j);
+                                if (element.contains(demand)) {
+                                    tableRow.set(i, 0);
+                                }
+                            }
+                        }
+                    }else if(!tableCol.get(j).equals(-1)){
                         String element = tableContent.get(i * tableCol.size() + j);
                         if (element.contains(demand)) {
                             tableRow.set(i, 0);
@@ -398,7 +438,6 @@ protected String showTheContent (String operation, String demand){
         curCommandStatus = showTheContent(symbol,curToken);
         return curCommandStatus;
     }
-
     public void setSelectAttribute(ArrayList<String> value){
         selectAttributes.addAll(value);
     }

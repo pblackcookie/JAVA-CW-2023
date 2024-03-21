@@ -302,7 +302,5 @@ public class ExampleDBTests {
         response=sendCommandToServer("DROP DATABASE markbook;");
         assertTrue(response.contains("[OK]"));
         assertFalse(response.contains("[ERROR]"));
-
-
     }
 }
