@@ -125,24 +125,14 @@ public class DBParser {
     // return the boolean to indicate if this arraylist valid.
     protected boolean colIndexStorage(String filePath, ArrayList<String> attributeNames) throws IOException {
         selectAttributes.addAll(attributes);
-        boolean exist = false;
         BufferedReader tableReader = new BufferedReader(new FileReader(filePath));
         String line = tableReader.readLine();
-        int duplicate = 0;
         tableContent.addAll(Arrays.asList(line.split("\t")));
         // for loop for storage the information that need to be shown
-        if(tableCol.size() == 0) {
+        if(tableCol.isEmpty()) {
             for (int i = 0; i < tableContent.size(); i++) {
                 if (tableCol.size() <= tableContent.size()) { // prevent many times adding
                     tableCol.add(-1);
-                }
-            }
-        }// for loop for record the duplicate elements
-        for (int i = 0; i < attributeNames.size(); i++) {
-            String attributeNow = attributeNames.get(i);
-            for (int j = i+1; j < attributeNames.size(); j++) {
-                if(attributeNow.equalsIgnoreCase(attributeNames.get(j))){
-                    duplicate++;
                 }
             }
         }
@@ -156,7 +146,7 @@ public class DBParser {
         while ((line = tableReader.readLine()) != null) {
             tableContent.addAll(Arrays.asList(line.split("\t")));
         }
-        if(tableRow.size() == 0) {
+        if(tableRow.isEmpty()) {
             for (int i = 0; i < tableContent.size() / tableCol.size(); i++) {
                 if (i == 0) {
                     tableRow.add(0); // table head information
@@ -168,16 +158,13 @@ public class DBParser {
         tableReader.close();
         // check if the attribute name exist
         int count = 0;
-        for (int i = 0; i < tableCol.size(); i++) {
-          if(tableCol.get(i) == -1){
-              count++;
-          }
+        for (Integer integer : tableCol) {
+            if (integer == -1) {
+                count++;
+            }
         }
-        if(count == tableCol.size()){ // not exists...
-            return false;
-        }else {
-            return true;
-        }
+        // not exists... -> after simplify
+        return count != tableCol.size();
     }
 
     // different symbols will lead different result
@@ -191,8 +178,8 @@ public class DBParser {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
-                        for (int k = 0; k < selectAttributes.size(); k++) {
-                            if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
+                        for (String selectAttribute : selectAttributes) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttribute)) {
                                 if (tableContent.get(i * tableCol.size() + j).equalsIgnoreCase(demand)) {
                                     tableRow.set(i, 0);
                                 }
@@ -210,8 +197,8 @@ public class DBParser {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
-                        for (int k = 0; k < selectAttributes.size(); k++) {
-                            if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
+                        for (String selectAttribute : selectAttributes) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttribute)) {
                                 if (!tableContent.get(i * tableCol.size() + j).equalsIgnoreCase(demand)) {
                                     tableRow.set(i, 0);
                                 }
@@ -229,8 +216,8 @@ public class DBParser {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
-                        for (int k = 0; k < selectAttributes.size(); k++) {
-                            if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
+                        for (String selectAttribute : selectAttributes) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttribute)) {
                                 float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
                                 float demandNow = Float.parseFloat(demand);
                                 if (numberNow > demandNow) {
@@ -252,8 +239,8 @@ public class DBParser {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
-                        for (int k = 0; k < selectAttributes.size(); k++) {
-                            if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
+                        for (String selectAttribute : selectAttributes) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttribute)) {
                                 float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
                                 float demandNow = Float.parseFloat(demand);
                                 if (numberNow < demandNow) {
@@ -275,8 +262,8 @@ public class DBParser {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
-                        for (int k = 0; k < selectAttributes.size(); k++) {
-                            if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
+                        for (String selectAttribute : selectAttributes) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttribute)) {
                                 float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
                                 float demandNow = Float.parseFloat(demand);
                                 if (numberNow >= demandNow) {
@@ -298,8 +285,8 @@ public class DBParser {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
-                        for (int k = 0; k < selectAttributes.size(); k++) {
-                            if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
+                        for (String selectAttribute : selectAttributes) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttribute)) {
                                 float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
                                 float demandNow = Float.parseFloat(demand);
                                 if (numberNow <= demandNow) {
@@ -321,8 +308,8 @@ public class DBParser {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
-                        for (int k = 0; k < selectAttributes.size(); k++) {
-                            if (!tableContent.get(j).equalsIgnoreCase(selectAttributes.get(k))) {
+                        for (String selectAttribute : selectAttributes) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttribute)) {
                                 String element = tableContent.get(i * tableCol.size() + j);
                                 if (element.contains(demand)) {
                                     tableRow.set(i, 0);

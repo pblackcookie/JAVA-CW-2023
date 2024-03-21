@@ -92,7 +92,6 @@ public class ParserSelectCommand extends DBParser{
         if(token.tokens.size() >5){
             // Situation 1 : consider the attribute name more than one
             ArrayList<String> attributesCheck = new ArrayList<>();
-            
             if(!curToken.equals("*")){ // attributes
                 while(!token.tokens.get(index).equalsIgnoreCase("FROM")){
                     attributesCheck.add(token.tokens.get(index));

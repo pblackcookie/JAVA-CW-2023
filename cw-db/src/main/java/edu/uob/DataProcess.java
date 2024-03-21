@@ -7,8 +7,7 @@ import java.util.Arrays;
 public class DataProcess {
     // This class is used to process series of data when one specific table is selected
     private String dataStatus;
-    private final String firstElement = "id";
-    private ArrayList<String> attributeList = new ArrayList<>();
+    private final ArrayList<String> attributeList = new ArrayList<>();
 
     public String dataInsert(ArrayList<String> data, String path) throws IOException {
         // In here process the process method
@@ -42,12 +41,13 @@ public class DataProcess {
                 return dataStatus;
             }
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+                    String firstElement = "id";
                     writer.write(firstElement);
                     writer.write("\t");
                     writer.write(attributeName);
                     try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
                         String line = reader.readLine();
-                        // line = line.trim(); // remove \n if exists.
+                        line = line.trim(); // remove \n if exists.
                     }catch (IOException e) {
                         dataStatus = "[Error]Error occur: " + e.getMessage();
                         return dataStatus;
