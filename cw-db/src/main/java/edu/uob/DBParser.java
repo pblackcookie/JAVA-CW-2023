@@ -337,6 +337,7 @@ public class DBParser {
                     if(!tableCol.get(j).equals(-1)){
                         if(j == tableRow.size()-1) {
                             newString.append(tableContent.get(i * tableCol.size() + j));
+                            newString.append("\t");
                         }else{
                             newString.append(tableContent.get(i * tableCol.size() + j));
                             newString.append("\t");

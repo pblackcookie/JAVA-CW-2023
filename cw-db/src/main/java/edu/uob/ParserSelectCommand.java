@@ -197,10 +197,10 @@ public class ParserSelectCommand extends DBParser{
                         if (tableContent.get(j).equalsIgnoreCase(attribute)) {
                             if (j == tableRow.size() - 1) {
                                 newString.append(tableContent.get(i * tableCol.size() + j));
-                                newString.append("\n");
+                                newString.append("\t");
                             } else {
                                 newString.append(tableContent.get(i * tableCol.size() + j));
-                                newString.append("\n");
+                                newString.append("\t");
                             }
                         }
                     }

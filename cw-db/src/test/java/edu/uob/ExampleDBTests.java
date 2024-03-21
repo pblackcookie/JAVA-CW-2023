@@ -150,6 +150,7 @@ public class ExampleDBTests {
         testDatabase.useDatabase(databaseName[1]);
 
     }
+    // This test is reference for example-transcript document
     @Test
     public void testDocxReference(){
         String response=sendCommandToServer("CREATE DATABASE markbook;");
