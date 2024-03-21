@@ -173,22 +173,20 @@ public class DBParser {
         }
         switch(symbol){
             case "==":
-                rowIndexStorageEquals(demand);
-                break;
+                rowIndexStorageEquals(demand);break;
             case "!=":
-                rowIndexStorageNotEquals(demand);
-                break;
+                rowIndexStorageNotEquals(demand); break;
             case ">" :
-                rowIndexStorageMoreThan(demand);
+                if(!rowIndexStorageMoreThan(demand)){return false;}
                 break;
             case ">=":
-                rowIndexStorageMoreThanEquals(demand);
+                if(!rowIndexStorageMoreThanEquals(demand)){return false;}
                 break;
             case "<":
-                rowIndexStorageLessThan(demand);
+                if(!rowIndexStorageLessThan(demand)){return false;}
                 break;
             case "<=":
-                rowIndexStorageLessThanEquals(demand);
+                if(!rowIndexStorageLessThanEquals(demand)){return false;}
                 break;
             case "LIKE":
                 rowIndexStorageLike(demand);
@@ -235,101 +233,118 @@ public class DBParser {
             }
         }
     }
-    protected void rowIndexStorageMoreThan(String demand) { // >
-        for (int i = 1; i < tableRow.size(); i++) {
-            for (int j = 0; j < tableCol.size(); j++) {
-                if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
-                    for (String selectAttribute : selectAttributes) {
-                        if (!tableContent.get(j).equalsIgnoreCase(selectAttribute)) {
-                            float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
-                            float demandNow = Float.parseFloat(demand);
-                            if (numberNow > demandNow) {
-                                tableRow.set(i, 0);
+    protected boolean rowIndexStorageMoreThan(String demand) { // >
+        try{
+            for (int i = 1; i < tableRow.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+                    if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
+                        for (String selectAttribute : selectAttributes) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttribute)) {
+                                float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                                float demandNow = Float.parseFloat(demand);
+                                if (numberNow > demandNow) {
+                                    tableRow.set(i, 0);
+                                }
                             }
                         }
-                    }
-                }else if(!tableCol.get(j).equals(-1)){
-                    float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
-                    float demandNow = Float.parseFloat(demand);
-                    if (numberNow > demandNow) {
-                        tableRow.set(i, 0);
+                    }else if(!tableCol.get(j).equals(-1)){
+                        float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                        float demandNow = Float.parseFloat(demand);
+                        if (numberNow > demandNow) {
+                            tableRow.set(i, 0);
+                        }
                     }
                 }
             }
+        }catch (Exception e){
+            return false;
         }
+        return true;
     }
-    protected void rowIndexStorageLessThan(String demand) { //<
-        for (int i = 1; i < tableRow.size(); i++) {
-            for (int j = 0; j < tableCol.size(); j++) {
-                if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
-                    for (String selectAttribute : selectAttributes) {
-                        if (!tableContent.get(j).equalsIgnoreCase(selectAttribute)) {
-                            float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
-                            float demandNow = Float.parseFloat(demand);
-                            if (numberNow < demandNow) {
-                                tableRow.set(i, 0);
+    protected boolean rowIndexStorageLessThan(String demand) { //<
+        try {
+            for (int i = 1; i < tableRow.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+                    if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
+                        for (String selectAttribute : selectAttributes) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttribute)) {
+                                float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                                float demandNow = Float.parseFloat(demand);
+                                if (numberNow < demandNow) {
+                                    tableRow.set(i, 0);
+                                }
                             }
                         }
-                    }
-                }else if(!tableCol.get(j).equals(-1)){
-                    float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
-                    float demandNow = Float.parseFloat(demand);
-                    if (numberNow < demandNow) {
-                        tableRow.set(i, 0);
+                    } else if (!tableCol.get(j).equals(-1)) {
+                        float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                        float demandNow = Float.parseFloat(demand);
+                        if (numberNow < demandNow) {
+                            tableRow.set(i, 0);
+                        }
                     }
                 }
             }
+        }catch (Exception e){
+            return false;
         }
+        return true;
     }
-
-
-    protected void rowIndexStorageMoreThanEquals(String demand) { // >=
-        for (int i = 1; i < tableRow.size(); i++) {
-            for (int j = 0; j < tableCol.size(); j++) {
-                if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
-                    for (String selectAttribute : selectAttributes) {
-                        if (!tableContent.get(j).equalsIgnoreCase(selectAttribute)) {
-                            float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
-                            float demandNow = Float.parseFloat(demand);
-                            if (numberNow >= demandNow) {
-                                tableRow.set(i, 0);
+    protected boolean rowIndexStorageMoreThanEquals(String demand) { // >=
+        try{
+            for (int i = 1; i < tableRow.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+                    if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
+                        for (String selectAttribute : selectAttributes) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttribute)) {
+                                float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                                float demandNow = Float.parseFloat(demand);
+                                if (numberNow >= demandNow) {
+                                    tableRow.set(i, 0);
+                                }
                             }
                         }
-                    }
-                }else if(!tableCol.get(j).equals(-1)){
-                    float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
-                    float demandNow = Float.parseFloat(demand);
-                    if (numberNow >= demandNow) {
-                        tableRow.set(i, 0);
+                    } else if (!tableCol.get(j).equals(-1)) {
+                        float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                        float demandNow = Float.parseFloat(demand);
+                        if (numberNow >= demandNow) {
+                            tableRow.set(i, 0);
+                        }
                     }
                 }
             }
+        }catch(Exception e){
+                return false;
         }
+        return true;
     }
-    protected void rowIndexStorageLessThanEquals(String demand){  //<=
-        for (int i = 1; i < tableRow.size(); i++) {
-            for (int j = 0; j < tableCol.size(); j++) {
-                if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
-                    for (String selectAttribute : selectAttributes) {
-                        if (!tableContent.get(j).equalsIgnoreCase(selectAttribute)) {
-                            float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
-                            float demandNow = Float.parseFloat(demand);
-                            if (numberNow <= demandNow) {
-                                tableRow.set(i, 0);
+    protected boolean rowIndexStorageLessThanEquals(String demand){  //<=
+        try {
+            for (int i = 1; i < tableRow.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+                    if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
+                        for (String selectAttribute : selectAttributes) {
+                            if (!tableContent.get(j).equalsIgnoreCase(selectAttribute)) {
+                                float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                                float demandNow = Float.parseFloat(demand);
+                                if (numberNow <= demandNow) {
+                                    tableRow.set(i, 0);
+                                }
                             }
                         }
-                    }
-                }else if(!tableCol.get(j).equals(-1)){
-                    float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
-                    float demandNow = Float.parseFloat(demand);
-                    if (numberNow <= demandNow) {
-                        tableRow.set(i, 0);
+                    } else if (!tableCol.get(j).equals(-1)) {
+                        float numberNow = Float.parseFloat(tableContent.get(i * tableCol.size() + j));
+                        float demandNow = Float.parseFloat(demand);
+                        if (numberNow <= demandNow) {
+                            tableRow.set(i, 0);
+                        }
                     }
                 }
             }
+        }catch (Exception e){
+            return false;
         }
+        return true;
     }
-
     protected void rowIndexStorageLike(String demand){ // LIKE
         for (int i = 1; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
@@ -351,7 +366,6 @@ public class DBParser {
             }
         }
     }
-
     protected String showTheContent (){ // most original show the content
         StringBuilder newString = new StringBuilder();
             for (int i = 0; i < tableRow.size(); i++) {
