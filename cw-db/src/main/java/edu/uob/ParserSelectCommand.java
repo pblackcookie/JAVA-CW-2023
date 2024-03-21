@@ -2,7 +2,6 @@ package edu.uob;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 
 import static edu.uob.GlobalMethod.getCurDatabaseName;
@@ -53,7 +52,6 @@ public class ParserSelectCommand extends DBParser{
                     curCommandStatus = "[ERROR]Database does not set.";
                     return curCommandStatus;
                 }
-                return curCommandStatus;
             }else {// when the length = 5, current token be one attribute name;
                 curCommandStatus = nameCheck(curToken);
                 if(curCommandStatus.contains("[ERROR]")){
@@ -85,11 +83,11 @@ public class ParserSelectCommand extends DBParser{
                 // show the content
                 curCommandStatus = showTheContent();
                 curCommandStatus = "[OK]\n" + curCommandStatus;
-                return curCommandStatus;
             }
+            return curCommandStatus;
         }
         // In this situation, the SELECT may add some conditions or the attribute name is more than one
-        if(token.tokens.size() >5){
+        if(token.tokens.size() > 5){
             // Situation 1 : consider the attribute name more than one
             ArrayList<String> attributesCheck = new ArrayList<>();
             if(!curToken.equals("*")){ // attributes
@@ -151,65 +149,66 @@ public class ParserSelectCommand extends DBParser{
             }else {
                 // Situation 2 : it brings some condition
                 // "SELECT " <WildAttribList> " FROM " [TableName] " WHERE " <Condition>
-                if(curToken.equals("*")){
-                    index++;
-                    curToken = token.tokens.get(index);
-                    if (!curToken.equalsIgnoreCase("FROM")){
-                        curCommandStatus = "[ERROR]Missing or typo 'from'.";
-                        return curCommandStatus;
-                    }
-                    index++; // table name now
-                    curToken = token.tokens.get(index).toLowerCase();
-                    String filePath = server.getStorageFolderPath() + File.separator + GlobalMethod.getCurDatabaseName()
-                            + File.separator +curToken + ".tab";
-                    File file = new File(filePath);
-                    if(!file.exists()){
-                        curCommandStatus = "[ERROR]File does not exists.";
-                        return curCommandStatus;
-                    }
-                    index++; // should be where now
-                    curToken = token.tokens.get(index);
-                    if (curToken.equalsIgnoreCase("WHERE")){
-                        curCommandStatus ="[ERROR]Missing or typo 'where'.";
-                    } // where attribute operation message
-                    index++; // should be attribute now
-                    curToken = token.tokens.get(index);
-                    curCommandStatus = conditionCheck(filePath);
-                    System.out.println("cur commandstatus: " + curCommandStatus);
-                    System.out.println("tablecol" + tableCol);
-                    System.out.println("tablerow" + tableRow);
-                    if(curCommandStatus.contains("[ERROR]")){
-                        return curCommandStatus;
-                    }
-                    curCommandStatus = "[OK]\n" + curCommandStatus;
+                // cur token now must be * ...
+                index++;
+                curToken = token.tokens.get(index);
+                if (!curToken.equalsIgnoreCase("FROM")){
+                    curCommandStatus = "[ERROR]Missing or typo 'from'.";
                     return curCommandStatus;
                 }
+                index++; // table name now
+                curToken = token.tokens.get(index).toLowerCase();
+                String filePath = server.getStorageFolderPath() + File.separator + GlobalMethod.getCurDatabaseName()
+                        + File.separator +curToken + ".tab";
+                File file = new File(filePath);
+                if(!file.exists()){
+                    curCommandStatus = "[ERROR]File does not exists.";
+                    return curCommandStatus;
+                }
+                index++; // should be where now
+                curToken = token.tokens.get(index);
+                if (curToken.equalsIgnoreCase("WHERE")){
+                    curCommandStatus ="[ERROR]Missing or typo 'where'.";
+                } // where attribute operation message
+                index++; // should be attribute now
+                curToken = token.tokens.get(index);
+                curCommandStatus = conditionCheck(filePath);
+                System.out.println("cur commandstatus: " + curCommandStatus);
+                System.out.println("tablecol" + tableCol);
+                System.out.println("tablerow" + tableRow);
+                if(curCommandStatus.contains("[ERROR]")){
+                    return curCommandStatus;
+                }
+                curCommandStatus = "[OK]\n" + curCommandStatus;
+                return curCommandStatus;
+
             }
-            return curCommandStatus;
         }
         return curCommandStatus;
     }
 
     private String strictShowTheContent (){
-        System.out.println("this child method is call.");
-        curCommandStatus = "";
+        StringBuilder newString = new StringBuilder();
         System.out.println("In select attributes:" + attributes);
         for (int i = 0; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if(!tableRow.get(i).equals(-1)&& !tableCol.get(j).equals(-1)) {
-                    for (int k = 0; k < attributes.size(); k++) {
-                        if (tableContent.get(j).equalsIgnoreCase(attributes.get(k))) {
+                    for (String attribute : attributes) {
+                        if (tableContent.get(j).equalsIgnoreCase(attribute)) {
                             if (j == tableRow.size() - 1) {
-                                curCommandStatus += tableContent.get(i * tableCol.size() + j)+ "\n";;
+                                newString.append(tableContent.get(i * tableCol.size() + j));
+                                newString.append("\n");
                             } else {
-                                curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
+                                newString.append(tableContent.get(i * tableCol.size() + j));
+                                newString.append("\n");
                             }
                         }
                     }
                 }
             }
-            curCommandStatus += "\n";
+            newString.append("\n");
         }
+        curCommandStatus = newString.toString().trim();
         return curCommandStatus;
     }
 }

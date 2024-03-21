@@ -13,12 +13,12 @@ import java.util.Objects;
 
 public class ParserJoinCommand extends DBParser{
     private final DBServer server;
-    private ArrayList<Boolean> table1Col;
-    private ArrayList<Boolean> table1Row;
-    private ArrayList<Boolean> table2Col;
-    private ArrayList<Boolean> table2Row;
-    private ArrayList<String> table1Content;
-    private ArrayList<String> table2Content;
+    private final ArrayList<Boolean> table1Col;
+    private final ArrayList<Boolean> table1Row;
+    private final ArrayList<Boolean> table2Col;
+    private final ArrayList<Boolean> table2Row;
+    private final ArrayList<String> table1Content;
+    private final ArrayList<String> table2Content;
 
 
     public ParserJoinCommand(String command, int index) {
@@ -161,24 +161,27 @@ public class ParserJoinCommand extends DBParser{
     // In here do the operation to join two tables
     // just using buffer reader to change the content
     private String joinTable(){
-        curCommandStatus = "";
+        StringBuilder newString = new StringBuilder();
         // Attribute message
         for (int t1 = 0; t1 < table1Col.size(); t1++){
             if(table1Col.get(t1)) {
-                curCommandStatus += table1Content.get(t1) + "\t";
+                newString.append(table1Content.get(t1));
+                newString.append("\t");
             }
         }
         for (int t2 = 0; t2 < table2Col.size(); t2++) {
             if(table2Col.get(t2)) {
-                curCommandStatus += table2Content.get(t2) + "\t";
+                newString.append(table2Content.get(t2));
+                newString.append("\t");
             }
         }
-        curCommandStatus = curCommandStatus.trim() + "\n";
+        newString.append("\n");
         // table information message
         for (int i = 1; i < table1Row.size(); i++) {
             for (int j = 0; j < table1Col.size(); j++) {
                 if(table1Col.get(j)){
-                    curCommandStatus += table1Content.get(i*table1Col.size()+j) + "\t";
+                    newString.append(table1Content.get(i * table1Col.size() + j));
+                    newString.append("\t");
                 }else { // table1 false -> not print out it to the terminal
                     for (int k = 1; k < table2Row.size(); k++) {
                         for (int l = 0; l <table2Col.size() ; l++) {
@@ -186,9 +189,10 @@ public class ParserJoinCommand extends DBParser{
                                 for (int m = (k*table2Col.size()+l+1); m < ((k*table2Col.size()+l)+table2Col.size()); m++) {
                                         // l column false --> so l+1 and left right column all were true.
                                         if (m == ((k * table2Col.size() + l) + table2Col.size() - 1)) {
-                                            curCommandStatus += table2Content.get(m);
+                                            newString.append(table2Content.get(m));
                                         } else {
-                                            curCommandStatus += table2Content.get(m) + "\t";
+                                            newString.append(table2Content.get(m));
+                                            newString.append("\t");
                                         }
 
                                 }
@@ -197,8 +201,9 @@ public class ParserJoinCommand extends DBParser{
                     }
                 }
             }
-            curCommandStatus += "\n";
+            newString.append("\n");
         }
+        curCommandStatus = newString.toString().trim();
         return curCommandStatus;
     }
 }

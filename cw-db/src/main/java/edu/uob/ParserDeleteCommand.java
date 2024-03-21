@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class ParserDeleteCommand extends DBParser{
     DBServer server = new DBServer();
@@ -56,7 +55,7 @@ public class ParserDeleteCommand extends DBParser{
     }
     @Override
     protected String showTheContent (String operation, String demand){
-        curCommandStatus = "";
+        StringBuilder newString = new StringBuilder();
         int rowCount = 0;
         for (int i = 1; i < tableRow.size(); i++) {
             if(tableRow.get(i).equals(-1)){
@@ -71,14 +70,16 @@ public class ParserDeleteCommand extends DBParser{
             for (int j = 0; j < tableCol.size(); j++) {
                 if(tableRow.get(i).equals(-1) || i == 0){
                     if(j == tableCol.size()-1) {
-                        curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
+                        newString.append(tableContent.get(i * tableCol.size() + j));
+                        newString.append("\n");
                     }else{
-                        curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
+                        newString.append(tableContent.get(i * tableCol.size() + j));
+                        newString.append("\t");
                     }
                 }
             }
         }
-        curCommandStatus = curCommandStatus.trim();
+        curCommandStatus = newString.toString().trim();
         return curCommandStatus;
     }
 }

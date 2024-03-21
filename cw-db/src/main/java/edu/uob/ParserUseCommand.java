@@ -1,7 +1,4 @@
 package edu.uob;
-
-import java.io.IOException;
-
 import static edu.uob.GlobalMethod.setCurDatabaseName;
 
 public class ParserUseCommand extends DBParser{
@@ -9,7 +6,7 @@ public class ParserUseCommand extends DBParser{
         super(command);
         this.index = index; // Now should be the database or table
     }
-    protected String parserUse() throws IOException {
+    protected String parserUse(){
         String curToken = token.tokens.get(index).toLowerCase();
         if(token.tokens.size() != 3){
             curCommandStatus = "[ERROR]Invalid syntax.";

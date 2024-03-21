@@ -13,14 +13,14 @@ public class GlobalMethod {
     protected static HashSet<String> conditionAll;
 
     static {
-        symbols = new HashSet<String>(Arrays.asList("!", "#", "$","%","&","(",")","*","+",",","-",".","/", ":",";",
-                ">","=","<","?","@","[","\\","]","^","_","`","{","}","~"));
-        keyWords = new HashSet<String>(Arrays.asList("USE","CREATE","DROP","ALTER","INSERT","SELECT","UPDATE",
-                "DELETE","JOIN","TRUE","FALSE","DATABASE","TABLE","INTO","VALUES","FROM","WHERE","SET","AND","ON","ADD",
-                "OR", "NULL","LIKE")); //24
-        booleanLiteral = new HashSet<Boolean>(Arrays.asList(true,false));
+        symbols = new HashSet<>(Arrays.asList("!", "#", "$", "%", "&", "(", ")", "*", "+", ",", "-", ".", "/", ":", ";",
+                ">", "=", "<", "?", "@", "[", "\\", "]", "^", "_", "`", "{", "}", "~"));
+        keyWords = new HashSet<>(Arrays.asList("USE", "CREATE", "DROP", "ALTER", "INSERT", "SELECT", "UPDATE",
+                "DELETE", "JOIN", "TRUE", "FALSE", "DATABASE", "TABLE", "INTO", "VALUES", "FROM", "WHERE", "SET", "AND", "ON", "ADD",
+                "OR", "NULL", "LIKE")); //24
+        booleanLiteral = new HashSet<>(Arrays.asList(true, false));
 
-        conditionAll = new HashSet<String>(Arrays.asList("==" , ">" , "<" , ">=" , "<=" , "!=" , " LIKE ","AND","OR"));
+        conditionAll = new HashSet<>(Arrays.asList("==", ">", "<", ">=", "<=", "!=", " LIKE ", "AND", "OR"));
     }
     // Using for store current database name.
     public static void setCurDatabaseName(String databaseName) {
@@ -32,8 +32,8 @@ public class GlobalMethod {
     public static void setCurTableName(String tableName) {
         curTableName = tableName;
     }
-    public static String getCurTableName() {
-        return curTableName;
-    }
+//    public static String getCurTableName() {
+//        return curTableName;
+//    }
 
 }

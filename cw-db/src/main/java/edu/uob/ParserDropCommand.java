@@ -28,7 +28,7 @@ public class ParserDropCommand extends DBParser{
         }
         return curCommandStatus;
     }
-    private String parserDropDatabase() throws IOException {
+    private String parserDropDatabase(){
         String curToken = token.tokens.get(index).toLowerCase();
         curCommandStatus = database.dropDatabase(curToken);
         // if delete the current using database, then set the current

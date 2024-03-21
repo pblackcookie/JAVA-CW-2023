@@ -4,10 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ParserUpdateCommand extends DBParser{
     ArrayList<String> setAttribute = new ArrayList<>();
@@ -48,11 +45,6 @@ public class ParserUpdateCommand extends DBParser{
         setAttribute.add(curToken);
         attributes.add(curToken);
         // update the row column
-//        boolean attributeCheck = colIndexStorage(filePath,attributes);
-//        if(!attributeCheck){
-//            curCommandStatus = "[ERROR]Does not exist attribute.";
-//            return curCommandStatus;
-//        }
         index++; // must be = in here
         curToken =  token.tokens.get(index);
         if(!curToken.equalsIgnoreCase("=")){
@@ -90,33 +82,40 @@ public class ParserUpdateCommand extends DBParser{
     }
 
     private String readContend(String filePath){
-        curCommandStatus = "";
+        StringBuilder newString = new StringBuilder();
         for (int i = 0; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if(tableRow.get(i).equals(-1) || i == 0){
                     if(j == tableCol.size()-1) {
-                        curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
+                        newString.append(tableContent.get(i * tableCol.size() + j));
+                        newString.append("\n");
                     }else{
-                        curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
+                        newString.append(tableContent.get(i * tableCol.size() + j));
+                        newString.append("\t");
                     }
                 }
                 if(!tableRow.get(i).equals(-1) && i != 0){
                     if(tableContent.get(j).equalsIgnoreCase(setAttribute.get(0))){
                         if(j == tableCol.size()-1) {
-                            curCommandStatus += setValue.get(0) + "\n";
+                            newString.append(setValue.get(0));
+                            newString.append("\n");
                         }else{
-                            curCommandStatus += setValue.get(0) + "\t";
+                            newString.append(setValue.get(0));
+                            newString.append("\t");
                         }
                     }else{
                         if(j == tableCol.size()-1) {
-                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
+                            newString.append(tableContent.get(i * tableCol.size() + j));
+                            newString.append("\n");
                         }else{
-                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
+                            newString.append(tableContent.get(i * tableCol.size() + j));
+                            newString.append("\t");
                         }
                     }
                 }
             }
         }
+        curCommandStatus = newString.toString().trim();
         return  curCommandStatus;
     }
 }
