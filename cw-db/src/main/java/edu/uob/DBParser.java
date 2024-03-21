@@ -325,44 +325,47 @@ public class DBParser {
                 }
             }
             return valid;
-        }
+        }// not all the situations above so an error occurs, return false
         valid = false;
         return valid;
     }
 
     protected String showTheContent (){
-        curCommandStatus = "";
+        StringBuilder newString = new StringBuilder();
             for (int i = 0; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
                     if(!tableCol.get(j).equals(-1)){
                         if(j == tableRow.size()-1) {
-                            curCommandStatus += tableContent.get(i * tableCol.size() + j);
+                            newString.append(tableContent.get(i * tableCol.size() + j));
                         }else{
-                            curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
+                            newString.append(tableContent.get(i * tableCol.size() + j));
+                            newString.append("\t");
                         }
                     }
                 }
-                curCommandStatus += "\n";
+                newString.append("\n");
             }
+        curCommandStatus = newString.toString().trim();
         return curCommandStatus;
     }
 
 
 protected String showTheContent (String operation, String demand){
-
-    curCommandStatus = "";
+    StringBuilder newString = new StringBuilder();
         for (int i = 0; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if(!tableRow.get(i).equals(-1)){
                     if(j == tableCol.size()-1) {
-                        curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\n";
+                        newString.append(tableContent.get(i * tableCol.size() + j));
+                        newString.append("\n");
                     }else{
-                        curCommandStatus += tableContent.get(i * tableCol.size() + j) + "\t";
+                        newString.append(tableContent.get(i * tableCol.size() + j));
+                        newString.append("\t");
                     }
                 }
             }
         }
-    curCommandStatus = curCommandStatus.trim();
+    curCommandStatus = newString.toString().trim();
     return curCommandStatus;
 }
     // for condition check (only one condition)
