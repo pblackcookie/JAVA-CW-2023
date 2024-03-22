@@ -15,6 +15,8 @@ public class DBParser {
     protected ArrayList<Integer> tableCol = new ArrayList<>();
     protected ArrayList<Integer> tableRow = new ArrayList<>();
     protected ArrayList<String> tableContent = new ArrayList<>();
+
+    protected ArrayList<String> tableHeading = new ArrayList<>();
     ArrayList<String> attributes = new ArrayList<>();
     ArrayList<String> data = new ArrayList<>();
 
@@ -24,7 +26,7 @@ public class DBParser {
     CommandToken token = new CommandToken(); // storage all tokens
     DatabaseProcess database = new DatabaseProcess();
     FileProcess table = new FileProcess();
-
+    String filePath = null;
     DBServer server = new DBServer();
 
 
@@ -124,51 +126,66 @@ public class DBParser {
     // use one int array --> for print out inordered result
     // changing the variable in the function
     // return the boolean to indicate if this arraylist valid.
-    protected boolean colIndexStorage(String filePath, ArrayList<String> attributeNames) throws IOException {
-        selectAttributes.addAll(attributes);
-        BufferedReader tableReader = new BufferedReader(new FileReader(filePath));
-        String line = tableReader.readLine();
-        tableContent.addAll(Arrays.asList(line.split("\t")));
-        // for loop for storage the information that need to be shown
-        if(tableCol.isEmpty()) {
-            for (int i = 0; i < tableContent.size(); i++) {
-                if (tableCol.size() <= tableContent.size()) { // prevent many times adding
-                    tableCol.add(-1);
-                }
-            }
-        }
-        for (int i = 0; i < attributeNames.size(); i++) {
-            for (int j = 0; j < tableCol.size(); j++) {
-                if (tableContent.get(j).equalsIgnoreCase(attributeNames.get(i))) {
-                    tableCol.set(j,i);
-                }
-            }
-        }
-        while ((line = tableReader.readLine()) != null) {
+    protected boolean colIndexStorage(String filePath, ArrayList<String> attributeNames, ArrayList<Integer> rowIndex) throws IOException {
+        System.out.println("filePath is:" + filePath);
+        if(tableContent.isEmpty()) {
+            selectAttributes.addAll(attributes);
+            BufferedReader tableReader = new BufferedReader(new FileReader(filePath));
+            String line = tableReader.readLine();
             tableContent.addAll(Arrays.asList(line.split("\t")));
+            System.out.println("table content is:" + tableContent);
+            // for loop for storage the information that need to be shown
+            if (tableCol.isEmpty()) {
+                for (int i = 0; i < tableContent.size(); i++) {
+                    if (tableCol.size() <= tableContent.size()) { // prevent many times adding
+                        tableCol.add(-1);
+                    }
+                }
+            }
+            for (int i = 0; i < attributeNames.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+                    if (tableContent.get(j).equalsIgnoreCase(attributeNames.get(i))) {
+                        tableCol.set(j, i);
+                    }
+                }
+            }
+            while ((line = tableReader.readLine()) != null) {
+                tableContent.addAll(Arrays.asList(line.split("\t")));
+            }
+            tableReader.close();// check if the attribute name exist
         }
         if(tableRow.isEmpty()) {
             for (int i = 0; i < tableContent.size() / tableCol.size(); i++) {
                 if (i == 0) {
-                    tableRow.add(0); // table head information
+                    rowIndex.add(0); // table head information
                 } else {
-                    tableRow.add(-1);
+                    rowIndex.add(-1);
+                }
+            }
+        }else{ //already exist , reset it
+            for (int i = 0; i < tableContent.size() / tableCol.size(); i++) {
+                if (i == 0 || !tableRow.get(i).equals(-1)) {
+                    rowIndex.set(i,0); // table head information
+                } else {
+                    rowIndex.set(i,-1);
                 }
             }
         }
-        tableReader.close();// check if the attribute name exist
-        int count = 0;
-        for (Integer integer : tableCol) {
-            if (integer == -1) {
-                count++;
-            }
-        }// not exists... -> after simplify
-        return count != tableCol.size();
+        tableRow = rowIndex; //pass the arguments
+//
+//        int count = 0;
+//        for (Integer integer : tableCol) {
+//            if (integer == -1) {
+//                count++;
+//            }
+//        }// not exists... -> after simplify
+//        return count != tableCol.size();
+        return true;
     }
 
     // different symbols will lead different result
     // col now -> then row : ordered
-    protected boolean rowIndexStorage(String symbol,String demand, ArrayList<String> rowIndex){
+    protected boolean rowIndexStorage(String symbol,String demand, ArrayList<Integer> rowIndex){
         if(demand.startsWith("'") && demand.endsWith("'")){
             demand = demand.substring(1, demand.length() - 1); // remove "'"
         }
@@ -196,7 +213,7 @@ public class DBParser {
         }
         return true;
     }
-    protected void rowIndexStorageEquals(String demand,ArrayList<String> rowIndex){ //==
+    protected void rowIndexStorageEquals(String demand,ArrayList<Integer> rowIndex){ //==
         for (int i = 1; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
@@ -215,7 +232,7 @@ public class DBParser {
             }
         }
     }
-    protected void rowIndexStorageNotEquals(String demand,ArrayList<String> rowIndex) { //!=
+    protected void rowIndexStorageNotEquals(String demand,ArrayList<Integer> rowIndex) { //!=
         for (int i = 1; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
@@ -234,7 +251,7 @@ public class DBParser {
             }
         }
     }
-    protected boolean rowIndexStorageMoreThan(String demand,ArrayList<String> rowIndex) { // >
+    protected boolean rowIndexStorageMoreThan(String demand,ArrayList<Integer> rowIndex) { // >
         try{
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
@@ -262,7 +279,7 @@ public class DBParser {
         }
         return true;
     }
-    protected boolean rowIndexStorageLessThan(String demand,ArrayList<String> rowIndex) { //<
+    protected boolean rowIndexStorageLessThan(String demand,ArrayList<Integer> rowIndex) { //<
         try {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
@@ -290,7 +307,7 @@ public class DBParser {
         }
         return true;
     }
-    protected boolean rowIndexStorageMoreThanEquals(String demand,ArrayList<String> rowIndex) { // >=
+    protected boolean rowIndexStorageMoreThanEquals(String demand,ArrayList<Integer> rowIndex) { // >=
         try{
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
@@ -318,7 +335,7 @@ public class DBParser {
         }
         return true;
     }
-    protected boolean rowIndexStorageLessThanEquals(String demand,ArrayList<String> rowIndex){  //<=
+    protected boolean rowIndexStorageLessThanEquals(String demand,ArrayList<Integer> rowIndex){  //<=
         try {
             for (int i = 1; i < tableRow.size(); i++) {
                 for (int j = 0; j < tableCol.size(); j++) {
@@ -346,7 +363,7 @@ public class DBParser {
         }
         return true;
     }
-    protected void rowIndexStorageLike(String demand,ArrayList<String> rowIndex){ // LIKE
+    protected void rowIndexStorageLike(String demand,ArrayList<Integer> rowIndex){ // LIKE
         for (int i = 1; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
@@ -367,142 +384,130 @@ public class DBParser {
             }
         }
     }
-    protected String showTheContent (){ // most original show the content
-        StringBuilder newString = new StringBuilder();
-            for (int i = 0; i < tableRow.size(); i++) {
-                for (int j = 0; j < tableCol.size(); j++) {
-                    if(!tableCol.get(j).equals(-1)){
-                        if(j == tableRow.size()-1) {
-                            newString.append(tableContent.get(i * tableCol.size() + j));
-                            newString.append("\t");
-                        }else{
-                            newString.append(tableContent.get(i * tableCol.size() + j));
-                            newString.append("\t");
-                        }
-                    }
-                }
-                newString.append("\n");
-            }
-        curCommandStatus = newString.toString().trim();
-        return curCommandStatus;
-    }
-
-
-protected String showTheContent (String operation, String demand){
-    StringBuilder newString = new StringBuilder();
-        for (int i = 0; i < tableRow.size(); i++) {
-            for (int j = 0; j < tableCol.size(); j++) {
-                if(!tableRow.get(i).equals(-1)){
-                    if(j == tableCol.size()-1) {
-                        newString.append(tableContent.get(i * tableCol.size() + j));
-                        newString.append("\n");
-                    }else{
-                        newString.append(tableContent.get(i * tableCol.size() + j));
-                        newString.append("\t");
-                    }
-                }
-            }
-        }
-    curCommandStatus = newString.toString().trim();
-    return curCommandStatus;
-}
-    // for condition check (only one condition)
-//    protected String conditionCheck(String filePath) throws IOException {
-//        // assume only one condition now
-//        String symbol;
-//        String curToken = token.tokens.get(index); // ( or attribute
-//        if(curToken.equalsIgnoreCase("(")){
-//            index++; //ignore
-//            curToken = token.tokens.get(index); // attribute
-//        }
-//        ArrayList<String> attributes = new ArrayList<>() ;
-//        attributes.add(curToken);
-//        curCommandStatus = attributeCheck(attributes);
-//        if(curCommandStatus.contains("[ERROR]")){
-//            curCommandStatus = "[ERROR]Attribute error.";
-//            return curCommandStatus;
-//        }
-//        attributes.add(curToken);
-//        boolean exist = colIndexStorage(filePath,attributes);
-//        if(!exist){
-//            curCommandStatus ="[ERROR]Attributes not exist.";
-//            return curCommandStatus;
-//        }
-//        // symbol check
-//        index++;
-//        curToken = token.tokens.get(index);
-//        symbol = curToken;
-//        if(symbol.equals("=")||symbol.equals("!")||symbol.equals("<")||symbol.equals(">")||symbol.equalsIgnoreCase("LIKE")){
-//            index++; // may be the values or another symbol.
-//            curToken = token.tokens.get(index);
-//            if(curToken.equals("=")){
-//                symbol = symbol + curToken;
-//                index++;
-//                curToken = token.tokens.get(index); // one values in here
+//    protected String showTheContent (){ // most original show the content
+//        StringBuilder newString = new StringBuilder();
+//            for (int i = 0; i < tableRow.size(); i++) {
+//                for (int j = 0; j < tableCol.size(); j++) {
+//                    if(!tableCol.get(j).equals(-1)){
+//                        if(j == tableRow.size()-1) {
+//                            newString.append(tableContent.get(i * tableCol.size() + j));
+//                            newString.append("\t");
+//                        }else{
+//                            newString.append(tableContent.get(i * tableCol.size() + j));
+//                            newString.append("\t");
+//                        }
+//                    }
+//                }
+//                newString.append("\n");
 //            }
-//        }// make sure after this if-condition the current token is the
-//        curCommandStatus = valueCheck(curToken);
-//        if(curCommandStatus.contains("[ERROR]")){
-//            curCommandStatus = "[ERROR]Value format invalid";
-//            return curCommandStatus;
+//        curCommandStatus = newString.toString().trim();
+//        return curCommandStatus;
+//    }
+//    protected String showTheContent (ArrayList<Integer> rowIndex){ // most original show the content
+//        StringBuilder newString = new StringBuilder();
+//        for (int i = 0; i < rowIndex.size(); i++) {
+//            for (int j = 0; j < tableCol.size(); j++) {
+//                if(!tableCol.get(j).equals(-1)){
+//                    if(j == rowIndex.size()-1) {
+//                        newString.append(tableContent.get(i * tableCol.size() + j));
+//                        newString.append("\t");
+//                    }else{
+//                        newString.append(tableContent.get(i * tableCol.size() + j));
+//                        newString.append("\t");
+//                    }
+//                }
+//            }
+//            newString.append("\n");
 //        }
-//        boolean symbolValid = rowIndexStorage(symbol,curToken,rowIndex);
-//        if(!symbolValid){
-//            curCommandStatus = "[ERROR]Detected the invalid symbol:" + symbol;
-//            return curCommandStatus;
-//        }
-//        curCommandStatus = showTheContent(symbol,curToken);
+//        curCommandStatus = newString.toString().trim();
+//        return curCommandStatus;
+//    }
+
+
+//    protected String showTheContent (String operation, String demand){
+//        StringBuilder newString = new StringBuilder();
+//            for (int i = 0; i < tableRow.size(); i++) {
+//                for (int j = 0; j < tableCol.size(); j++) {
+//                    if(!tableRow.get(i).equals(-1)){
+//                        if(j == tableCol.size()-1) {
+//                            newString.append(tableContent.get(i * tableCol.size() + j));
+//                            newString.append("\n");
+//                        }else{
+//                            newString.append(tableContent.get(i * tableCol.size() + j));
+//                            newString.append("\t");
+//                        }
+//                    }
+//                }
+//            }
+//        curCommandStatus = newString.toString().trim();
 //        return curCommandStatus;
 //    }
     // <Condition>       ::=  "(" <Condition> <BoolOperator> <Condition> ")" | <Condition> <BoolOperator> <Condition> |
     // "(" [AttributeName] <Comparator> [Value] ")" | [AttributeName] <Comparator> [Value]
     // Try to recursion the Condition -> assume first token is next the "WHERE"
-    protected ArrayList<Integer> MultipleConditionCheck(String filePath) throws Exception {
-        String curToken = token.tokens.get(index); // Assume this is the first token after where
+    // Need to return the Integer arraylist
+    protected ArrayList<Integer> MultipleConditionCheck() throws Exception {
+        ArrayList<Integer> newRow1 = new ArrayList();
+        String curToken;
+        if(index <= token.tokens.size()-1){curToken = token.tokens.get(index); // Assume this is the first token after where
+        }else{ curToken = ";";}
+//        String curToken = token.tokens.get(index); // Assume this is the first token after where
         if(curToken.equals("(")){
             index++;
-            curToken = token.tokens.get(index);
+            MultipleConditionCheck();
         }
-        if(!checkInCondition(curToken,filePath)){throw new Exception("[ERROR]");}
+        System.out.println("current token is:" + curToken);
+        if(!checkInCondition(curToken,filePath,newRow1) && !curToken.equals("(")){throw new Exception("[ERROR]");}  // Global variable filePath
+        newRow1 = tableRow; // just for test
+        System.out.println("After check& set column, newRow 1 is:" + newRow1);
+        // get one new rowIndex value in here...
         curToken = token.tokens.get(index); // may be AND or OR | ) |;
         if(curToken.equalsIgnoreCase("AND") || curToken.equalsIgnoreCase("OR")) {
-            //andOrOperation(curToken);
-            MultipleConditionCheck(filePath); // call itself
+            index++;
+            String currentOperation = curToken.toUpperCase(); // AND or OR
+            ArrayList<Integer> newRow2 = new ArrayList();
+            newRow2 = MultipleConditionCheck(); // call itself
+            // The compare should occur in here...? -> update row index
+            newRow1 = operationCondition(newRow1,newRow2,currentOperation);
+            System.out.println("After  and & or operation, newRow 1 is:" + newRow1);
         }
         index++;
-        curToken = token.tokens.get(index);
+        //curToken = token.tokens.get(index);
+        if(index <= token.tokens.size()-1){curToken = token.tokens.get(index); // Assume this is the first token after where
+        }else{curToken = ";";}
+        System.out.println("The curtoken is:" + curToken); // assume be ) ; ..
         if(curToken.equals(")")){
             index++; // check the next index
             curToken = token.tokens.get(index); // may be AND or OR | ) |;
             if(curToken.equalsIgnoreCase("AND") || curToken.equalsIgnoreCase("OR")) {
-                //andOrOperation(curToken);
-                MultipleConditionCheck(filePath); // call itself
-            }
-            if(curToken.equals(";")){ // end of the command
-                curCommandStatus = showTheContent();
-                return curCommandStatus;
+                index++;
+                String currentOperation = curToken.toUpperCase(); // AND or OR
+                ArrayList<Integer> newRow2 = new ArrayList();
+                newRow2 = MultipleConditionCheck(); // call itself
+                // The compare should occur in here...? -> update row index
+                newRow1 = operationCondition(newRow1,newRow2,currentOperation);
+                return newRow1;
             }
         }
-        if(curToken.equals(";")){ // end of the command
-            curCommandStatus = showTheContent();
-            return curCommandStatus;
-        }
-        return curCommandStatus;
+        return newRow1;
     }
 
     // [AttributeName] <Comparator> [Value]
-    protected boolean checkInCondition(String attributeName, String filePath) throws Exception {
+    protected boolean checkInCondition(String attributeName, String filePath, ArrayList<Integer> rowIndex) throws Exception {
         ArrayList<String> conditionAttribute = new ArrayList<>();
         conditionAttribute.add(attributeName);
+        System.out.println("attribute now is:" + conditionAttribute);
         if(attributeCheck(conditionAttribute).contains("[ERROR]")){ return false;} // check attribute format valid
         conditionAttribute.add(attributeName);
-        if(!colIndexStorage(filePath,conditionAttribute)){ return false;} // check attribute exist in the table
+        System.out.println("attribute after check is:" + conditionAttribute);
+        if(!colIndexStorage(filePath,conditionAttribute,rowIndex)){ return false;} // check attribute exist in the table
+        System.out.println("attribute after exist check is:" + conditionAttribute);
         index++; // expect be the <Comparator> in here
         String comparator = token.tokens.get(index); // check now : <Comparator> [Value]
-        return comparatorValueCheck(comparator);
+        return comparatorValueCheck(comparator,rowIndex);
     }
 
-    protected boolean comparatorValueCheck(String symbol){ //
+    protected boolean comparatorValueCheck(String symbol,ArrayList<Integer> rowIndex){ //
         String curToken;
         if(symbol.equals("=")||symbol.equals("!")||symbol.equals("<")||symbol.equals(">")||symbol.equalsIgnoreCase("LIKE")){
             index++; // may be the values or another symbol.  ->
@@ -513,11 +518,48 @@ protected String showTheContent (String operation, String demand){
                 curToken = token.tokens.get(index);
             }
             valueCheck(curToken); // In here value check
-            rowIndexStorage(symbol,curToken); // also check demand(?) and set the row Index
+            rowIndexStorage(symbol,curToken,rowIndex); // also check demand(?) and set the row Index
         }else{
             return false;
         }
         return true;
+    }
+
+    protected ArrayList<Integer> operationCondition(ArrayList<Integer> row1,ArrayList<Integer> row2,String operation){
+        switch (operation){
+            case "AND":
+                return operationAnd(row1,row2);
+            case "OR":
+                return operationOr(row1,row2);
+            default:
+                throw new IllegalStateException("Unexpected value: " + operation);
+        }
+    }
+
+    protected ArrayList<Integer> operationAnd(ArrayList<Integer> row1,ArrayList<Integer> row2){
+        ArrayList<Integer> newOne = new ArrayList();
+        for (int i = 0; i < row1.size(); i++) {
+            if(row1.get(i).equals(row2.get(i)) && !row1.get(i).equals(-1)){
+                newOne.add(0);
+            }else{
+                newOne.add(-1);
+            }
+        }
+        System.out.println("In AND: " + newOne);
+        return newOne;
+    }
+
+    protected ArrayList<Integer> operationOr(ArrayList<Integer> row1,ArrayList<Integer> row2){
+        ArrayList<Integer> newOne = new ArrayList();
+        for (int i = 0; i < row1.size(); i++) {
+            if(!row1.get(i).equals(-1) || !row2.get(i).equals(-1)){
+                newOne.add(0);
+            }else{
+                newOne.add(-1);
+            }
+        }
+        System.out.println("In Or: " + newOne);
+        return newOne;
     }
 
     public void setSelectAttribute(ArrayList<String> value){
