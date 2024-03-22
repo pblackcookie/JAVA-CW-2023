@@ -187,14 +187,15 @@ public class ParserJoinCommand extends DBParser{
                         for (int l = 0; l <table2Col.size() ; l++) {
                             if (Objects.equals(table1Content.get(i * table1Col.size() + j), table2Content.get(k * table2Col.size() + l))){
                                 for (int m = (k*table2Col.size()+l+1); m < ((k*table2Col.size()+l)+table2Col.size()); m++) {
-                                        // l column false --> so l+1 and left right column all were true.
+                                    // l column false --> so l+1 and left right column all were true.
+                                    if (m < table2Content.size() - 1) {
                                         if (m == ((k * table2Col.size() + l) + table2Col.size() - 1)) {
                                             newString.append(table2Content.get(m));
                                         } else {
                                             newString.append(table2Content.get(m));
-                                            newString.append("\t");
                                         }
-
+                                        newString.append("\t");
+                                    }
                                 }
                             }
                         }
