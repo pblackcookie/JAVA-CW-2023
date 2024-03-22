@@ -167,6 +167,13 @@ public class DBParser {
                     rowIndex.add(-1);
                 }
             }
+            for (int i = 0; i < attributeNames.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+                    if (tableContent.get(j).equalsIgnoreCase(attributeNames.get(i))) {
+                        tableCol.set(j, i);
+                    }
+                }
+            }
 
 
         }
@@ -412,43 +419,37 @@ public class DBParser {
     // Need to return the Integer arraylist
     protected ArrayList<Integer> multipleConditionCheck() throws Exception {
         ArrayList<Integer> newRow1 = new ArrayList<Integer>();
+        ArrayList<Integer> newRow2;
         String curToken;
         if(index <= token.tokens.size()-1){curToken = token.tokens.get(index); // Assume this is the first token after where
         }else{ curToken = ";";}
-//        String curToken = token.tokens.get(index); // Assume this is the first token after where
         if(curToken.equals("(")){
             index++;
             multipleConditionCheck();
         }
-        //System.out.println("current token is:" + curToken);
         if(!checkInCondition(curToken,filePath,newRow1) && !curToken.equals("(")){throw new Exception("[ERROR]");}  // Global variable filePath
         newRow1 = tableRow; // just for test
-        //System.out.println("After check& set column, newRow 1 is:" + newRow1);
-        // get one new rowIndex value in here...
-        //curToken = token.tokens.get(index); // may be AND or OR | ) |;
+        // get one new rowIndex value in here... // may be AND or OR | ) |;
         if(index <= token.tokens.size()-1){curToken = token.tokens.get(index); // Assume this is the first token after where
         }else{ curToken = ";";}
         if(curToken.equalsIgnoreCase("AND") || curToken.equalsIgnoreCase("OR")) {
             index++;
             String currentOperation = curToken.toUpperCase(); // AND or OR
-            ArrayList<Integer> newRow2 = new ArrayList<Integer>();
+            //ArrayList<Integer> newRow2; // = new ArrayList<Integer>();
             newRow2 = multipleConditionCheck(); // call itself
             // The compare should occur in here...? -> update row index
             newRow1 = operationCondition(newRow1,newRow2,currentOperation);
-            //System.out.println("After  and & or operation, newRow 1 is:" + newRow1);
         }
         index++;
-        //curToken = token.tokens.get(index);
         if(index <= token.tokens.size()-1){curToken = token.tokens.get(index); // Assume this is the first token after where
         }else{curToken = ";";}
-        //System .out.println("The curtoken is:" + curToken); // assume be ) ; ..
         if(curToken.equals(")")){
             index++; // check the next index
             curToken = token.tokens.get(index); // may be AND or OR | ) |;
             if(curToken.equalsIgnoreCase("AND") || curToken.equalsIgnoreCase("OR")) {
                 index++;
                 String currentOperation = curToken.toUpperCase(); // AND or OR
-                ArrayList<Integer> newRow2 = new ArrayList<Integer>();
+                // ArrayList<Integer> newRow2 = new ArrayList<Integer>();
                 newRow2 = multipleConditionCheck(); // call itself
                 // The compare should occur in here...? -> update row index
                 newRow1 = operationCondition(newRow1,newRow2,currentOperation);
@@ -508,7 +509,6 @@ public class DBParser {
                 newOne.add(-1);
             }
         }
-        //System.out.println("In AND: " + newOne);
         return newOne;
     }
 
@@ -521,7 +521,6 @@ public class DBParser {
                 newOne.add(-1);
             }
         }
-        //System.out.println("In Or: " + newOne);
         return newOne;
     }
 

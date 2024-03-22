@@ -124,11 +124,8 @@ public class ParserSelectCommand extends DBParser{
         String curToken = token.tokens.get(index);
         if(curToken.equals("*")) {
             index++;
-            curToken = token.tokens.get(index);
-            System.out.println("In select now token is:" + curToken);
             curCommandStatus = variableLengthAsterisk();
         }else{ // Now is one attribute name
-            System.out.println("In select now token is:" + curToken);
             curCommandStatus = variableLengthAttribute();
         }
         return curCommandStatus;
@@ -222,13 +219,11 @@ public class ParserSelectCommand extends DBParser{
             return curCommandStatus;
         }// show the content
         if(token.tokens.size()-2 == index){ // no where condition on here
-            System.out.println("ROw INdex now is:" + rowIndex);
             curCommandStatus = "[OK]\n" + showContent(rowIndex);
             return curCommandStatus;
         }else {
             index++; // now check is where
             curToken = token.tokens.get(index);
-            System.out.println("cur token is:" + curToken);
             if (!curToken.equalsIgnoreCase("WHERE")){
                 curCommandStatus ="[ERROR]Missing or typo 'where'.";
                 return curCommandStatus;
@@ -236,10 +231,11 @@ public class ParserSelectCommand extends DBParser{
             index++; // should be attribute now
             try {
                 ArrayList<Integer> rowIndex1 = multipleConditionCheck();
-                curCommandStatus = strictShowTheContent();
+                curCommandStatus = strictShowTheContent(rowIndex1);
                 curCommandStatus = "[OK]\n" + curCommandStatus;
                 return curCommandStatus;
             }catch(Exception e){
+                e.printStackTrace();
                 curCommandStatus = "[ERROR]Error in Select...";
                 return curCommandStatus;
             }
@@ -247,9 +243,8 @@ public class ParserSelectCommand extends DBParser{
         }
     }
 
-    private String strictShowTheContent (){
+    private String strictShowTheContent (ArrayList<Integer> rowIndex){
         StringBuilder newString = new StringBuilder();
-        System.out.println("In select attributes:" + attributes);
         for (int j = 0; j < tableCol.size(); j++){ // for heading -> set the update column index
             for (int i = 0; i < attributes.size(); i++) {
                 if(attributes.get(i).equalsIgnoreCase(tableContent.get(j))){
@@ -257,12 +252,12 @@ public class ParserSelectCommand extends DBParser{
                 }
             }
         }
-        for (int i = 0; i < tableRow.size(); i++) {
+        for (int i = 0; i < rowIndex.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
-                if(!tableRow.get(i).equals(-1)&& !tableCol.get(j).equals(-1)) {
+                if(!rowIndex.get(i).equals(-1)&& !tableCol.get(j).equals(-1)) {
                     for (String attribute : attributes) {
                         if (tableContent.get(j).equalsIgnoreCase(attribute)) {
-                            if (j == tableRow.size() - 1) {
+                            if (j == rowIndex.size() - 1) {
                                 newString.append(tableContent.get(i * tableCol.size() + j));
                                 newString.append("\t");
                             } else {
