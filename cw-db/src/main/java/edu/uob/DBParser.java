@@ -16,7 +16,7 @@ public class DBParser {
     protected ArrayList<Integer> tableRow = new ArrayList<>();
     protected ArrayList<String> tableContent = new ArrayList<>();
 
-    protected ArrayList<String> tableHeading = new ArrayList<>();
+    protected ArrayList<String> rowIndex = new ArrayList<>();
     ArrayList<String> attributes = new ArrayList<>();
     ArrayList<String> data = new ArrayList<>();
 
@@ -161,8 +161,8 @@ public class DBParser {
                         rowIndex.add(-1);
                     }
                 }
+                tableRow = rowIndex; //pass the arguments
             }
-            tableRow = rowIndex; //pass the arguments
         }else{
             for (int i = 0; i < tableContent.size() / tableCol.size(); i++) {
                 if (i == 0) {
@@ -171,6 +171,7 @@ public class DBParser {
                     rowIndex.add(-1);
                 }
             }
+
 
         }
         int count = 0;
@@ -213,23 +214,26 @@ public class DBParser {
         return true;
     }
     protected void rowIndexStorageEquals(String demand,ArrayList<Integer> rowIndex){ //==
-        for (int i = 1; i < tableRow.size(); i++) {
+        System.out.println("In the == operation");
+        System.out.println("select attribute:" + selectAttributes);
+        for (int i = 1; i < rowIndex.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
                     for (String selectAttribute : selectAttributes) {
                         if (!tableContent.get(j).equalsIgnoreCase(selectAttribute)) {
-                            if (tableContent.get(i * tableCol.size() + j).equalsIgnoreCase(demand)) {
-                                tableRow.set(i, 0);
+                            if (tableContent.get(i * tableCol.size() + j).equals(demand)) {
+                                rowIndex.set(i, 0);
                             }
                         }
                     }
                 }else if(!tableCol.get(j).equals(-1)){
                     if (tableContent.get(i * tableCol.size() + j).equalsIgnoreCase(demand)) {
-                        tableRow.set(i, 0);
+                        rowIndex.set(i, 0);
                     }
                 }
             }
         }
+         tableRow = rowIndex;
     }
     protected void rowIndexStorageNotEquals(String demand,ArrayList<Integer> rowIndex) { //!=
         for (int i = 1; i < tableRow.size(); i++) {
@@ -407,7 +411,7 @@ public class DBParser {
     // Try to recursion the Condition -> assume first token is next the "WHERE"
     // Need to return the Integer arraylist
     protected ArrayList<Integer> multipleConditionCheck() throws Exception {
-        ArrayList<Integer> newRow1 = new ArrayList();
+        ArrayList<Integer> newRow1 = new ArrayList<Integer>();
         String curToken;
         if(index <= token.tokens.size()-1){curToken = token.tokens.get(index); // Assume this is the first token after where
         }else{ curToken = ";";}
@@ -427,7 +431,7 @@ public class DBParser {
         if(curToken.equalsIgnoreCase("AND") || curToken.equalsIgnoreCase("OR")) {
             index++;
             String currentOperation = curToken.toUpperCase(); // AND or OR
-            ArrayList<Integer> newRow2 = new ArrayList();
+            ArrayList<Integer> newRow2 = new ArrayList<Integer>();
             newRow2 = multipleConditionCheck(); // call itself
             // The compare should occur in here...? -> update row index
             newRow1 = operationCondition(newRow1,newRow2,currentOperation);
@@ -444,7 +448,7 @@ public class DBParser {
             if(curToken.equalsIgnoreCase("AND") || curToken.equalsIgnoreCase("OR")) {
                 index++;
                 String currentOperation = curToken.toUpperCase(); // AND or OR
-                ArrayList<Integer> newRow2 = new ArrayList();
+                ArrayList<Integer> newRow2 = new ArrayList<Integer>();
                 newRow2 = multipleConditionCheck(); // call itself
                 // The compare should occur in here...? -> update row index
                 newRow1 = operationCondition(newRow1,newRow2,currentOperation);
@@ -499,7 +503,7 @@ public class DBParser {
     }
 
     protected ArrayList<Integer> operationAnd(ArrayList<Integer> row1,ArrayList<Integer> row2){
-        ArrayList<Integer> newOne = new ArrayList();
+        ArrayList<Integer> newOne = new ArrayList<Integer>();
         for (int i = 0; i < row1.size(); i++) {
             if(row1.get(i).equals(row2.get(i)) && !row1.get(i).equals(-1)){
                 newOne.add(0);
@@ -512,7 +516,7 @@ public class DBParser {
     }
 
     protected ArrayList<Integer> operationOr(ArrayList<Integer> row1,ArrayList<Integer> row2){
-        ArrayList<Integer> newOne = new ArrayList();
+        ArrayList<Integer> newOne = new ArrayList<Integer>();
         for (int i = 0; i < row1.size(); i++) {
             if(!row1.get(i).equals(-1) || !row2.get(i).equals(-1)){
                 newOne.add(0);

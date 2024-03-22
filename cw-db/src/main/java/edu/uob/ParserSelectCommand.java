@@ -1,8 +1,11 @@
 package edu.uob;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static edu.uob.GlobalMethod.getCurDatabaseName;
 
@@ -122,6 +125,7 @@ public class ParserSelectCommand extends DBParser{
         String curToken = token.tokens.get(index);
         if(curToken.equals("*")) {
             index++;
+            curToken = token.tokens.get(index);
             System.out.println("In select now token is:" + curToken);
             curCommandStatus = variableLengthAsterisk();
         }else{ // Now is one attribute name
@@ -136,7 +140,6 @@ public class ParserSelectCommand extends DBParser{
         // Situation 2 : it brings some condition
         // "SELECT " <WildAttribList> " FROM " [TableName] " WHERE " <Condition>
         // cur token now must be * ...
-        index++;
         curToken = token.tokens.get(index);
         if (!curToken.equalsIgnoreCase("FROM")){
             curCommandStatus = "[ERROR]Missing or typo 'from'.";
@@ -153,18 +156,13 @@ public class ParserSelectCommand extends DBParser{
         }
         index++; // should be where now
         curToken = token.tokens.get(index);
-        if (curToken.equalsIgnoreCase("WHERE")){
+        if (!curToken.equalsIgnoreCase("WHERE")){
             curCommandStatus ="[ERROR]Missing or typo 'where'.";
         } // where attribute operation message
+        index++;
         try {
             ArrayList<Integer> rowIndex = multipleConditionCheck();
-            System.out.println("cur commandstatus: " + curCommandStatus);
-            System.out.println("tablecol" + tableCol);
-            System.out.println("tablerow" + tableRow);
-            if (curCommandStatus.contains("[ERROR]")) {
-                return curCommandStatus;
-            }
-            curCommandStatus = showTheContent(rowIndex);
+            curCommandStatus = showContent(rowIndex);
             curCommandStatus = "[OK]\n" + curCommandStatus;
             return curCommandStatus;
         }catch (Exception e){
@@ -173,10 +171,10 @@ public class ParserSelectCommand extends DBParser{
     }
 
     private String variableLengthAttribute()  {
-        String curToken = token.tokens.get(index);
+        String curToken;
         // Situation 1 : consider the attribute name more than one
         ArrayList<String> attributesCheck = new ArrayList<>();
-        ArrayList<Integer> rowIndex = new ArrayList();
+        ArrayList<Integer> rowIndex = new ArrayList<Integer>();
         while(!token.tokens.get(index).equalsIgnoreCase("FROM")){
             attributesCheck.add(token.tokens.get(index));
             attributes.add(token.tokens.get(index));
@@ -204,39 +202,46 @@ public class ParserSelectCommand extends DBParser{
             curCommandStatus = "[ERROR]File does not exists.";
             return curCommandStatus;
         }
-        try {
-            boolean exist = colIndexStorage(filePath, attributes, rowIndex);
-            if (!exist) {
-                curCommandStatus = "[ERROR]Attribute Name does not exist.";
-                return curCommandStatus;
+        try{
+            BufferedReader headingReader = new BufferedReader(new FileReader(filePath));
+            String firstLine = headingReader.readLine();
+            ArrayList<String> nowCol = new ArrayList<String>();
+            nowCol.addAll(Arrays.asList(firstLine.split("\t")));
+            headingReader.close();
+            for (int i = 0; i < attributes.size(); i++) { // Loop
+                for (int j = 0; j < nowCol.size(); j++) {
+                    if(attributes.get(i).equalsIgnoreCase(nowCol.get(j))){ // has
+                        break;
+                    }
+                    if(j == (nowCol.size() - 1)){ // Already in the end of head not exist
+                        throw new Exception("[ERROR]");
+                    }
+                }
             }
         }catch (Exception e){
             curCommandStatus = "[ERROR]";
             return curCommandStatus;
-        }
-        // show the content
+        }// show the content
         if(token.tokens.size()-2 == index){ // no where condition on here
-            curCommandStatus = "[OK]\n" + showTheContent(rowIndex);
+            System.out.println("ROw INdex now is:" + rowIndex);
+            curCommandStatus = "[OK]\n" + showContent(rowIndex);
             return curCommandStatus;
         }else {
-            // todo : add WHERE CONDITION in here
-            System.out.println("NOW IN THE SELECT WHERE CONDITION");
             index++; // now check is where
-            if (curToken.equalsIgnoreCase("WHERE")){
+            curToken = token.tokens.get(index);
+            System.out.println("cur token is:" + curToken);
+            if (!curToken.equalsIgnoreCase("WHERE")){
                 curCommandStatus ="[ERROR]Missing or typo 'where'.";
+                return curCommandStatus;
             } // where attribute operation message
             index++; // should be attribute now
             try {
-                ArrayList<Integer> rowIndex1 = new ArrayList<>();
-                rowIndex1 = multipleConditionCheck();
-                // add error situation here
-                if (curCommandStatus.contains("[ERROR]")) {
-                    return curCommandStatus;
-                }
-                curCommandStatus = "[OK]\n" + strictShowTheContent(rowIndex1);
+                ArrayList<Integer> rowIndex1 = multipleConditionCheck();
+                curCommandStatus = strictShowTheContent(rowIndex1);
+                curCommandStatus = "[OK]\n" + curCommandStatus;
                 return curCommandStatus;
             }catch(Exception e){
-                curCommandStatus = "[ERROR]Error in";
+                curCommandStatus = "[ERROR]Error in Select...";
                 return curCommandStatus;
             }
 
@@ -246,12 +251,19 @@ public class ParserSelectCommand extends DBParser{
     private String strictShowTheContent (ArrayList<Integer> rowIndex){
         StringBuilder newString = new StringBuilder();
         System.out.println("In select attributes:" + attributes);
-        for (int i = 0; i < rowIndex.size(); i++) {
+        for (int j = 0; j < tableCol.size(); j++){ // for heading -> set the update column index
+            for (int i = 0; i < attributes.size(); i++) {
+                if(attributes.get(i).equalsIgnoreCase(tableContent.get(j))){
+                    tableCol.set(j,0);
+                }
+            }
+        }
+        for (int i = 0; i < tableRow.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
-                if(!rowIndex.get(i).equals(-1)&& !tableCol.get(j).equals(-1)) {
+                if(!tableRow.get(i).equals(-1)&& !tableCol.get(j).equals(-1)) {
                     for (String attribute : attributes) {
                         if (tableContent.get(j).equalsIgnoreCase(attribute)) {
-                            if (j == rowIndex.size() - 1) {
+                            if (j == tableRow.size() - 1) {
                                 newString.append(tableContent.get(i * tableCol.size() + j));
                                 newString.append("\t");
                             } else {
@@ -260,6 +272,21 @@ public class ParserSelectCommand extends DBParser{
                             }
                         }
                     }
+                }
+            }
+            newString.append("\n");
+        }
+        curCommandStatus = newString.toString().trim();
+        return curCommandStatus;
+    }
+  // SELECT * FROM marks WHERE name == 'Chris';
+    private String showContent(ArrayList<Integer> rowIndex){
+        StringBuilder newString = new StringBuilder();
+        for (int i = 0; i < rowIndex.size(); i++) {
+            for (int j = 0; j < tableCol.size(); j++) {
+                if(rowIndex.get(i).equals(0)){
+                    newString.append(tableContent.get(i * tableCol.size() + j));
+                    newString.append("\t");
                 }
             }
             newString.append("\n");
