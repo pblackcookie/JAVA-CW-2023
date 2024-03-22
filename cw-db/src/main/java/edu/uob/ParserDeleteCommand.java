@@ -63,16 +63,6 @@ public class ParserDeleteCommand extends DBParser{
 
     protected String showTheContent (ArrayList<Integer> rowIndex){
         StringBuilder newString = new StringBuilder();
-//        int rowCount = 0;
-//        for (int i = 1; i < rowIndex.size(); i++) {
-//            if(rowIndex.get(i).equals(-1)){
-//                rowCount++;
-//            }
-//        }
-//            if(rowIndex.size()-1 == rowCount){
-//                curCommandStatus = "[ERROR]Value does not exist";
-//                return curCommandStatus;
-//            }
         for (int i = 0; i < rowIndex.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if(rowIndex.get(i).equals(-1) || i == 0){

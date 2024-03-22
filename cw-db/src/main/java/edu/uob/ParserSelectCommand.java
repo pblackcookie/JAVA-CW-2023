@@ -21,7 +21,6 @@ public class ParserSelectCommand extends DBParser{
     }
 
     protected String parserSelect() {
-        String curToken  = token.tokens.get(index);
         int len = token.tokens.size();
         //length check
         if(len < 5){
@@ -208,12 +207,12 @@ public class ParserSelectCommand extends DBParser{
             ArrayList<String> nowCol = new ArrayList<String>();
             nowCol.addAll(Arrays.asList(firstLine.split("\t")));
             headingReader.close();
-            for (int i = 0; i < attributes.size(); i++) { // Loop
+            for (String attribute : attributes) { // Loop
                 for (int j = 0; j < nowCol.size(); j++) {
-                    if(attributes.get(i).equalsIgnoreCase(nowCol.get(j))){ // has
+                    if (attribute.equalsIgnoreCase(nowCol.get(j))) { // has
                         break;
                     }
-                    if(j == (nowCol.size() - 1)){ // Already in the end of head not exist
+                    if (j == (nowCol.size() - 1)) { // Already in the end of head not exist
                         throw new Exception("[ERROR]");
                     }
                 }
@@ -237,7 +236,7 @@ public class ParserSelectCommand extends DBParser{
             index++; // should be attribute now
             try {
                 ArrayList<Integer> rowIndex1 = multipleConditionCheck();
-                curCommandStatus = strictShowTheContent(rowIndex1);
+                curCommandStatus = strictShowTheContent();
                 curCommandStatus = "[OK]\n" + curCommandStatus;
                 return curCommandStatus;
             }catch(Exception e){
@@ -248,7 +247,7 @@ public class ParserSelectCommand extends DBParser{
         }
     }
 
-    private String strictShowTheContent (ArrayList<Integer> rowIndex){
+    private String strictShowTheContent (){
         StringBuilder newString = new StringBuilder();
         System.out.println("In select attributes:" + attributes);
         for (int j = 0; j < tableCol.size(); j++){ // for heading -> set the update column index
