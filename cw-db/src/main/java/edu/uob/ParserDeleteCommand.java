@@ -44,7 +44,6 @@ public class ParserDeleteCommand extends DBParser{
         try{
             ArrayList<Integer> rowIndex =  MultipleConditionCheck();
             curCommandStatus = showTheContent(rowIndex);
-            System.out.println(curCommandStatus);
             if(curCommandStatus.contains("[ERROR]")){ return  curCommandStatus;}
             updateContent(curCommandStatus,filePath);
             curCommandStatus = "[OK]";

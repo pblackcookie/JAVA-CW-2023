@@ -14,9 +14,9 @@ public class ParserUpdateCommand extends DBParser{
         this.index = index;
     }
 //<Update> ::=  "UPDATE " [TableName] " SET " <NameValueList> " WHERE " <Condition>
-    protected String parserUpdate() throws IOException {
+    protected String parserUpdate(){
         String curToken = token.tokens.get(index).toLowerCase(); // table name now
-        String filePath = server.getStorageFolderPath() + File.separator + GlobalMethod.getCurDatabaseName()
+        filePath = server.getStorageFolderPath() + File.separator + GlobalMethod.getCurDatabaseName()
                 + File.separator + curToken + ".tab";
         // check table exists
         File file = new File(filePath);
@@ -30,7 +30,6 @@ public class ParserUpdateCommand extends DBParser{
             curCommandStatus = "[ERROR]Missing or typo 'SET' command.";
             return curCommandStatus;
         }
-        // TODO：From here start NameValueList check
         // assume only one NameValueList first
         index++;
         curToken = token.tokens.get(index); // must be attributes now
@@ -68,11 +67,16 @@ public class ParserUpdateCommand extends DBParser{
         }
         index++; // from here the condition start
         // UPDATE marks SET age = 35 WHERE name == 'Simon';
-        //curCommandStatus = conditionCheck(filePath);
-        curCommandStatus = readContend(filePath);
-        updateContent(curCommandStatus,filePath);
-        curCommandStatus = "[OK]";
-        return curCommandStatus;
+        try {
+            ArrayList<Integer> rowIndex = MultipleConditionCheck();
+            curCommandStatus = readContend(rowIndex);
+            updateContent(curCommandStatus,filePath);
+            curCommandStatus = "[OK]";
+            return curCommandStatus;
+        }catch (Exception e){
+            curCommandStatus = "[ERROR]";
+            return curCommandStatus;
+        }
     }
 
     private void updateContent(String content,String filePath) throws IOException {
@@ -81,11 +85,11 @@ public class ParserUpdateCommand extends DBParser{
         writer.close();
     }
 
-    private String readContend(String filePath){
+    private String readContend(ArrayList<Integer> rowIndex){
         StringBuilder newString = new StringBuilder();
-        for (int i = 0; i < tableRow.size(); i++) {
+        for (int i = 0; i < rowIndex.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
-                if(tableRow.get(i).equals(-1) || i == 0){
+                if(rowIndex.get(i).equals(-1) || i == 0){
                     if(j == tableCol.size()-1) {
                         newString.append(tableContent.get(i * tableCol.size() + j));
                         newString.append("\n");
@@ -94,7 +98,7 @@ public class ParserUpdateCommand extends DBParser{
                         newString.append("\t");
                     }
                 }
-                if(!tableRow.get(i).equals(-1) && i != 0){
+                if(!rowIndex.get(i).equals(-1) && i != 0){
                     if(tableContent.get(j).equalsIgnoreCase(setAttribute.get(0))){
                         if(j == tableCol.size()-1) {
                             newString.append(setValue.get(0));
