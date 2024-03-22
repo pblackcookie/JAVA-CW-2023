@@ -383,69 +383,30 @@ public class DBParser {
             }
         }
     }
-//    protected String showTheContent (){ // most original show the content
-//        StringBuilder newString = new StringBuilder();
-//            for (int i = 0; i < tableRow.size(); i++) {
-//                for (int j = 0; j < tableCol.size(); j++) {
-//                    if(!tableCol.get(j).equals(-1)){
-//                        if(j == tableRow.size()-1) {
-//                            newString.append(tableContent.get(i * tableCol.size() + j));
-//                            newString.append("\t");
-//                        }else{
-//                            newString.append(tableContent.get(i * tableCol.size() + j));
-//                            newString.append("\t");
-//                        }
-//                    }
-//                }
-//                newString.append("\n");
-//            }
-//        curCommandStatus = newString.toString().trim();
-//        return curCommandStatus;
-//    }
-//    protected String showTheContent (ArrayList<Integer> rowIndex){ // most original show the content
-//        StringBuilder newString = new StringBuilder();
-//        for (int i = 0; i < rowIndex.size(); i++) {
-//            for (int j = 0; j < tableCol.size(); j++) {
-//                if(!tableCol.get(j).equals(-1)){
-//                    if(j == rowIndex.size()-1) {
-//                        newString.append(tableContent.get(i * tableCol.size() + j));
-//                        newString.append("\t");
-//                    }else{
-//                        newString.append(tableContent.get(i * tableCol.size() + j));
-//                        newString.append("\t");
-//                    }
-//                }
-//            }
-//            newString.append("\n");
-//        }
-//        curCommandStatus = newString.toString().trim();
-//        return curCommandStatus;
-//    }
-
-
-//    protected String showTheContent (String operation, String demand){
-//        StringBuilder newString = new StringBuilder();
-//            for (int i = 0; i < tableRow.size(); i++) {
-//                for (int j = 0; j < tableCol.size(); j++) {
-//                    if(!tableRow.get(i).equals(-1)){
-//                        if(j == tableCol.size()-1) {
-//                            newString.append(tableContent.get(i * tableCol.size() + j));
-//                            newString.append("\n");
-//                        }else{
-//                            newString.append(tableContent.get(i * tableCol.size() + j));
-//                            newString.append("\t");
-//                        }
-//                    }
-//                }
-//            }
-//        curCommandStatus = newString.toString().trim();
-//        return curCommandStatus;
-//    }
+    protected String showTheContent (ArrayList<Integer> rowIndex){ // most original show the content
+        StringBuilder newString = new StringBuilder();
+            for (int i = 0; i < rowIndex.size(); i++) {
+                for (int j = 0; j < tableCol.size(); j++) {
+                    if(!tableCol.get(j).equals(-1)){
+                        if(j == rowIndex.size()-1) {
+                            newString.append(tableContent.get(i * tableCol.size() + j));
+                            newString.append("\t");
+                        }else{
+                            newString.append(tableContent.get(i * tableCol.size() + j));
+                            newString.append("\t");
+                        }
+                    }
+                }
+                newString.append("\n");
+            }
+        curCommandStatus = newString.toString().trim();
+        return curCommandStatus;
+    }
     // <Condition>       ::=  "(" <Condition> <BoolOperator> <Condition> ")" | <Condition> <BoolOperator> <Condition> |
     // "(" [AttributeName] <Comparator> [Value] ")" | [AttributeName] <Comparator> [Value]
     // Try to recursion the Condition -> assume first token is next the "WHERE"
     // Need to return the Integer arraylist
-    protected ArrayList<Integer> MultipleConditionCheck() throws Exception {
+    protected ArrayList<Integer> multipleConditionCheck() throws Exception {
         ArrayList<Integer> newRow1 = new ArrayList();
         String curToken;
         if(index <= token.tokens.size()-1){curToken = token.tokens.get(index); // Assume this is the first token after where
@@ -453,7 +414,7 @@ public class DBParser {
 //        String curToken = token.tokens.get(index); // Assume this is the first token after where
         if(curToken.equals("(")){
             index++;
-            MultipleConditionCheck();
+            multipleConditionCheck();
         }
         System.out.println("current token is:" + curToken);
         if(!checkInCondition(curToken,filePath,newRow1) && !curToken.equals("(")){throw new Exception("[ERROR]");}  // Global variable filePath
@@ -467,7 +428,7 @@ public class DBParser {
             index++;
             String currentOperation = curToken.toUpperCase(); // AND or OR
             ArrayList<Integer> newRow2 = new ArrayList();
-            newRow2 = MultipleConditionCheck(); // call itself
+            newRow2 = multipleConditionCheck(); // call itself
             // The compare should occur in here...? -> update row index
             newRow1 = operationCondition(newRow1,newRow2,currentOperation);
             System.out.println("After  and & or operation, newRow 1 is:" + newRow1);
@@ -484,7 +445,7 @@ public class DBParser {
                 index++;
                 String currentOperation = curToken.toUpperCase(); // AND or OR
                 ArrayList<Integer> newRow2 = new ArrayList();
-                newRow2 = MultipleConditionCheck(); // call itself
+                newRow2 = multipleConditionCheck(); // call itself
                 // The compare should occur in here...? -> update row index
                 newRow1 = operationCondition(newRow1,newRow2,currentOperation);
                 return newRow1;

@@ -42,7 +42,7 @@ public class ParserDeleteCommand extends DBParser{
         index++; // should be condition now - attribute
         // using this for multiple check....
         try{
-            ArrayList<Integer> rowIndex =  MultipleConditionCheck();
+            ArrayList<Integer> rowIndex =  multipleConditionCheck();
             curCommandStatus = showTheContent(rowIndex);
             if(curCommandStatus.contains("[ERROR]")){ return  curCommandStatus;}
             updateContent(curCommandStatus,filePath);

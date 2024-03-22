@@ -68,7 +68,7 @@ public class ParserUpdateCommand extends DBParser{
         index++; // from here the condition start
         // UPDATE marks SET age = 35 WHERE name == 'Simon';
         try {
-            ArrayList<Integer> rowIndex = MultipleConditionCheck();
+            ArrayList<Integer> rowIndex = multipleConditionCheck();
             curCommandStatus = readContend(rowIndex);
             updateContent(curCommandStatus,filePath);
             curCommandStatus = "[OK]";
