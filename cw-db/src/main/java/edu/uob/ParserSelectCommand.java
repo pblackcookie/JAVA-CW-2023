@@ -122,8 +122,10 @@ public class ParserSelectCommand extends DBParser{
         String curToken = token.tokens.get(index);
         if(curToken.equals("*")) {
             index++;
+            System.out.println("In select now token is:" + curToken);
             curCommandStatus = variableLengthAsterisk();
         }else{ // Now is one attribute name
+            System.out.println("In select now token is:" + curToken);
             curCommandStatus = variableLengthAttribute();
         }
         return curCommandStatus;
@@ -174,76 +176,71 @@ public class ParserSelectCommand extends DBParser{
         String curToken = token.tokens.get(index);
         // Situation 1 : consider the attribute name more than one
         ArrayList<String> attributesCheck = new ArrayList<>();
-        if(!curToken.equals("*")){ // attributes
-            while(!token.tokens.get(index).equalsIgnoreCase("FROM")){
-                attributesCheck.add(token.tokens.get(index));
-                attributes.add(token.tokens.get(index));
-                index++; // until equals from
-            }
-            curCommandStatus = attributeCheck(attributesCheck);
-            if(curCommandStatus.contains("[ERROR]")){
-                curCommandStatus = "[ERROR]Attribute or format error";
-                return curCommandStatus;
-            }
-            for (int i = 0; i < attributes.size(); i++) {
-                String attribute = attributes.get(i);
-                if(attribute.equals(",")){
-                    attributes.remove(i);
-                    i--; // after remove
-                }
-            }
-            setSelectAttribute(attributes);
-            index++; // should be table name now
-            curToken = token.tokens.get(index).toLowerCase(); // should be table name now
-            filePath = server.getStorageFolderPath() + File.separator + getCurDatabaseName()
-                    + File.separator +curToken + ".tab";
-            File file = new File(filePath);
-            if(!file.exists()){
-                curCommandStatus = "[ERROR]File does not exists.";
-                return curCommandStatus;
-            }
-            try {
-                ArrayList<Integer> rowIndex = new ArrayList();
-                rowIndex = multipleConditionCheck();
-                boolean exist = colIndexStorage(filePath, attributes, rowIndex);
-                if (!exist) {
-                    curCommandStatus = "[ERROR]Attribute Name does not exist.";
-                    return curCommandStatus;
-                }
-            }catch (Exception e){
-                curCommandStatus = "[ERROR]";
-                return curCommandStatus;
-            }
-            // show the content
-            if(token.tokens.size()-2 == index){ // no where condition on here
-                //curCommandStatus = "[OK]\n" + showTheContent();
-                return curCommandStatus;
-            }else {
-                // todo : add WHERE CONDITION in here
-                System.out.println("NOW IN THE SELECT WHERE CONDITION");
-                index++; // now check is where
-                if (curToken.equalsIgnoreCase("WHERE")){
-                    curCommandStatus ="[ERROR]Missing or typo 'where'.";
-                } // where attribute operation message
-                index++; // should be attribute now
-
-                try {
-                    ArrayList<Integer> rowIndex1 = new ArrayList<>();
-                    rowIndex1 = multipleConditionCheck();
-                    // add error situation here
-                    if (curCommandStatus.contains("[ERROR]")) {
-                        return curCommandStatus;
-                    }
-                    curCommandStatus = "[OK]\n" + strictShowTheContent(rowIndex1);
-                    return curCommandStatus;
-                }catch(Exception e){
-                    curCommandStatus = "[ERROR]";
-                    return curCommandStatus;
-                }
-
+        ArrayList<Integer> rowIndex = new ArrayList();
+        while(!token.tokens.get(index).equalsIgnoreCase("FROM")){
+            attributesCheck.add(token.tokens.get(index));
+            attributes.add(token.tokens.get(index));
+            index++; // until equals from
+        }
+        curCommandStatus = attributeCheck(attributesCheck);
+        if(curCommandStatus.contains("[ERROR]")){
+            curCommandStatus = "[ERROR]Attribute or format error";
+            return curCommandStatus;
+        }
+        for (int i = 0; i < attributes.size(); i++) {
+            String attribute = attributes.get(i);
+            if(attribute.equals(",")){
+                attributes.remove(i);
+                i--; // after remove
             }
         }
-        return curCommandStatus;
+        setSelectAttribute(attributes);
+        index++; // should be table name now
+        curToken = token.tokens.get(index).toLowerCase(); // should be table name now
+        filePath = server.getStorageFolderPath() + File.separator + getCurDatabaseName()
+                + File.separator +curToken + ".tab";
+        File file = new File(filePath);
+        if(!file.exists()){
+            curCommandStatus = "[ERROR]File does not exists.";
+            return curCommandStatus;
+        }
+        try {
+            boolean exist = colIndexStorage(filePath, attributes, rowIndex);
+            if (!exist) {
+                curCommandStatus = "[ERROR]Attribute Name does not exist.";
+                return curCommandStatus;
+            }
+        }catch (Exception e){
+            curCommandStatus = "[ERROR]";
+            return curCommandStatus;
+        }
+        // show the content
+        if(token.tokens.size()-2 == index){ // no where condition on here
+            curCommandStatus = "[OK]\n" + showTheContent(rowIndex);
+            return curCommandStatus;
+        }else {
+            // todo : add WHERE CONDITION in here
+            System.out.println("NOW IN THE SELECT WHERE CONDITION");
+            index++; // now check is where
+            if (curToken.equalsIgnoreCase("WHERE")){
+                curCommandStatus ="[ERROR]Missing or typo 'where'.";
+            } // where attribute operation message
+            index++; // should be attribute now
+            try {
+                ArrayList<Integer> rowIndex1 = new ArrayList<>();
+                rowIndex1 = multipleConditionCheck();
+                // add error situation here
+                if (curCommandStatus.contains("[ERROR]")) {
+                    return curCommandStatus;
+                }
+                curCommandStatus = "[OK]\n" + strictShowTheContent(rowIndex1);
+                return curCommandStatus;
+            }catch(Exception e){
+                curCommandStatus = "[ERROR]Error in";
+                return curCommandStatus;
+            }
+
+        }
     }
 
     private String strictShowTheContent (ArrayList<Integer> rowIndex){
