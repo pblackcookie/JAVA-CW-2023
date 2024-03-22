@@ -40,25 +40,20 @@ public class ParserDeleteCommand extends DBParser{
             return curCommandStatus;
         }
         index++; // should be condition now - attribute
-        //conditionCheck(filePath); // using condition for checking
         // using this for multiple check....
         try{
             ArrayList<Integer> rowIndex =  MultipleConditionCheck();
-            System.out.println("rowIndex:" +rowIndex);
-            System.out.println("Table content:" + tableContent);
-            curCommandStatus = "[OK]\n" + showTheContent(rowIndex);;
+            curCommandStatus = showTheContent(rowIndex);
+            System.out.println(curCommandStatus);
+            if(curCommandStatus.contains("[ERROR]")){ return  curCommandStatus;}
+            updateContent(curCommandStatus,filePath);
+            curCommandStatus = "[OK]";
             return curCommandStatus;
         }catch (Exception e){
             e.printStackTrace();
-         curCommandStatus = "[ERROR]An error Occur";
-         return curCommandStatus;
+            curCommandStatus = "[ERROR]An error Occur";
+            return curCommandStatus;
         }
-//        if(curCommandStatus.contains("[ERROR]")){
-//            return curCommandStatus;
-//        }
-        //updateContent(curCommandStatus,filePath); *****
-//        curCommandStatus = "[OK]";
-//        return curCommandStatus;
     }
 
     private void updateContent(String content,String filePath) throws IOException {
@@ -70,15 +65,15 @@ public class ParserDeleteCommand extends DBParser{
     protected String showTheContent (ArrayList<Integer> rowIndex){
         StringBuilder newString = new StringBuilder();
         int rowCount = 0;
-//        for (int i = 1; i < tableRow.size(); i++) {
-//            if(tableRow.get(i).equals(-1)){
-//                rowCount++;
-//            }
-//        }
-//            if(tableRow.size()-1 == rowCount){
-//                curCommandStatus = "[ERROR]Value does not exist";
-//                return curCommandStatus;
-//            }
+        for (int i = 1; i < rowIndex.size(); i++) {
+            if(rowIndex.get(i).equals(-1)){
+                rowCount++;
+            }
+        }
+            if(rowIndex.size()-1 == rowCount){
+                curCommandStatus = "[ERROR]Value does not exist";
+                return curCommandStatus;
+            }
         for (int i = 0; i < rowIndex.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if(rowIndex.get(i).equals(-1) || i == 0){
