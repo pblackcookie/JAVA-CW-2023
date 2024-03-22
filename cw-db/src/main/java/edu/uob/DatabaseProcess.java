@@ -16,7 +16,6 @@ public class DatabaseProcess {
         databasePath = getCurDatabasePath(databaseName);
         try {
             if(Files.exists(Path.of(databasePath))) {
-                //System.err.println("Database: " + databaseName + " already exists.");
                 return "[ERROR]Database: " + databaseName + " already exists.";
             }else {
                 Files.createDirectories(Path.of(databasePath));
@@ -24,7 +23,6 @@ public class DatabaseProcess {
             }
         }catch (IOException ioe){
             return "[ERROR]Can't able to create database storage folder " + databaseName;
-            //throw new IOException("Can't able to create database storage folder " + databaseName);
         }
     }
     // Drop the database if it exists

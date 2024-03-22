@@ -10,13 +10,11 @@ import static edu.uob.GlobalMethod.*;
 
 public class DBParser {
     protected int index = 0; // use to indicate the current token
-    protected String curCommandStatus = "[OK]Haven't finished that function or parser.";
+    protected String curCommandStatus = "[OK]";
     protected String curCommand;
     protected ArrayList<Integer> tableCol = new ArrayList<>();
     protected ArrayList<Integer> tableRow = new ArrayList<>();
     protected ArrayList<String> tableContent = new ArrayList<>();
-
-    protected ArrayList<String> rowIndex = new ArrayList<>();
     ArrayList<String> attributes = new ArrayList<>();
     ArrayList<String> data = new ArrayList<>();
 
@@ -127,13 +125,11 @@ public class DBParser {
     // changing the variable in the function
     // return the boolean to indicate if this arraylist valid.
     protected boolean colIndexStorage(String filePath, ArrayList<String> attributeNames, ArrayList<Integer> rowIndex) throws IOException {
-        System.out.println("filePath is:" + filePath);
         selectAttributes.addAll(attributes);
         if(tableContent.isEmpty()) {
             BufferedReader tableReader = new BufferedReader(new FileReader(filePath));
             String line = tableReader.readLine();
             tableContent.addAll(Arrays.asList(line.split("\t")));
-            System.out.println("table content is:" + tableContent);
             // for loop for storage the information that need to be shown
             if (tableCol.isEmpty()) {
                 for (int i = 0; i < tableContent.size(); i++) {
@@ -214,8 +210,6 @@ public class DBParser {
         return true;
     }
     protected void rowIndexStorageEquals(String demand,ArrayList<Integer> rowIndex){ //==
-        System.out.println("In the == operation");
-        System.out.println("select attribute:" + selectAttributes);
         for (int i = 1; i < rowIndex.size(); i++) {
             for (int j = 0; j < tableCol.size(); j++) {
                 if (!tableCol.get(j).equals(-1) && !selectAttributes.isEmpty()) {
@@ -253,6 +247,7 @@ public class DBParser {
                 }
             }
         }
+        tableRow = rowIndex;
     }
     protected boolean rowIndexStorageMoreThan(String demand,ArrayList<Integer> rowIndex) { // >
         try{
@@ -276,6 +271,7 @@ public class DBParser {
                         }
                     }
                 }
+                tableRow = rowIndex;
             }
         }catch (Exception e){
             return false;
@@ -305,6 +301,7 @@ public class DBParser {
                     }
                 }
             }
+            tableRow = rowIndex;
         }catch (Exception e){
             return false;
         }
@@ -333,6 +330,7 @@ public class DBParser {
                     }
                 }
             }
+            tableRow = rowIndex;
         }catch(Exception e){
                 return false;
         }
@@ -361,6 +359,7 @@ public class DBParser {
                     }
                 }
             }
+            tableRow = rowIndex;
         }catch (Exception e){
             return false;
         }
@@ -386,6 +385,7 @@ public class DBParser {
                 }
             }
         }
+        tableRow = rowIndex;
     }
     protected String showTheContent (ArrayList<Integer> rowIndex){ // most original show the content
         StringBuilder newString = new StringBuilder();
@@ -420,10 +420,10 @@ public class DBParser {
             index++;
             multipleConditionCheck();
         }
-        System.out.println("current token is:" + curToken);
+        //System.out.println("current token is:" + curToken);
         if(!checkInCondition(curToken,filePath,newRow1) && !curToken.equals("(")){throw new Exception("[ERROR]");}  // Global variable filePath
         newRow1 = tableRow; // just for test
-        System.out.println("After check& set column, newRow 1 is:" + newRow1);
+        //System.out.println("After check& set column, newRow 1 is:" + newRow1);
         // get one new rowIndex value in here...
         //curToken = token.tokens.get(index); // may be AND or OR | ) |;
         if(index <= token.tokens.size()-1){curToken = token.tokens.get(index); // Assume this is the first token after where
@@ -435,13 +435,13 @@ public class DBParser {
             newRow2 = multipleConditionCheck(); // call itself
             // The compare should occur in here...? -> update row index
             newRow1 = operationCondition(newRow1,newRow2,currentOperation);
-            System.out.println("After  and & or operation, newRow 1 is:" + newRow1);
+            //System.out.println("After  and & or operation, newRow 1 is:" + newRow1);
         }
         index++;
         //curToken = token.tokens.get(index);
         if(index <= token.tokens.size()-1){curToken = token.tokens.get(index); // Assume this is the first token after where
         }else{curToken = ";";}
-        System.out.println("The curtoken is:" + curToken); // assume be ) ; ..
+        //System .out.println("The curtoken is:" + curToken); // assume be ) ; ..
         if(curToken.equals(")")){
             index++; // check the next index
             curToken = token.tokens.get(index); // may be AND or OR | ) |;
@@ -462,12 +462,9 @@ public class DBParser {
     protected boolean checkInCondition(String attributeName, String filePath, ArrayList<Integer> rowIndex) throws Exception {
         ArrayList<String> conditionAttribute = new ArrayList<>();
         conditionAttribute.add(attributeName);
-        System.out.println("attribute now is:" + conditionAttribute);
         if(attributeCheck(conditionAttribute).contains("[ERROR]")){ return false;} // check attribute format valid
         conditionAttribute.add(attributeName);
-        System.out.println("attribute after check is:" + conditionAttribute);
         if(!colIndexStorage(filePath,conditionAttribute,rowIndex)){ return false;} // check attribute exist in the table
-        System.out.println("attribute after exist check is:" + conditionAttribute);
         index++; // expect be the <Comparator> in here
         String comparator = token.tokens.get(index); // check now : <Comparator> [Value]
         return comparatorValueCheck(comparator,rowIndex);
@@ -511,7 +508,7 @@ public class DBParser {
                 newOne.add(-1);
             }
         }
-        System.out.println("In AND: " + newOne);
+        //System.out.println("In AND: " + newOne);
         return newOne;
     }
 
@@ -524,7 +521,7 @@ public class DBParser {
                 newOne.add(-1);
             }
         }
-        System.out.println("In Or: " + newOne);
+        //System.out.println("In Or: " + newOne);
         return newOne;
     }
 
