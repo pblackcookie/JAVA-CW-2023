@@ -128,8 +128,8 @@ public class DBParser {
     // return the boolean to indicate if this arraylist valid.
     protected boolean colIndexStorage(String filePath, ArrayList<String> attributeNames, ArrayList<Integer> rowIndex) throws IOException {
         System.out.println("filePath is:" + filePath);
+        selectAttributes.addAll(attributes);
         if(tableContent.isEmpty()) {
-            selectAttributes.addAll(attributes);
             BufferedReader tableReader = new BufferedReader(new FileReader(filePath));
             String line = tableReader.readLine();
             tableContent.addAll(Arrays.asList(line.split("\t")));
@@ -153,8 +153,17 @@ public class DBParser {
                 tableContent.addAll(Arrays.asList(line.split("\t")));
             }
             tableReader.close();// check if the attribute name exist
-        }
-        if(tableRow.isEmpty()) {
+            if(tableRow.isEmpty()) {
+                for (int i = 0; i < tableContent.size() / tableCol.size(); i++) {
+                    if (i == 0) {
+                        rowIndex.add(0); // table head information
+                    } else {
+                        rowIndex.add(-1);
+                    }
+                }
+            }
+            tableRow = rowIndex; //pass the arguments
+        }else{
             for (int i = 0; i < tableContent.size() / tableCol.size(); i++) {
                 if (i == 0) {
                     rowIndex.add(0); // table head information
@@ -162,25 +171,15 @@ public class DBParser {
                     rowIndex.add(-1);
                 }
             }
-        }else{ //already exist , reset it
-            for (int i = 0; i < tableContent.size() / tableCol.size(); i++) {
-                if (i == 0 || !tableRow.get(i).equals(-1)) {
-                    rowIndex.set(i,0); // table head information
-                } else {
-                    rowIndex.set(i,-1);
-                }
-            }
+
         }
-        tableRow = rowIndex; //pass the arguments
-//
-//        int count = 0;
-//        for (Integer integer : tableCol) {
-//            if (integer == -1) {
-//                count++;
-//            }
-//        }// not exists... -> after simplify
-//        return count != tableCol.size();
-        return true;
+        int count = 0;
+        for (Integer integer : tableCol) {
+            if (integer == -1) {
+                count++;
+            }
+        }// not exists... -> after simplify
+        return count != tableCol.size();
     }
 
     // different symbols will lead different result
@@ -461,7 +460,9 @@ public class DBParser {
         newRow1 = tableRow; // just for test
         System.out.println("After check& set column, newRow 1 is:" + newRow1);
         // get one new rowIndex value in here...
-        curToken = token.tokens.get(index); // may be AND or OR | ) |;
+        //curToken = token.tokens.get(index); // may be AND or OR | ) |;
+        if(index <= token.tokens.size()-1){curToken = token.tokens.get(index); // Assume this is the first token after where
+        }else{ curToken = ";";}
         if(curToken.equalsIgnoreCase("AND") || curToken.equalsIgnoreCase("OR")) {
             index++;
             String currentOperation = curToken.toUpperCase(); // AND or OR
