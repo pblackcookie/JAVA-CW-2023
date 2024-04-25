@@ -12,9 +12,13 @@ import com.alexmerz.graphviz.ParseException;
 import com.alexmerz.graphviz.objects.Graph;
 import com.alexmerz.graphviz.objects.Node;
 import com.alexmerz.graphviz.objects.Edge;
+
+import javax.xml.crypto.NodeSetData;
+
 public class GameEntityParser {
     // Read the config file
     static Map<String, String> pathMap = new HashMap<>();
+
     public static void main(String[] args) {
         fileReader();
         // For test the 'path' is corrected stored or not
@@ -25,21 +29,61 @@ public class GameEntityParser {
         }
     }
 
+    //Reading the entities config file
     public static void fileReader() {
         try {
-            //Create the parser to read the config file
             Parser parser = new Parser();
             FileReader reader = new FileReader("config" + File.separator + "basic-entities.dot");
             parser.parse(reader);
             Graph wholeDocument = parser.getGraphs().get(0);
-            ArrayList<Graph> sections = wholeDocument.getSubgraphs(); // get the list
+            ArrayList<Graph> sections = wholeDocument.getSubgraphs(); // get the file information
 
-            // In first subgraph -> get all locations
+            // In first subgraph -> get all locations & description
             ArrayList<Graph> locations = sections.get(0).getSubgraphs();
+            for(Graph location: locations){
+                Node locationDetails = location.getNodes(false).get(0);
+                // Get the each location's name and description
+                String locationName = locationDetails.getId().getId();
+                String description = locationDetails.getAttributes().get("description");
+                // Put the entities to the Location object
+                Location currentLocation = new Location(locationName,description);
 
+                // All entities on each location
+                ArrayList<Graph> entities = location.getSubgraphs();
+                for(Graph entity: entities){
+                    ArrayList<Node> nodeDetails = entity.getNodes(false);
+                    String currentEntity = entity.getId().getId();
+                    switch(currentEntity) {
+                        case "artefacts":
+                            for(Node node: nodeDetails){
+                                String name = node.getId().getId();
+                                description = node.getAttributes().get("description");
+                                Artefacts currentArtefacts = new Artefacts(name,description);
+                            }
+                            break;
+                        case "furniture":
+                            for(Node node: nodeDetails){
+                                String name = node.getId().getId();
+                                description = node.getAttributes().get("description");
+                                Furniture currentFurniture = new Furniture(name,description);
+                            }
+                            break;
+                        case "characters":
+                            for(Node node: nodeDetails){
+                                String name = node.getId().getId();
+                                description = node.getAttributes().get("description");
+                                Characters currentCharacters = new Characters(name,description);
+                            }
+                            break;
+                        default:
+                            System.out.println("Not current Entity now.");
+                            break;
+                    }
+                }
+            }
             // In the second subgraph -> get all paths
             ArrayList<Edge> paths = sections.get(1).getEdges();
-            // for loop: to store from and to location to the map
+            // for loop: to store tha path information and direction to the Hashmap
             for (Edge path : paths) {
                 String fromLocation = path.getSource().getNode().getId().getId();
                 String toLocation = path.getTarget().getNode().getId().getId();
@@ -51,4 +95,7 @@ public class GameEntityParser {
             System.out.println("ParseException was thrown when attempting to read basic entities file");
         }
     }
+
+
+
 }
