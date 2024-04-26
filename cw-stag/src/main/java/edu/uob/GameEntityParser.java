@@ -16,8 +16,8 @@ import com.alexmerz.graphviz.objects.Edge;
 
 public class GameEntityParser {
     // Read the config file
-    Map<String, String> pathMap = new HashMap<>();
-    Map<Location,HashMap<String, HashSet<GameEntity>>> entitiesMap = new HashMap<>();
+    HashMap<String, String> pathMap = new HashMap<>();
+    HashMap<Location,HashMap<String, HashSet<GameEntity>>> entitiesMap = new HashMap<>();
 
 
     //Reading the entities config file

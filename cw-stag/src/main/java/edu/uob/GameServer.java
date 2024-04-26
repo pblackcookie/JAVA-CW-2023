@@ -16,9 +16,9 @@ import java.util.Map;
 public final class GameServer {
 
     private static final char END_OF_TRANSMISSION = 4;
-    Map<String, String> pathMap;
-    Map<Location,HashMap<String, HashSet<GameEntity>>> entitiesMap;
-    HashMap<String,HashSet<GameAction>> actions = new HashMap<String, HashSet<GameAction>>();
+    HashMap<String, String> pathMap;
+    HashMap<Location,HashMap<String, HashSet<GameEntity>>> entitiesMap;
+    HashMap<String,HashSet<GameAction>> actions;
 
     public static void main(String[] args) throws IOException {
         File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
@@ -42,8 +42,9 @@ public final class GameServer {
         pathMap = gameEntityParser.pathMap;
         entitiesMap = gameEntityParser.entitiesMap;
         // Statements to read the actions file
-//        GameActionParser gameActionParser = new GameActionParser();
-//        gameActionParser.actionsFileReader(String.valueOf(actionsFile));
+        GameActionParser gameActionParser = new GameActionParser();
+        gameActionParser.actionsFileReader(String.valueOf(actionsFile));
+        actions = gameActionParser.actions;
     }
 
     /**
@@ -54,6 +55,8 @@ public final class GameServer {
     */
     public String handleCommand(String command) {
         // TODO implement your server logic here
+        String playerName = command.split(":")[0].trim();
+        Player player = new Player(playerName,"","cabin");
         return "";
     }
 
