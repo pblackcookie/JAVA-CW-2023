@@ -1,10 +1,11 @@
 package edu.uob;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import com.alexmerz.graphviz.Parser;
@@ -13,27 +14,17 @@ import com.alexmerz.graphviz.objects.Graph;
 import com.alexmerz.graphviz.objects.Node;
 import com.alexmerz.graphviz.objects.Edge;
 
-import javax.xml.crypto.NodeSetData;
-
 public class GameEntityParser {
     // Read the config file
-    static Map<String, String> pathMap = new HashMap<>();
+    Map<String, String> pathMap = new HashMap<>();
+    Map<Location,HashMap<String, HashSet<GameEntity>>> entitiesMap = new HashMap<>();
 
-    public static void main(String[] args) {
-        fileReader();
-        // For test the 'path' is corrected stored or not
-        for (Map.Entry<String, String> entry : pathMap.entrySet()) {
-            String from = entry.getKey();
-            String to = entry.getValue();
-            System.out.println( from + " -> " +  to);
-        }
-    }
 
     //Reading the entities config file
-    public static void fileReader() {
+    public void fileReader(String filePath) {
         try {
             Parser parser = new Parser();
-            FileReader reader = new FileReader("config" + File.separator + "basic-entities.dot");
+            FileReader reader = new FileReader(filePath);
             parser.parse(reader);
             Graph wholeDocument = parser.getGraphs().get(0);
             ArrayList<Graph> sections = wholeDocument.getSubgraphs(); // get the file information
@@ -47,40 +38,46 @@ public class GameEntityParser {
                 String description = locationDetails.getAttributes().get("description");
                 // Put the entities to the Location object
                 Location currentLocation = new Location(locationName,description);
-
                 // All entities on each location
                 ArrayList<Graph> entities = location.getSubgraphs();
                 for(Graph entity: entities){
+                    String entityName;
+                    String entityDescription;
                     ArrayList<Node> nodeDetails = entity.getNodes(false);
                     String currentEntity = entity.getId().getId();
+                    // Get the detail node information from each location
                     switch(currentEntity) {
                         case "artefacts":
                             for(Node node: nodeDetails){
-                                String name = node.getId().getId();
-                                description = node.getAttributes().get("description");
-                                Artefacts currentArtefacts = new Artefacts(name,description);
+                                entityName = node.getId().getId();
+                                entityDescription = node.getAttributes().get("description");
+                                // Create the game entity object
+                                Artefacts currentArtefacts = new Artefacts(entityName,entityDescription);
+                                entitiesLoading(currentLocation, currentArtefacts, entityName);
                             }
                             break;
                         case "furniture":
                             for(Node node: nodeDetails){
-                                String name = node.getId().getId();
-                                description = node.getAttributes().get("description");
-                                Furniture currentFurniture = new Furniture(name,description);
+                                entityName = node.getId().getId();
+                                entityDescription = node.getAttributes().get("description");
+                                Furniture currentFurniture = new Furniture(entityName,entityDescription);
+                                entitiesLoading(currentLocation, currentFurniture, entityName);
                             }
                             break;
                         case "characters":
                             for(Node node: nodeDetails){
-                                String name = node.getId().getId();
-                                description = node.getAttributes().get("description");
-                                Characters currentCharacters = new Characters(name,description);
+                                entityName = node.getId().getId();
+                                entityDescription = node.getAttributes().get("description");
+                                Characters currentCharacters = new Characters(entityName,entityDescription);
+                                entitiesLoading(currentLocation,currentCharacters, entityName);
                             }
                             break;
                         default:
-                            System.out.println("Not current Entity now.");
                             break;
                     }
                 }
             }
+
             // In the second subgraph -> get all paths
             ArrayList<Edge> paths = sections.get(1).getEdges();
             // for loop: to store tha path information and direction to the Hashmap
@@ -94,6 +91,19 @@ public class GameEntityParser {
         } catch (ParseException pe) {
             System.out.println("ParseException was thrown when attempting to read basic entities file");
         }
+    }
+
+    private void entitiesLoading(Location currentLocation, GameEntity currentEntity, String entityName){
+        // get or create current location's inner HashMap
+        HashMap<String, HashSet<GameEntity>> innerMap = entitiesMap.getOrDefault(currentLocation, new HashMap<>());
+        // get or create  current entityName's HashSet
+        HashSet<GameEntity> entitySet = innerMap.getOrDefault(entityName, new HashSet<>());
+        // add the object into HashSet
+        entitySet.add(currentEntity);
+        // put the updated HashSet back to inner HashMap
+        innerMap.put(entityName, entitySet);
+        // put the inner HashMap into HashMap
+        entitiesMap.put(currentLocation, innerMap);
     }
 
 
