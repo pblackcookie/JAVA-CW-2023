@@ -46,34 +46,13 @@ public class GameEntityParser {
                     ArrayList<Node> nodeDetails = entity.getNodes(false);
                     String currentEntity = entity.getId().getId();
                     // Get the detail node information from each location
-                    switch(currentEntity) {
-                        case "artefacts":
-                            for(Node node: nodeDetails){
-                                entityName = node.getId().getId();
-                                entityDescription = node.getAttributes().get("description");
-                                // Create the game entity object
-                                Artefacts currentArtefacts = new Artefacts(entityName,entityDescription);
-                                entitiesLoading(currentLocation, currentArtefacts, entityName);
-                            }
-                            break;
-                        case "furniture":
-                            for(Node node: nodeDetails){
-                                entityName = node.getId().getId();
-                                entityDescription = node.getAttributes().get("description");
-                                Furniture currentFurniture = new Furniture(entityName,entityDescription);
-                                entitiesLoading(currentLocation, currentFurniture, entityName);
-                            }
-                            break;
-                        case "characters":
-                            for(Node node: nodeDetails){
-                                entityName = node.getId().getId();
-                                entityDescription = node.getAttributes().get("description");
-                                Characters currentCharacters = new Characters(entityName,entityDescription);
-                                entitiesLoading(currentLocation,currentCharacters, entityName);
-                            }
-                            break;
-                        default:
-                            break;
+                    for(Node node: nodeDetails){
+                        entityName = node.getId().getId();
+                        entityDescription = node.getAttributes().get("description");
+                        GameEntity newEntity = createEntity(currentEntity, entityName, entityDescription);
+                        if (newEntity != null) {
+                            entitiesLoading(currentLocation, newEntity, entityName);
+                        }
                     }
                 }
             }
@@ -90,6 +69,20 @@ public class GameEntityParser {
             System.out.println("FileNotFoundException was thrown when attempting to read basic entities file");
         } catch (ParseException pe) {
             System.out.println("ParseException was thrown when attempting to read basic entities file");
+        }
+    }
+
+    // Create the different entities when on the different locations with different entities
+    private GameEntity createEntity(String currentEntity, String entityName, String entityDescription){
+        switch(currentEntity) {
+            case "artefacts":
+                return new Artefacts(entityName, entityDescription);
+            case "furniture":
+                return new Furniture(entityName, entityDescription);
+            case "characters":
+                return new Characters(entityName, entityDescription);
+            default:
+                return null;
         }
     }
 

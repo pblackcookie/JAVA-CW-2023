@@ -43,7 +43,7 @@ public final class GameServer {
         entitiesMap = gameEntityParser.entitiesMap;
 //        Test whether the entities Map is correct store the information
 //        for (Location location : entitiesMap.keySet()) {
-//            System.out.println("Location: " + location); // 输出当前的 Location 对象
+//            System.out.println(location); // 输出当前的 Location 对象
 //
 //            HashMap<String, HashSet<GameEntity>> innerMap = entitiesMap.get(location); // 获取内部的 HashMap
 //
