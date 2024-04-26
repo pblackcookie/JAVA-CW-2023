@@ -18,6 +18,7 @@ public final class GameServer {
     private static final char END_OF_TRANSMISSION = 4;
     Map<String, String> pathMap;
     Map<Location,HashMap<String, HashSet<GameEntity>>> entitiesMap;
+    HashMap<String,HashSet<GameAction>> actions = new HashMap<String, HashSet<GameAction>>();
 
     public static void main(String[] args) throws IOException {
         File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
@@ -35,28 +36,14 @@ public final class GameServer {
     */
     public GameServer(File entitiesFile, File actionsFile) {
         // TODO implement your server logic here
-        // TODO write a class to read the entities file and actions file
         // Statements to read the entities file
         GameEntityParser gameEntityParser = new GameEntityParser();
-        gameEntityParser.fileReader(String.valueOf(entitiesFile));
+        gameEntityParser.entitiesFileReader(String.valueOf(entitiesFile));
         pathMap = gameEntityParser.pathMap;
         entitiesMap = gameEntityParser.entitiesMap;
-//        Test whether the entities Map is correct store the information
-//        for (Location location : entitiesMap.keySet()) {
-//            System.out.println(location); // 输出当前的 Location 对象
-//
-//            HashMap<String, HashSet<GameEntity>> innerMap = entitiesMap.get(location); // 获取内部的 HashMap
-//
-//            for (String entityType : innerMap.keySet()) {
-//                System.out.println("  Entity Type: " + entityType); // 输出当前的实体类型
-//
-//                HashSet<GameEntity> entitySet = innerMap.get(entityType); // 获取实体的 HashSet
-//
-//                for (GameEntity entity : entitySet) {
-//                    System.out.println("    " + entity); // 输出每个实体对象
-//                }
-//            }
-//        }
+        // Statements to read the actions file
+//        GameActionParser gameActionParser = new GameActionParser();
+//        gameActionParser.actionsFileReader(String.valueOf(actionsFile));
     }
 
     /**

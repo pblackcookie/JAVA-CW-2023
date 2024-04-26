@@ -21,7 +21,7 @@ public class GameEntityParser {
 
 
     //Reading the entities config file
-    public void fileReader(String filePath) {
+    public void entitiesFileReader(String filePath) {
         try {
             Parser parser = new Parser();
             FileReader reader = new FileReader(filePath);
@@ -51,7 +51,7 @@ public class GameEntityParser {
                         entityDescription = node.getAttributes().get("description");
                         GameEntity newEntity = createEntity(currentEntity, entityName, entityDescription);
                         if (newEntity != null) {
-                            entitiesLoading(currentLocation, newEntity, entityName);
+                            entitiesLoading(currentLocation, newEntity, currentEntity);
                         }
                     }
                 }
@@ -89,7 +89,7 @@ public class GameEntityParser {
     private void entitiesLoading(Location currentLocation, GameEntity currentEntity, String entityName){
         // get or create current location's inner HashMap
         HashMap<String, HashSet<GameEntity>> innerMap = entitiesMap.getOrDefault(currentLocation, new HashMap<>());
-        // get or create  current entityName's HashSet
+        // get or create current entityName's HashSet
         HashSet<GameEntity> entitySet = innerMap.getOrDefault(entityName, new HashSet<>());
         // add the object into HashSet
         entitySet.add(currentEntity);
