@@ -57,11 +57,10 @@ public final class GameServer {
         // TODO implement your server logic here
         // Get the player born location
         command = command.toLowerCase();
-        Location firstLocation = entitiesMap.keySet().stream().findFirst().orElse(null);
         String playerName = command.split(":")[0].trim(); // get the player name
-        Player player = new Player(playerName,"",firstLocation.getName(),entitiesMap);
+        Player player = new Player(playerName,"","cabin",entitiesMap);
         GameEngine gameEngine = new GameEngine(pathMap,entitiesMap,actions);
-        // send the now command and current player
+        // send the now command and current player - trigger for built in command
         if(command.contains("inv")||command.contains("goto")||command.contains("get")||command.contains("drop")||command.contains("look")){
             return gameEngine.builtInCommand(command, player);
         }

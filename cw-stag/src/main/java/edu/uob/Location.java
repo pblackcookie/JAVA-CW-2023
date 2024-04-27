@@ -6,7 +6,7 @@ public class Location extends GameEntity{
      }
     @Override
     public String toString() {
-        return "Location: " + getName() + ", Description: " + getDescription();
+        return "You are now in the " + getName() + ". This is " + getDescription();
     }
 
 

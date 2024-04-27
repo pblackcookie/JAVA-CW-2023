@@ -11,4 +11,12 @@ public class Player extends Characters{
         this.currentLocation = currentLocation;
         this.entitiesMap = entitiesMap;
     }
+
+    public String getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(String currentLocation) {
+        this.currentLocation = currentLocation;
+    }
 }
