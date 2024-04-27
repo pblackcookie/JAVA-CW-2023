@@ -17,21 +17,24 @@ public class GameEngine {
 
     public String builtInCommand(String command, Player player){
         // create all built in commands
-        String builtInTrigger = null;
         String currentCommand = command.toLowerCase();
         String[] words = currentCommand.split(" ");
-        for(String word: words){
+        //only the trigger need to be checked
+        for(String word: words) {
             //look the trigger first
-            if(word.contains("inv")){
+            if (word.contains("inv")) {
                 return inv(player);
-            }else if(word.contains("look")){
+            } else if (word.contains("look")) {
                 return look(player);
-            }else if(word.contains("get")){
-                return get(player);
-            }else if(word.contains("drop")){
-                return drop(player);
-            }else if(word.contains("goto")){
-                return goto_(player);
+            }
+        }// The case trigger + one key phrase to be checked
+        for (int i = 0; i < words.length - 1; i++) {
+            if(words[i].contains("get")){
+                return get(player,words[i+1]);
+            }else if(words[i].contains("drop")){
+                return drop(player,words[i+1]);
+            }else if(words[i].contains("goto")){
+                return goto_(player,words[i+1]);
             }
         }
         return "[Warning]Can not found the current command.";
@@ -41,7 +44,6 @@ public class GameEngine {
     public String inv(Player player){
         HashMap<String, HashSet<GameEntity>> storeRoom = null;
         StringBuilder artefactsNow = new StringBuilder();
-        Artefacts bag;
         System.out.println("Now the player is: " + player.getName());
         // Get the current players store room
         Set<Location> locations = entitiesMap.keySet();
@@ -58,18 +60,22 @@ public class GameEngine {
         }
         return artefactsNow.toString();
     }
+
     // get picks up a specified artefact from the current location and adds it into player's inventory
-    public String get(Player player){
+    public String get(Player player, String entity){
         return "";
     }
     // drop puts down an artefact from player's inventory and places it into the current location
-    public String drop(Player player){
+    public String drop(Player player, String entity){
         return "";
     }
     // goto moves the player from the current location to the specified location (if there is a path to that location)
-    public String goto_(Player player){
-        return "";
+    public String goto_(Player player, String location){
+
+        player.setCurrentLocation(location);
+        return "You are now in the: " + location;
     }
+
     // look 1.prints names and descriptions of entities in the current location and 2.lists paths to other locations
     public String look(Player player){
         String currentLocation = player.getCurrentLocation();
@@ -77,14 +83,14 @@ public class GameEngine {
         String pathDetails = "";
         Set<Location> locations = entitiesMap.keySet();
         HashMap<String, HashSet<GameEntity>> currentEntities;
-        String EntityDetail = "";
+        StringBuilder EntityDetail = new StringBuilder();
         for (Location location : locations){
             if(location.getName().equals(currentLocation)){
                 locationDetails = location.toString();
                 currentEntities = entitiesMap.get(location);
                 Set<String> entities = currentEntities.keySet();
                 for (String entityType : entities){
-                    EntityDetail += currentEntities.get(entityType).toString() + "\n";
+                    EntityDetail.append(currentEntities.get(entityType).toString()).append("\n");
                 }
                 break;
             }

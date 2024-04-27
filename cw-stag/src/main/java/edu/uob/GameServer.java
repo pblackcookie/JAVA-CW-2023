@@ -19,6 +19,8 @@ public final class GameServer {
     HashMap<String, String> pathMap;
     HashMap<Location,HashMap<String, HashSet<GameEntity>>> entitiesMap;
     HashMap<String,HashSet<GameAction>> actions;
+    boolean playerInitialized = false;
+    Player player;
 
     public static void main(String[] args) throws IOException {
         File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
@@ -58,10 +60,14 @@ public final class GameServer {
         // Get the player born location
         command = command.toLowerCase();
         String playerName = command.split(":")[0].trim(); // get the player name
-        Player player = new Player(playerName,"","cabin",entitiesMap);
+        if(!playerInitialized){
+            player = new Player(playerName,"","cabin",entitiesMap);
+            playerInitialized = true;
+        }
         GameEngine gameEngine = new GameEngine(pathMap,entitiesMap,actions);
         // send the now command and current player - trigger for built in command
         if(command.contains("inv")||command.contains("goto")||command.contains("get")||command.contains("drop")||command.contains("look")){
+            System.out.println("current Location:" + player.currentLocation);
             return gameEngine.builtInCommand(command, player);
         }
         return "";
