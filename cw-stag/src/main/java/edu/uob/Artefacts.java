@@ -6,6 +6,6 @@ public class Artefacts extends GameEntity{
     }
     @Override
     public String toString() {
-        return "You are now seeing the " + getName() + ": " + getDescription() + " ";
+        return "You are now seeing the [" + getName() + "]: " + getDescription() + " ";
     }
 }

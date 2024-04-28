@@ -1,5 +1,6 @@
 package edu.uob;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -63,17 +64,58 @@ public class GameEngine {
 
     // get picks up a specified artefact from the current location and adds it into player's inventory
     public String get(Player player, String entity){
-        return "";
+        System.out.println("Now the player is:" + player.getName() + "\n");
+        String currentLocation = player.getCurrentLocation();
+        HashMap<String, HashSet<GameEntity>> nowLocation = null;
+        HashMap<String, HashSet<GameEntity>> storeRoom = null;
+        Set<Location> locations = entitiesMap.keySet();
+
+        for(Location location: locations){
+            if(location.getName().equals(currentLocation)){
+                nowLocation = entitiesMap.get(location);
+            }
+            if(location.getName().equalsIgnoreCase("storeroom")){
+                storeRoom = entitiesMap.get(location);
+            }
+        }
+        // only artefacts can be collected by the player
+        HashSet<GameEntity> entitiesCanBeCollected = nowLocation.get("artefacts");
+        HashSet<GameEntity> artefacts = storeRoom.get("artefacts");
+        for (GameEntity entityCanBeCollected : entitiesCanBeCollected) {
+            System.out.println(entityCanBeCollected);
+            if(entityCanBeCollected.getName().equals(entity)){
+                // Remove the entity after collecting it from location
+                nowLocation.get("artefacts").remove(entityCanBeCollected);
+                // Add the collected entity into the storeroom
+                artefacts.add(entityCanBeCollected);
+                return "You get the " + entity;
+            }
+        }
+        return "[Warning]You can't pick up this thing. / Item does not exist";
     }
+
     // drop puts down an artefact from player's inventory and places it into the current location
     public String drop(Player player, String entity){
-        return "";
-    }
-    // goto moves the player from the current location to the specified location (if there is a path to that location)
-    public String goto_(Player player, String location){
+        System.out.println("Now the player is:" + player.getName() + "\n");
 
-        player.setCurrentLocation(location);
-        return "You are now in the: " + location;
+        return "You drop the " + entity;
+    }
+
+    // goto moves the player from the current location to the specified location (if there is a path to that location)
+    public String goto_(Player player, String destination){
+        Set<Location> locations = entitiesMap.keySet();
+        ArrayList<String> locationNames = new ArrayList<>();
+        for (Location location : locations){
+            locationNames.add(location.getName());
+        }
+        for(String currentLocation: locationNames){
+            if(currentLocation.equals(destination)){
+                player.setCurrentLocation(destination);
+                return "You are now in the: " + destination;
+            }
+        }
+        return "[Warning]You entered a non-existent location.";
+
     }
 
     // look 1.prints names and descriptions of entities in the current location and 2.lists paths to other locations
