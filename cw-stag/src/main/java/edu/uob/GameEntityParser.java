@@ -16,7 +16,7 @@ import com.alexmerz.graphviz.objects.Edge;
 
 public class GameEntityParser {
     // Read the config file
-    HashMap<String, String> pathMap = new HashMap<>();
+    HashMap<String, HashSet<String>> pathMap = new HashMap<>();
     HashMap<Location,HashMap<String, HashSet<GameEntity>>> entitiesMap = new HashMap<>();
 
 
@@ -63,7 +63,13 @@ public class GameEntityParser {
             for (Edge path : paths) {
                 String fromLocation = path.getSource().getNode().getId().getId();
                 String toLocation = path.getTarget().getNode().getId().getId();
-                pathMap.put(fromLocation, toLocation);
+                if (!pathMap.containsKey(fromLocation)) {
+                    HashSet<String> destinations = new HashSet<>();
+                    destinations.add(toLocation);
+                    pathMap.put(fromLocation, destinations);
+                } else { // if fromLocation's key already exists，directly toLocation to the hashset
+                    pathMap.get(fromLocation).add(toLocation);
+                }
             }
         } catch (FileNotFoundException fnfe) {
             System.out.println("FileNotFoundException was thrown when attempting to read basic entities file");

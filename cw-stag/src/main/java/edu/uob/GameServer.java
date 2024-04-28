@@ -16,7 +16,7 @@ import java.util.Map;
 public final class GameServer {
 
     private static final char END_OF_TRANSMISSION = 4;
-    HashMap<String, String> pathMap;
+    HashMap<String, HashSet<String>> pathMap;
     HashMap<Location,HashMap<String, HashSet<GameEntity>>> entitiesMap;
     HashMap<String,HashSet<GameAction>> actions;
     boolean playerInitialized = false;
@@ -67,7 +67,6 @@ public final class GameServer {
         GameEngine gameEngine = new GameEngine(pathMap,entitiesMap,actions);
         // send the now command and current player - trigger for built in command
         if(command.contains("inv")||command.contains("goto")||command.contains("get")||command.contains("drop")||command.contains("look")){
-            System.out.println("current Location:" + player.currentLocation);
             return gameEngine.builtInCommand(command, player);
         }
         return "";

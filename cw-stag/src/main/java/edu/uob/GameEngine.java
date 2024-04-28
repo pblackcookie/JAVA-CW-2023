@@ -6,11 +6,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class GameEngine {
-    HashMap<String, String> pathMap;
+    HashMap<String, HashSet<String>> pathMap;
     HashMap<Location,HashMap<String, HashSet<GameEntity>>> entitiesMap;
     HashMap<String,HashSet<GameAction>> actions;
 
-    public GameEngine(HashMap<String, String> pathMap, HashMap<Location, HashMap<String, HashSet<GameEntity>>> entitiesMap, HashMap<String, HashSet<GameAction>> actions) {
+    public GameEngine(HashMap<String, HashSet<String>> pathMap, HashMap<Location, HashMap<String, HashSet<GameEntity>>> entitiesMap, HashMap<String, HashSet<GameAction>> actions) {
         this.pathMap = pathMap;
         this.entitiesMap = entitiesMap;
         this.actions = actions;
@@ -82,13 +82,12 @@ public class GameEngine {
         HashSet<GameEntity> entitiesCanBeCollected = nowLocation.get("artefacts");
         HashSet<GameEntity> artefacts = storeRoom.get("artefacts");
         for (GameEntity entityCanBeCollected : entitiesCanBeCollected) {
-            System.out.println(entityCanBeCollected);
             if(entityCanBeCollected.getName().equals(entity)){
                 // Remove the entity after collecting it from location
                 nowLocation.get("artefacts").remove(entityCanBeCollected);
                 // Add the collected entity into the storeroom
                 artefacts.add(entityCanBeCollected);
-                return "You get the " + entity;
+                return "You get the [" + entity + "]";
             }
         }
         return "[Warning]You can't pick up this thing. / Item does not exist";
@@ -97,8 +96,31 @@ public class GameEngine {
     // drop puts down an artefact from player's inventory and places it into the current location
     public String drop(Player player, String entity){
         System.out.println("Now the player is:" + player.getName() + "\n");
-
-        return "You drop the " + entity;
+        String currentLocation = player.getCurrentLocation();
+        HashMap<String, HashSet<GameEntity>> nowLocation = null;
+        HashMap<String, HashSet<GameEntity>> storeRoom = null;
+        Set<Location> locations = entitiesMap.keySet();
+        for(Location location: locations){
+            if(location.getName().equals(currentLocation)){
+                nowLocation = entitiesMap.get(location);
+            }
+            if(location.getName().equalsIgnoreCase("storeroom")){
+                storeRoom = entitiesMap.get(location);
+            }
+        }
+        // only artefacts can be dropped by the player
+        HashSet<GameEntity> entitiesCanBeDropped = storeRoom.get("artefacts");
+        HashSet<GameEntity> artefacts = nowLocation.get("artefacts");
+        for (GameEntity entityCanBeDropped : entitiesCanBeDropped) {
+            if(entityCanBeDropped.getName().equals(entity)){
+                // Remove the entity after dropped it from storeroom
+                storeRoom.get("artefacts").remove(entityCanBeDropped);
+                // Add the collected entity into the now location
+                artefacts.add(entityCanBeDropped);
+                return "You drop the [" + entity +"]";
+            }
+        }
+        return "[Warning]You can't drop this thing. / Item does not exist";
     }
 
     // goto moves the player from the current location to the specified location (if there is a path to that location)
@@ -114,7 +136,7 @@ public class GameEngine {
                 return "You are now in the: " + destination;
             }
         }
-        return "[Warning]You entered a non-existent location.";
+        return "[Warning]You entered a non-existent location. -Maybe a typo?";
 
     }
 
@@ -122,7 +144,7 @@ public class GameEngine {
     public String look(Player player){
         String currentLocation = player.getCurrentLocation();
         String locationDetails = "";
-        String pathDetails = "";
+        StringBuilder pathDetails = new StringBuilder();
         Set<Location> locations = entitiesMap.keySet();
         HashMap<String, HashSet<GameEntity>> currentEntities;
         StringBuilder EntityDetail = new StringBuilder();
@@ -140,7 +162,7 @@ public class GameEngine {
         Set<String> paths = pathMap.keySet();
         for(String path: paths){
             if (path.equals(currentLocation)){
-                pathDetails = pathMap.get(path) + " ";
+                pathDetails.append(pathMap.get(path)).append(" ");
             }
         }
         return locationDetails + "\n" + EntityDetail + "You can go to the: " + pathDetails;
