@@ -19,8 +19,8 @@ public final class GameServer {
     HashMap<String, HashSet<String>> pathMap;
     HashMap<Location,HashMap<String, HashSet<GameEntity>>> entitiesMap;
     HashMap<String,HashSet<GameAction>> actions;
-    boolean playerInitialized = false;
-    Player player;
+    HashMap<String, Player> playerMap = new HashMap<>();
+    GameEngine gameEngine;
 
     public static void main(String[] args) throws IOException {
         File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
@@ -57,19 +57,9 @@ public final class GameServer {
     */
     public String handleCommand(String command) {
         // TODO implement your server logic here
-        // Get the player born location
-        command = command.toLowerCase();
-        String playerName = command.split(":")[0].trim(); // get the player name
-        if(!playerInitialized){
-            player = new Player(playerName,"","cabin",entitiesMap);
-            playerInitialized = true;
-        }
-        GameEngine gameEngine = new GameEngine(pathMap,entitiesMap,actions);
-        // send the now command and current player - trigger for built in command
-        if(command.contains("inv")||command.contains("goto")||command.contains("get")||command.contains("drop")||command.contains("look")){
-            return gameEngine.builtInCommand(command, player);
-        }
-        return "";
+        command = command.toLowerCase(); // Convert all command to lower case first
+        gameEngine = new GameEngine(pathMap,entitiesMap,actions,playerMap);
+        return gameEngine.commandParser(command);
     }
 
     /**

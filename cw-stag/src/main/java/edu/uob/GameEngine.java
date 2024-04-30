@@ -9,17 +9,40 @@ public class GameEngine {
     HashMap<String, HashSet<String>> pathMap;
     HashMap<Location,HashMap<String, HashSet<GameEntity>>> entitiesMap;
     HashMap<String,HashSet<GameAction>> actions;
+    HashMap<String, Player> playerMap;
 
-    public GameEngine(HashMap<String, HashSet<String>> pathMap, HashMap<Location, HashMap<String, HashSet<GameEntity>>> entitiesMap, HashMap<String, HashSet<GameAction>> actions) {
+    public GameEngine(HashMap<String, HashSet<String>> pathMap,
+                      HashMap<Location, HashMap<String, HashSet<GameEntity>>> entitiesMap,
+                      HashMap<String, HashSet<GameAction>> actions,
+                      HashMap<String, Player> playerMap) {
         this.pathMap = pathMap;
         this.entitiesMap = entitiesMap;
         this.actions = actions;
+        this.playerMap = playerMap;
     }
 
+    public String commandParser(String command){
+        // get current player name
+        String currentPlayer = command.split(":")[0].trim();
+        Player player = playerChecker(currentPlayer); // Check now player
+        if(command.contains("inv")||command.contains("goto")||command.contains("get")||command.contains("drop")||command.contains("look")){
+            return builtInCommand(command, player);
+        }
+        return "[Warning]This function has not been implemented.";
+    }
+    // Check if the player exists or not
+    // If player does not exists, create the new object and put it into player map.
+    public Player playerChecker(String playerName){
+        Player nowPlayer = playerMap.get(playerName);;
+        if(nowPlayer == null){ // put thr new player into player map
+            nowPlayer = new Player(playerName,"","cabin",entitiesMap);
+            playerMap.put(playerName,nowPlayer);
+        }
+        return nowPlayer;
+    }
     public String builtInCommand(String command, Player player){
         // create all built in commands
-        String currentCommand = command.toLowerCase();
-        String[] words = currentCommand.split(" ");
+        String[] words = command.split(" ");
         //only the trigger need to be checked
         for(String word: words) {
             //look the trigger first
@@ -165,6 +188,6 @@ public class GameEngine {
                 pathDetails.append(pathMap.get(path)).append(" ");
             }
         }
-        return locationDetails + "\n" + EntityDetail + "You can go to the: " + pathDetails;
+        return locationDetails + "\n" + EntityDetail + "You can go to the: " + pathDetails + player.getDescription();
     }
 }
