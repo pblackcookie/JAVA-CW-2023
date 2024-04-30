@@ -30,10 +30,12 @@ public class GameEngine {
         }
         return "[Warning]This function has not been implemented.";
     }
+
+
     // Check if the player exists or not
     // If player does not exists, create the new object and put it into player map.
     public Player playerChecker(String playerName){
-        Player nowPlayer = playerMap.get(playerName);;
+        Player nowPlayer = playerMap.get(playerName);
         if(nowPlayer == null){ // put thr new player into player map
             nowPlayer = new Player(playerName,"","cabin",entitiesMap);
             playerMap.put(playerName,nowPlayer);
@@ -168,6 +170,7 @@ public class GameEngine {
         String currentLocation = player.getCurrentLocation();
         String locationDetails = "";
         StringBuilder pathDetails = new StringBuilder();
+        StringBuilder totalPlayers = new StringBuilder();
         Set<Location> locations = entitiesMap.keySet();
         HashMap<String, HashSet<GameEntity>> currentEntities;
         StringBuilder EntityDetail = new StringBuilder();
@@ -182,12 +185,23 @@ public class GameEngine {
                 break;
             }
         }
+
+        // Get the current map
         Set<String> paths = pathMap.keySet();
         for(String path: paths){
             if (path.equals(currentLocation)){
                 pathDetails.append(pathMap.get(path)).append(" ");
             }
         }
-        return locationDetails + "\n" + EntityDetail + "You can go to the: " + pathDetails + player.getDescription();
+
+        // Get the other players
+        Set<String> players = playerMap.keySet();
+        for (String curPlayer: players){
+            Player loaclPlayer = playerMap.get(curPlayer);
+            if(loaclPlayer.getCurrentLocation().equals(currentLocation)){
+                totalPlayers.append(loaclPlayer.getDescription()).append(" ");
+            }
+        }
+        return locationDetails + "\n" + EntityDetail + "You can go to the: " + pathDetails + totalPlayers;
     }
 }
