@@ -1,15 +1,17 @@
 package edu.uob;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class GameEngine {
     HashMap<String, HashSet<String>> pathMap;
     HashMap<Location,HashMap<String, HashSet<GameEntity>>> entitiesMap;
     HashMap<String,HashSet<GameAction>> actions;
     HashMap<String, Player> playerMap;
+    // Entities
+    HashSet<String> locations = new HashSet<>();
+    HashSet<String> artefacts = new HashSet<>();
+    HashSet<String> furniture = new HashSet<>();
+    HashSet<String> characters = new HashSet<>();
 
     public GameEngine(HashMap<String, HashSet<String>> pathMap,
                       HashMap<Location, HashMap<String, HashSet<GameEntity>>> entitiesMap,
@@ -22,15 +24,23 @@ public class GameEngine {
     }
 
     public String commandParser(String command){
-        // get current player name
+        // get current player name & check the player exists or not.
         String currentPlayer = command.split(":")[0].trim();
-        Player player = playerChecker(currentPlayer); // Check now player
-        if(command.contains("inv")||command.contains("goto")||command.contains("get")||command.contains("drop")||command.contains("look")){
-            return builtInCommand(command, player);
+        Player player = playerChecker(currentPlayer);
+        // Split the command.
+        HashSet<String> wordSet = new HashSet<>(Arrays.asList(command.split(" ")));
+        // Check the trigger && entity valid or not
+        String trigger = triggerChecker(wordSet);
+        entitiesSet(player);
+        String entity = entityChecker(trigger, wordSet);
+        if(trigger.contains("Warning")||entity.contains("Warning")){
+            return "[Warning]No valid trigger/entity or trigger/entity more than one.";
+        } else if(trigger.contains("inv") || trigger.equals("look") ||
+                trigger.equals("get")||trigger.equals("drop") || trigger.equals("goto")){
+            return builtInCommand(trigger,entity,player);
         }
         return "[Warning]This function has not been implemented.";
     }
-
 
     // Check if the player exists or not
     // If player does not exists, create the new object and put it into player map.
@@ -42,27 +52,94 @@ public class GameEngine {
         }
         return nowPlayer;
     }
-    public String builtInCommand(String command, Player player){
-        // create all built in commands
-        String[] words = command.split(" ");
-        //only the trigger need to be checked
-        for(String word: words) {
-            //look the trigger first
-            if (word.contains("inv")) {
-                return inv(player);
-            } else if (word.contains("look")) {
-                return look(player);
-            }
-        }// The case trigger + one key phrase to be checked
-        for (int i = 0; i < words.length - 1; i++) {
-            if(words[i].contains("get")){
-                return get(player,words[i+1]);
-            }else if(words[i].contains("drop")){
-                return drop(player,words[i+1]);
-            }else if(words[i].contains("goto")){
-                return goto_(player,words[i+1]);
+
+    // Check if the trigger is valid or not(only 1 trigger is valid)
+    public String triggerChecker(HashSet<String> words){
+        String curTrigger = "";
+        int triggerCount = 0;
+        //Check if the command contains builtin commands
+        for(String word: words){
+            if(word.contains("inv")){ curTrigger = word; triggerCount++;
+            }else if(word.contains("goto")){ curTrigger = word; triggerCount++;
+            }else if(word.contains("look")){ curTrigger = word; triggerCount++;
+            }else if(word.contains("get")){ curTrigger = word; triggerCount++;
+            }else if(word.contains("drop")){ curTrigger = word; triggerCount++;}
+        }
+        if(triggerCount != 1){
+            return "[Warning]Not a valid trigger.";
+        }
+        return curTrigger;
+    }
+
+
+    // Check if the entity is valid or not(only 1 entity is valid)
+    public String entityChecker(String trigger, HashSet<String> words){
+        String curEntity = "";
+        int entityCounter = 0;
+        HashSet<String> mergedSet = new HashSet<>();
+        mergedSet.addAll(locations);
+        mergedSet.addAll(artefacts);
+        mergedSet.addAll(furniture);
+        mergedSet.addAll(characters);
+        for(String word: words){
+            // need one entity set
+            if(trigger.equals("goto")) {
+                for (String location : locations) {
+                    if (word.equals(location)) {
+                        curEntity = word;
+                        entityCounter++;
+                    }
+                }
+            }else if(trigger.equals("get") || trigger.equals("drop")) {
+                for (String artefact : artefacts) {
+                    if (word.equals(artefact)) {
+                        curEntity = word;
+                        entityCounter++;
+                    }
+                }
+            }else{
+                for (String entity: mergedSet){
+                    if (word.equals(entity)) {
+                        curEntity = word;
+                        entityCounter++;
+                    }
+                }
             }
         }
+        if((trigger.contains("inv") || trigger.equals("look")) && entityCounter != 0){
+            return "[Warning]Not a valid command.";
+        }else if((trigger.equals("get")||trigger.equals("drop") || trigger.equals("goto")) && entityCounter !=1){
+            return "[Warning]Not a valid entity.";
+        }
+        return curEntity;
+    }
+    public void entitiesSet(Player player){
+        // Get all location entities
+        for (Map.Entry<Location, HashMap<String, HashSet<GameEntity>>> entry : entitiesMap.entrySet()) {
+            Location location = entry.getKey();
+            locations.add(location.getName()); //Update the location entities
+            // Get the all entities for current location & storeroom
+            if(location.getName().equals(player.getCurrentLocation())||location.getName().equals("storeroom")){
+                for(Map.Entry<String, HashSet<GameEntity>> innerEntry : entry.getValue().entrySet()){
+                    String entityName = innerEntry.getKey(); // artefacts or characters or furniture
+                    for (GameEntity entity : innerEntry.getValue()) {
+                        if(entityName.equals("artefacts")){ artefacts.add(entity.getName());}
+                        if(entityName.equals("furniture")){ furniture.add(entity.getName());}
+                        if(entityName.equals("characters")){ characters.add(entity.getName());}
+                    }
+                }
+            }
+        }
+
+    }
+
+    public String builtInCommand(String trigger, String entity, Player player){
+        //look the trigger first
+        if (trigger.contains("inv")) { return inv(player);
+        }else if (trigger.equals("look")) { return look(player);
+        }else if(trigger.equals("goto")){ return goto_(player,entity);
+        }else if(trigger.equals("get")){ return get(player,entity);
+        }else if(trigger.equals("drop")){ return drop(player,entity); }
         return "[Warning]Can not found the current command.";
     }
 
