@@ -20,6 +20,7 @@ public final class GameServer {
     HashMap<Location,HashMap<String, HashSet<GameEntity>>> entitiesMap;
     HashMap<String,HashSet<GameAction>> actions;
     HashMap<String, Player> playerMap = new HashMap<>();
+    HashMap<String, HashSet<GameEntity> > bagMap = new HashMap<>();
     GameEngine gameEngine;
 
     public static void main(String[] args) throws IOException {
@@ -58,7 +59,7 @@ public final class GameServer {
     public String handleCommand(String command) {
         // TODO implement your server logic here
         command = command.toLowerCase(); // Convert all command to lower case first
-        gameEngine = new GameEngine(pathMap,entitiesMap,actions,playerMap);
+        gameEngine = new GameEngine(pathMap,entitiesMap,actions,playerMap,bagMap);
         return gameEngine.commandParser(command);
     }
 

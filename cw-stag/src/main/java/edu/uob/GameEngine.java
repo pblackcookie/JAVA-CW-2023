@@ -7,20 +7,25 @@ public class GameEngine {
     HashMap<Location,HashMap<String, HashSet<GameEntity>>> entitiesMap;
     HashMap<String,HashSet<GameAction>> actions;
     HashMap<String, Player> playerMap;
+    HashMap<String, HashSet<GameEntity>> bagMap;
     // Entities
     HashSet<String> locations = new HashSet<>();
     HashSet<String> artefacts = new HashSet<>();
     HashSet<String> furniture = new HashSet<>();
     HashSet<String> characters = new HashSet<>();
+    HashSet<String> mergedSet = new HashSet<>();
+
 
     public GameEngine(HashMap<String, HashSet<String>> pathMap,
                       HashMap<Location, HashMap<String, HashSet<GameEntity>>> entitiesMap,
                       HashMap<String, HashSet<GameAction>> actions,
-                      HashMap<String, Player> playerMap) {
+                      HashMap<String, Player> playerMap,
+                      HashMap<String, HashSet<GameEntity>> bagMap) {
         this.pathMap = pathMap;
         this.entitiesMap = entitiesMap;
         this.actions = actions;
         this.playerMap = playerMap;
+        this.bagMap = bagMap;
     }
 
     public String commandParser(String command){
@@ -33,13 +38,18 @@ public class GameEngine {
         String trigger = triggerChecker(wordSet);
         entitiesSet(player);
         String entity = entityChecker(trigger, wordSet);
+        String gameAction = actionChecker(trigger,wordSet);
         if(trigger.contains("Warning")||entity.contains("Warning")){
             return "[Warning]No valid trigger/entity or trigger/entity more than one.";
         } else if(trigger.contains("inv") || trigger.equals("look") ||
                 trigger.equals("get")||trigger.equals("drop") || trigger.equals("goto")){
             return builtInCommand(trigger,entity,player);
+        }else{ // If is is not a built in command
+            if(gameAction.contains("Warning")){
+                return "[Warning]No valid trigger/gameAction or trigger/gameAction more than one.";
+            }
+            return builtInCommand(trigger,gameAction,player);
         }
-        return "[Warning]This function has not been implemented.";
     }
 
     // Check if the player exists or not
@@ -49,6 +59,7 @@ public class GameEngine {
         if(nowPlayer == null){ // put thr new player into player map
             nowPlayer = new Player(playerName,"","cabin",entitiesMap);
             playerMap.put(playerName,nowPlayer);
+            bagMap.put(playerName, new HashSet<>()); // create the bag
         }
         return nowPlayer;
     }
@@ -57,7 +68,7 @@ public class GameEngine {
     public String triggerChecker(HashSet<String> words){
         String curTrigger = "";
         int triggerCount = 0;
-        //Check if the command contains builtin commands
+        // Check if the command contains builtin commands
         for(String word: words){
             if(word.contains("inv")){ curTrigger = word; triggerCount++;
             }else if(word.contains("goto")){ curTrigger = word; triggerCount++;
@@ -65,6 +76,7 @@ public class GameEngine {
             }else if(word.contains("get")){ curTrigger = word; triggerCount++;
             }else if(word.contains("drop")){ curTrigger = word; triggerCount++;}
         }
+        // Check if the command is game action trigger
         if(triggerCount != 1){
             return "[Warning]Not a valid trigger.";
         }
@@ -73,34 +85,29 @@ public class GameEngine {
 
 
     // Check if the entity is valid or not(only 1 entity is valid)
-    public String entityChecker(String trigger, HashSet<String> words){
+    public String entityChecker(String trigger, HashSet<String> entities){
         String curEntity = "";
         int entityCounter = 0;
-        HashSet<String> mergedSet = new HashSet<>();
-        mergedSet.addAll(locations);
-        mergedSet.addAll(artefacts);
-        mergedSet.addAll(furniture);
-        mergedSet.addAll(characters);
-        for(String word: words){
-            // need one entity set
+        mergeSet();
+        for(String entity: entities){
             if(trigger.equals("goto")) {
                 for (String location : locations) {
-                    if (word.equals(location)) {
-                        curEntity = word;
+                    if (entity.equals(location)) {
+                        curEntity = entity;
                         entityCounter++;
                     }
                 }
             }else if(trigger.equals("get") || trigger.equals("drop")) {
                 for (String artefact : artefacts) {
-                    if (word.equals(artefact)) {
-                        curEntity = word;
+                    if (entity.equals(artefact)) {
+                        curEntity = entity;
                         entityCounter++;
                     }
                 }
             }else{
-                for (String entity: mergedSet){
-                    if (word.equals(entity)) {
-                        curEntity = word;
+                for (String mergeEntity: mergedSet){
+                    if (mergeEntity.equals(entity)) {
+                        curEntity = entity;
                         entityCounter++;
                     }
                 }
@@ -112,6 +119,16 @@ public class GameEngine {
             return "[Warning]Not a valid entity.";
         }
         return curEntity;
+    }
+    // Check for not built in command
+    public String actionChecker(String trigger, HashSet<String> actions){
+        String curAction = "";
+        int actionCounter = 0;
+        //
+        if(actionCounter != 1){
+            return "[Warning]Multiple game actions";
+        }
+        return curAction;
     }
     public void entitiesSet(Player player){
         // Get all location entities
@@ -130,7 +147,13 @@ public class GameEngine {
                 }
             }
         }
+    }
 
+    public void mergeSet(){
+        mergedSet.addAll(locations);
+        mergedSet.addAll(artefacts);
+        mergedSet.addAll(furniture);
+        mergedSet.addAll(characters);
     }
 
     public String builtInCommand(String trigger, String entity, Player player){
@@ -145,80 +168,65 @@ public class GameEngine {
 
     // inventory (or inv for short) lists all of the artefacts currently being carried by the player
     public String inv(Player player){
-        HashMap<String, HashSet<GameEntity>> storeRoom = null;
-        StringBuilder artefactsNow = new StringBuilder();
-        System.out.println("Now the player is: " + player.getName());
-        // Get the current players store room
-        Set<Location> locations = entitiesMap.keySet();
-        for(Location location: locations){
-            if(location.getName().equalsIgnoreCase("storeroom")){
-                storeRoom = entitiesMap.get(location);
-                break;
-            }
-        }
-        if(storeRoom != null && storeRoom.containsKey("artefacts")){
-            HashSet<GameEntity> artefactsSet = storeRoom.get("artefacts");
-            for(GameEntity artefact: artefactsSet)
-                artefactsNow.append(artefact.toString());
-        }
-        return artefactsNow.toString();
+        String playerName = player.getName();
+        return "You are " + playerName + ". Your bag now has:" + bagMap.get(playerName);
     }
 
     // get picks up a specified artefact from the current location and adds it into player's inventory
     public String get(Player player, String entity){
-        System.out.println("Now the player is:" + player.getName() + "\n");
-        String currentLocation = player.getCurrentLocation();
-        HashMap<String, HashSet<GameEntity>> nowLocation = null;
-        HashMap<String, HashSet<GameEntity>> storeRoom = null;
-        Set<Location> locations = entitiesMap.keySet();
-
-        for(Location location: locations){
-            if(location.getName().equals(currentLocation)){
-                nowLocation = entitiesMap.get(location);
-            }
-            if(location.getName().equalsIgnoreCase("storeroom")){
-                storeRoom = entitiesMap.get(location);
-            }
-        }
+        HashMap<String, HashSet<GameEntity>> nowLocation = getLocationEntities(player);
+        HashSet<GameEntity> playerBag = getPlayerBag(player.getName());
         // only artefacts can be collected by the player
         HashSet<GameEntity> entitiesCanBeCollected = nowLocation.get("artefacts");
-        HashSet<GameEntity> artefacts = storeRoom.get("artefacts");
         for (GameEntity entityCanBeCollected : entitiesCanBeCollected) {
             if(entityCanBeCollected.getName().equals(entity)){
                 // Remove the entity after collecting it from location
                 nowLocation.get("artefacts").remove(entityCanBeCollected);
-                // Add the collected entity into the storeroom
-                artefacts.add(entityCanBeCollected);
+                // Add the collected entity into the player's bag
+                playerBag.add(entityCanBeCollected);
                 return "You get the [" + entity + "]";
             }
         }
         return "[Warning]You can't pick up this thing. / Item does not exist";
     }
 
-    // drop puts down an artefact from player's inventory and places it into the current location
-    public String drop(Player player, String entity){
-        System.out.println("Now the player is:" + player.getName() + "\n");
+    // Can get current location
+    public HashMap<String, HashSet<GameEntity>> getLocationEntities(Player player){
         String currentLocation = player.getCurrentLocation();
         HashMap<String, HashSet<GameEntity>> nowLocation = null;
-        HashMap<String, HashSet<GameEntity>> storeRoom = null;
         Set<Location> locations = entitiesMap.keySet();
         for(Location location: locations){
             if(location.getName().equals(currentLocation)){
                 nowLocation = entitiesMap.get(location);
-            }
-            if(location.getName().equalsIgnoreCase("storeroom")){
-                storeRoom = entitiesMap.get(location);
+                break;
             }
         }
-        // only artefacts can be dropped by the player
-        HashSet<GameEntity> entitiesCanBeDropped = storeRoom.get("artefacts");
-        HashSet<GameEntity> artefacts = nowLocation.get("artefacts");
-        for (GameEntity entityCanBeDropped : entitiesCanBeDropped) {
+        return nowLocation;
+    }
+    // Can get current player bag
+    public HashSet<GameEntity> getPlayerBag(String playerName){
+        HashSet<GameEntity> playerBag = null;
+        Set<String> players = bagMap.keySet();
+        for(String player: players){
+            if(player.equals(playerName)){
+                playerBag = bagMap.get(playerName);
+                break;
+            }
+        }
+        return playerBag;
+    }
+
+    // drop puts down an artefact from player's inventory and places it into the current location
+    public String drop(Player player, String entity){
+        HashMap<String, HashSet<GameEntity>> nowLocation = getLocationEntities(player);
+        HashSet<GameEntity> locationArtefacts = nowLocation.get("artefacts");
+        HashSet<GameEntity> playerBag = getPlayerBag(player.getName());
+        for (GameEntity entityCanBeDropped : playerBag) {
             if(entityCanBeDropped.getName().equals(entity)){
-                // Remove the entity after dropped it from storeroom
-                storeRoom.get("artefacts").remove(entityCanBeDropped);
+                // Remove the entity after dropped it from player's bag
+                playerBag.remove(entityCanBeDropped);
                 // Add the collected entity into the now location
-                artefacts.add(entityCanBeDropped);
+                locationArtefacts.add(entityCanBeDropped);
                 return "You drop the [" + entity +"]";
             }
         }
