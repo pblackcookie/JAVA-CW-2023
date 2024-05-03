@@ -30,7 +30,13 @@ public class GameEngine {
 
     public String commandParser(String command){
         // get current player name & check the player exists or not.
+        actionTriggerSet();
         String currentPlayer = command.split(":")[0].trim();
+        if(currentPlayer.equals("goto")||currentPlayer.equals("get")||currentPlayer.equals("drop")||
+                currentPlayer.equals("look")||currentPlayer.equals("inv")||
+                currentPlayer.equals("inventory")){
+            return "[Warning]Invalid player name.";
+        }
         Player player = playerChecker(currentPlayer);
         // Split the command.
         HashSet<String> wordSet = new HashSet<>(Arrays.asList(command.split(" ")));
@@ -45,6 +51,7 @@ public class GameEngine {
                 trigger.equals("get")||trigger.equals("drop") || trigger.equals("goto")){
             return builtInCommand(trigger,entity,player);
         }else{ // If is is not a built in command
+
             if(gameAction.contains("Warning")){
                 return "[Warning]No valid trigger/gameAction or trigger/gameAction more than one.";
             }
@@ -71,19 +78,22 @@ public class GameEngine {
         // Check if the command contains builtin commands
         for(String word: words){
             if(word.contains("inv")){ curTrigger = word; triggerCount++;
-            }else if(word.contains("goto")){ curTrigger = word; triggerCount++;
-            }else if(word.contains("look")){ curTrigger = word; triggerCount++;
-            }else if(word.contains("get")){ curTrigger = word; triggerCount++;
-            }else if(word.contains("drop")){ curTrigger = word; triggerCount++;}
+            }else if(word.equals("goto")){ curTrigger = word; triggerCount++;
+            }else if(word.equals("look")){ curTrigger = word; triggerCount++;
+            }else if(word.equals("get")){ curTrigger = word; triggerCount++;
+            }else if(word.equals("drop")){ curTrigger = word; triggerCount++;}
         }
         // Check if the command is game action trigger
+        actionTriggerSet();
         if(triggerCount != 1){
             return "[Warning]Not a valid trigger.";
         }
         return curTrigger;
     }
 
+    public void actionTriggerSet() {
 
+    }
     // Check if the entity is valid or not(only 1 entity is valid)
     public String entityChecker(String trigger, HashSet<String> entities){
         String curEntity = "";
@@ -124,7 +134,8 @@ public class GameEngine {
     public String actionChecker(String trigger, HashSet<String> actions){
         String curAction = "";
         int actionCounter = 0;
-        //
+        // 1. Check the trigger is valid or not 2.Check the action is valid or not
+
         if(actionCounter != 1){
             return "[Warning]Multiple game actions";
         }
@@ -270,7 +281,6 @@ public class GameEngine {
                 break;
             }
         }
-
         // Get the current map
         Set<String> paths = pathMap.keySet();
         for(String path: paths){
@@ -278,7 +288,6 @@ public class GameEngine {
                 pathDetails.append(pathMap.get(path)).append(" ");
             }
         }
-
         // Get the other players
         Set<String> players = playerMap.keySet();
         for (String curPlayer: players){

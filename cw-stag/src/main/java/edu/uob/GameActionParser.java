@@ -45,7 +45,7 @@ public class GameActionParser {
         }
     }
 
-    private static GameAction createAction(Element actionElement) {
+    private GameAction createAction(Element actionElement) {
         HashSet<String> triggers = getElementSet(actionElement, "triggers");
         HashSet<String> subjects = getElementSet(actionElement, "subjects");
         HashSet<String> consumed = getElementSet(actionElement, "consumed");
@@ -55,7 +55,7 @@ public class GameActionParser {
         return new GameAction(triggers, subjects, consumed, produced, narration);
     }
 
-    private static HashSet<String> getElementSet(Element actionElement, String tagName) {
+    private HashSet<String> getElementSet(Element actionElement, String tagName) {
         HashSet<String> set = new HashSet<>();
         NodeList nodeList = actionElement.getElementsByTagName(tagName);
         for (int i = 0; i < nodeList.getLength(); i++) {
@@ -65,7 +65,7 @@ public class GameActionParser {
         return set;
     }
 
-    private static String getElementText(Element actionElement) {
+    private String getElementText(Element actionElement) {
         return actionElement.getElementsByTagName("narration").item(0).getTextContent();
     }
 }
