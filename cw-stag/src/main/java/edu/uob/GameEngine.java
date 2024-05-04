@@ -42,7 +42,7 @@ public class GameEngine {
         // Check the trigger && entity valid or not
         String trigger = triggerChecker(wordSet);
         entitiesSet(player);
-        String entity = entityChecker(trigger, wordSet);
+        String entity = entityChecker(currentPlayer, trigger, wordSet);
         String gameAction = actionChecker(trigger,wordSet);
         if(trigger.contains("Warning")||entity.contains("Warning")){
             return "[Warning]No valid trigger/entity or trigger/entity more than one.";
@@ -91,24 +91,10 @@ public class GameEngine {
     }
 
     public void actionTriggerSet() {
-        for (Map.Entry<String, HashSet<GameAction>> entry : actions.entrySet()) {
-            String trigger = entry.getKey();
-            HashSet<GameAction> actionSet = entry.getValue();
-
-            System.out.println("Trigger: " + trigger);
-            System.out.println("Actions:");
-
-            for (GameAction action : actionSet) {
-                System.out.println("\tSubject: " + action.getSubjects());
-                System.out.println("\tConsumed: " + action.getConsumed());
-                System.out.println("\tProduced: " + action.getProduced());
-                System.out.println("\tNarration: " + action.getNarration());
-            }
-        }
     }
 
     // Check if the entity is valid or not(only 1 entity is valid)
-    public String entityChecker(String trigger, HashSet<String> entities){
+    public String entityChecker(String playerName,String trigger, HashSet<String> entities){
         String curEntity = "";
         int entityCounter = 0;
         mergeSet();
@@ -120,14 +106,22 @@ public class GameEngine {
                         entityCounter++;
                     }
                 }
-            }else if(trigger.equals("get") || trigger.equals("drop")) {
+            }else if(trigger.equals("get")) {
                 for (String artefact : artefacts) {
                     if (entity.equals(artefact)) {
                         curEntity = entity;
                         entityCounter++;
                     }
                 }
-            }else{
+            } else if(trigger.equals("drop")) {
+                for (GameEntity artefact : bagMap.get(playerName)) {
+                    if (entity.equals(artefact.getName())) {
+                        curEntity = entity;
+                        entityCounter++;
+                    }
+                }
+            }
+            else{
                 for (String mergeEntity: mergedSet){
                     if (mergeEntity.equals(entity)) {
                         curEntity = entity;
