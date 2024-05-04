@@ -30,6 +30,7 @@ final class ActionsFileTests {
           Element triggers = (Element)firstAction.getElementsByTagName("triggers").item(0);
           // Get the first trigger phrase
           String firstTriggerPhrase = triggers.getElementsByTagName("keyphrase").item(0).getTextContent();
+          System.out.println("first trigger phrase: "+ firstTriggerPhrase);
           assertEquals("open", firstTriggerPhrase, "First trigger phrase was not 'open'");
       } catch(ParserConfigurationException pce) {
           fail("ParserConfigurationException was thrown when attempting to read basic actions file");

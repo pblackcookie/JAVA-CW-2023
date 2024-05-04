@@ -5,14 +5,13 @@ import java.util.HashSet;
 
 public class GameAction
 {
-    HashSet<String> triggers;
     HashSet<String> subjects;
     HashSet<String> consumed;
     HashSet<String> produced;
     String narration;
 
-    public GameAction(HashSet<String> triggers, HashSet<String> subjects, HashSet<String> consumed, HashSet<String> produced, String narration) {
-        this.triggers = triggers;
+    public GameAction(HashSet<String> subjects, HashSet<String> consumed,
+                      HashSet<String> produced, String narration) {
         this.subjects = subjects;
         this.consumed = consumed;
         this.produced = produced;
@@ -21,18 +20,13 @@ public class GameAction
 
     @Override
     public String toString() {
-        return "GameAction{" +
-                "triggers=" + triggers +
-                ", subjects=" + subjects +
+        return "GameAction{ subjects=" + subjects +
                 ", consumed=" + consumed +
                 ", produced=" + produced +
                 ", narration='" + narration + '\'' +
                 '}';
     }
 
-    public HashSet<String> getTriggers() {
-        return triggers;
-    }
 
     public HashSet<String> getSubjects() {
         return subjects;

@@ -14,6 +14,7 @@ import java.util.HashSet;
 
 public class GameActionParser {
     HashMap<String, HashSet<GameAction>> actions = new HashMap<String, HashSet<GameAction>>();
+
     public void actionsFileReader(String filePath) {
         try {
             //Get all action information from the actions file
@@ -25,12 +26,38 @@ public class GameActionParser {
             // Get all actions (only the odd items are actually actions - 1, 3, 5 etc.)
             for (int i = 1; i < actionNodes.getLength(); i+=2) {
                 Element actionElement = (Element) actionNodes.item(i);
-                GameAction action = createAction(actionElement);
-                for (String trigger : action.getTriggers()) {
-                    if (!actions.containsKey(trigger)) {
-                        actions.put(trigger, new HashSet<>());
+                Element triggers = (Element)actionElement.getElementsByTagName("triggers").item(0);
+                NodeList keyPhraseList = triggers.getElementsByTagName("keyphrase");
+                Element subjects = (Element)actionElement.getElementsByTagName("subjects").item(0);
+                NodeList subjectEntityList = subjects.getElementsByTagName("entity");
+                Element consumed = (Element)actionElement.getElementsByTagName("consumed").item(0);
+                NodeList consumedEntityList = consumed.getElementsByTagName("entity");
+                Element produced = (Element)actionElement.getElementsByTagName("produced").item(0);
+                NodeList producedEntityList = produced.getElementsByTagName("entity");
+                Element narration = (Element)actionElement.getElementsByTagName("narration").item(0);
+                for (int j = 0; j < keyPhraseList.getLength(); j++) {
+                    HashSet<GameAction> actionSet = new HashSet<>();
+                    // Get all current trigger in current game action
+                    String curTrigger = triggers.getElementsByTagName("keyphrase").item(j).getTextContent();
+                    HashSet<String> subjectSet = new HashSet<>();
+                    for (int k = 0; k < subjectEntityList.getLength(); k++) {
+                        String curSubject =subjects.getElementsByTagName("entity").item(k).getTextContent();
+                        subjectSet.add(curSubject);
                     }
-                    actions.get(trigger).add(action);
+                    HashSet<String> consumedSet = new HashSet<>();
+                    for (int k = 0; k < consumedEntityList.getLength(); k++) {
+                        String curConsumed =consumed.getElementsByTagName("entity").item(k).getTextContent();
+                        consumedSet.add(curConsumed);
+                    }
+                    HashSet<String> producedSet = new HashSet<>();
+                    for (int k = 0; k < producedEntityList.getLength(); k++) {
+                        String curProduced =produced.getElementsByTagName("entity").item(k).getTextContent();
+                        producedSet.add(curProduced);
+                    }
+                    String curNarration = narration.getTextContent();
+                    GameAction newGameAction = new GameAction(subjectSet, consumedSet, producedSet, curNarration);
+                    actionSet.add(newGameAction);
+                    actions.put(curTrigger,actionSet);
                 }
             }
         } catch(ParserConfigurationException pce) {
@@ -45,27 +72,5 @@ public class GameActionParser {
         }
     }
 
-    private GameAction createAction(Element actionElement) {
-        HashSet<String> triggers = getElementSet(actionElement, "triggers");
-        HashSet<String> subjects = getElementSet(actionElement, "subjects");
-        HashSet<String> consumed = getElementSet(actionElement, "consumed");
-        HashSet<String> produced = getElementSet(actionElement, "produced");
-        String narration = getElementText(actionElement);
 
-        return new GameAction(triggers, subjects, consumed, produced, narration);
-    }
-
-    private HashSet<String> getElementSet(Element actionElement, String tagName) {
-        HashSet<String> set = new HashSet<>();
-        NodeList nodeList = actionElement.getElementsByTagName(tagName);
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Element element = (Element) nodeList.item(i);
-            set.add(element.getTextContent());
-        }
-        return set;
-    }
-
-    private String getElementText(Element actionElement) {
-        return actionElement.getElementsByTagName("narration").item(0).getTextContent();
-    }
 }

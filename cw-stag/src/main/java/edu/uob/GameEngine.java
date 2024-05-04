@@ -30,7 +30,6 @@ public class GameEngine {
 
     public String commandParser(String command){
         // get current player name & check the player exists or not.
-        actionTriggerSet();
         String currentPlayer = command.split(":")[0].trim();
         if(currentPlayer.equals("goto")||currentPlayer.equals("get")||currentPlayer.equals("drop")||
                 currentPlayer.equals("look")||currentPlayer.equals("inv")||
@@ -84,16 +83,17 @@ public class GameEngine {
             }else if(word.equals("drop")){ curTrigger = word; triggerCount++;}
         }
         // Check if the command is game action trigger
-        actionTriggerSet();
+        //actionTriggerSet();
         if(triggerCount != 1){
             return "[Warning]Not a valid trigger.";
         }
         return curTrigger;
     }
 
-    public void actionTriggerSet() {
+//    public void actionTriggerSet() {
+//
+//    }
 
-    }
     // Check if the entity is valid or not(only 1 entity is valid)
     public String entityChecker(String trigger, HashSet<String> entities){
         String curEntity = "";
