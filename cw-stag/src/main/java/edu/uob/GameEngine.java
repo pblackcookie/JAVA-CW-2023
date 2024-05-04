@@ -83,16 +83,29 @@ public class GameEngine {
             }else if(word.equals("drop")){ curTrigger = word; triggerCount++;}
         }
         // Check if the command is game action trigger
-        //actionTriggerSet();
+        actionTriggerSet();
         if(triggerCount != 1){
             return "[Warning]Not a valid trigger.";
         }
         return curTrigger;
     }
 
-//    public void actionTriggerSet() {
-//
-//    }
+    public void actionTriggerSet() {
+        for (Map.Entry<String, HashSet<GameAction>> entry : actions.entrySet()) {
+            String trigger = entry.getKey();
+            HashSet<GameAction> actionSet = entry.getValue();
+
+            System.out.println("Trigger: " + trigger);
+            System.out.println("Actions:");
+
+            for (GameAction action : actionSet) {
+                System.out.println("\tSubject: " + action.getSubjects());
+                System.out.println("\tConsumed: " + action.getConsumed());
+                System.out.println("\tProduced: " + action.getProduced());
+                System.out.println("\tNarration: " + action.getNarration());
+            }
+        }
+    }
 
     // Check if the entity is valid or not(only 1 entity is valid)
     public String entityChecker(String trigger, HashSet<String> entities){
