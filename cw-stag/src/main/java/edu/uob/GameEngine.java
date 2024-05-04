@@ -43,18 +43,17 @@ public class GameEngine {
         String trigger = triggerChecker(wordSet);
         entitiesSet(player);
         String entity = entityChecker(currentPlayer, trigger, wordSet);
-        String gameAction = actionChecker(trigger,wordSet);
         if(trigger.contains("Warning")||entity.contains("Warning")){
             return "[Warning]No valid trigger/entity or trigger/entity more than one.";
         } else if(trigger.contains("inv") || trigger.equals("look") ||
                 trigger.equals("get")||trigger.equals("drop") || trigger.equals("goto")){
             return builtInCommand(trigger,entity,player);
-        }else{ // If is is not a built in command
-
+        }else{// If is is not a built in command
+            String gameAction = gameActionChecker(trigger,wordSet);
             if(gameAction.contains("Warning")){
                 return "[Warning]No valid trigger/gameAction or trigger/gameAction more than one.";
             }
-            return builtInCommand(trigger,gameAction,player);
+            return gameActionCommand(trigger,gameAction,player);
         }
     }
 
@@ -83,14 +82,13 @@ public class GameEngine {
             }else if(word.equals("drop")){ curTrigger = word; triggerCount++;}
         }
         // Check if the command is game action trigger
-        actionTriggerSet();
-        if(triggerCount != 1){
-            return "[Warning]Not a valid trigger.";
+        if(triggerCount != 1 || curTrigger.contains("Warning")){
+            curTrigger = actionTriggerChecker(words);
+            if(curTrigger.contains("Warning")) {
+                return "[Warning]Not a valid trigger.";
+            }
         }
         return curTrigger;
-    }
-
-    public void actionTriggerSet() {
     }
 
     // Check if the entity is valid or not(only 1 entity is valid)
@@ -137,16 +135,47 @@ public class GameEngine {
         }
         return curEntity;
     }
-    // Check for not built in command
-    public String actionChecker(String trigger, HashSet<String> actions){
-        String curAction = "";
-        int actionCounter = 0;
-        // 1. Check the trigger is valid or not 2.Check the action is valid or not
 
+    // Check for not built in command
+    public String actionTriggerChecker(HashSet<String> words) {
+        String curActionTrigger = "";
+        int triggerCounter = 0;
+        for (String trigger : actions.keySet()) {
+            for(String word : words){
+                if(word.equals(trigger)){
+                    curActionTrigger = trigger;
+                    triggerCounter++;
+                }
+            }
+        }
+        if(triggerCounter != 1){
+            return "[Warning]Invalid action trigger";
+        }
+        return curActionTrigger;
+    }
+
+    // trigger -> action trigger gameActions -> subjects from now trigger
+    public String gameActionChecker(String trigger, HashSet<String> wordSet){
+        String gameAction = ""; //Check the game action is valid or not
+        int actionCounter = 0;
+        HashSet<GameAction> actionSet = actions.get(trigger);
+        HashSet<String> subjects = null;
+        for (GameAction action : actionSet) {
+            subjects = action.getSubjects();
+        }
+        // 1. Check the trigger is valid or not 2.Check the action is valid or not
+        for(String subject: subjects){
+            for(String word : wordSet){
+                if (subject.equals(word)){
+                    gameAction = word;
+                    actionCounter++;
+                }
+            }
+        }
         if(actionCounter != 1){
             return "[Warning]Multiple game actions";
         }
-        return curAction;
+        return gameAction;
     }
     public void entitiesSet(Player player){
         // Get all location entities
@@ -304,5 +333,10 @@ public class GameEngine {
             }
         }
         return locationDetails + "\n" + EntityDetail + "You can go to the: " + pathDetails + totalPlayers;
+    }
+
+    public String gameActionCommand(String trigger,String gameAction,Player player){
+
+        return "Here is game action command";
     }
 }
