@@ -71,13 +71,14 @@ public class GameEngine {
     // Reset the player state when the health is down to 0
     public void resetPlayerState(Player player){
         String name = player.getName();
-        String curLocation = player.getCurrentLocation();
-        getPlayerBag(name);
+        //getPlayerBag(name);
+        if(getPlayerBag(name)!=null) {
+            for (GameEntity entity : getPlayerBag(name)) {
+                drop(player, entity.getName());
+            }
+        }
         player.setHealth(3);
         player.setCurrentLocation("cabin");
-        for(GameEntity entity: getPlayerBag(name)){
-            drop(player,entity.getName());
-        }
     }
 
     // Check if the trigger is valid or not(only 1 trigger is valid)
@@ -285,7 +286,7 @@ public class GameEngine {
     // drop puts down an artefact from player's inventory and places it into the current location
     public String drop(Player player, String entity){
         HashMap<String, HashSet<GameEntity>> nowLocation = getLocationEntities(player);
-        HashSet<GameEntity> locationArtefacts = nowLocation.get("artefacts");
+        HashSet<GameEntity> locationArtefacts = nowLocation.computeIfAbsent("artefacts", k -> new HashSet<>());
         HashSet<GameEntity> playerBag = getPlayerBag(player.getName());
         for (GameEntity entityCanBeDropped : playerBag) {
             if(entityCanBeDropped.getName().equals(entity)){
@@ -374,6 +375,11 @@ public class GameEngine {
             // Return the narration to client(player)
             return gameAction.getNarration();
         }
+        System.out.println("In game action command Health is:" + player.getHealth());
+        if(player.getHealth()==0){
+            resetPlayerState(player);
+            return "You died and lost all of your items, you must return to the start of the game.";
+        }
         return "[Warning]Invalid or no meaning command.";
     }
 
@@ -383,11 +389,10 @@ public class GameEngine {
         if(consumed.equals("health")){
             int health = player.getHealth();
             player.setHealth(health-1);
-            if(health == 0){
-                resetPlayerState(player);
+            if((health-1) == 0){
                 return "[Warning]";
             }
-
+            return "OK";
         }
         HashMap<String, HashSet<GameEntity>> locationEntities = getLocationEntities(player);
         HashMap<String, HashSet<GameEntity>> storeroomEntities = getStoreroomEntities();
