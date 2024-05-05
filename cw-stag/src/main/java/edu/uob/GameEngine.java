@@ -244,27 +244,31 @@ public class GameEngine {
     // Can get current location
     public HashMap<String, HashSet<GameEntity>> getLocationEntities(Player player){
         String currentLocation = player.getCurrentLocation();
-        HashMap<String, HashSet<GameEntity>> nowLocation = null;
-        Set<Location> locations = entitiesMap.keySet();
-        for(Location location: locations){
+        for(Location location: entitiesMap.keySet()){
             if(location.getName().equals(currentLocation)){
-                nowLocation = entitiesMap.get(location);
-                break;
+                return entitiesMap.get(location);
             }
         }
-        return nowLocation;
+        return null;
+    }
+    // Can get storeroom location
+    public HashMap<String, HashSet<GameEntity>> getStoreroomEntities(){
+        for(Location location: entitiesMap.keySet()){
+            if(location.getName().equals("storeroom")){
+                return entitiesMap.get(location);
+
+            }
+        }
+        return null;
     }
     // Can get current player bag
     public HashSet<GameEntity> getPlayerBag(String playerName){
-        HashSet<GameEntity> playerBag = null;
-        Set<String> players = bagMap.keySet();
-        for(String player: players){
+        for(String player: bagMap.keySet()){
             if(player.equals(playerName)){
-                playerBag = bagMap.get(playerName);
-                break;
+                return bagMap.get(playerName);
             }
         }
-        return playerBag;
+        return null;
     }
 
     // drop puts down an artefact from player's inventory and places it into the current location
@@ -364,18 +368,22 @@ public class GameEngine {
 
     // Check the location & player bag has the entity or not
     public String consumedAction(String consumed,Player player){
-        //Check player bag & location's entity first
-        HashSet<GameEntity> totalEntities;
         HashMap<String, HashSet<GameEntity>> locationEntities = getLocationEntities(player);
+        HashMap<String, HashSet<GameEntity>> storeroomEntities = getStoreroomEntities();
         HashSet<GameEntity> artefactsSet = locationEntities.get("artefacts");
         String playerName = player.getName();
-        //String curLocation = player.getCurrentLocation();
-        totalEntities = getPlayerBag(playerName);
-        totalEntities.addAll(artefactsSet);
-        for(GameEntity curEntity: totalEntities){
+        HashSet<GameEntity> playerEntities = getPlayerBag(playerName);
+        for(GameEntity curEntity: playerEntities){
             if(curEntity.getName().equals(consumed)){
-                System.out.println("Now the " + curEntity.getName()+ " should be move to the storeRoom");
-                
+                playerEntities.remove(curEntity); // remove the entity from the current player's bag
+                storeroomEntities.get("artefacts").add(curEntity); // add the entity to the store room
+                return "[OK]";
+            }
+        }
+        for(GameEntity curEntity: artefactsSet){
+            if(curEntity.getName().equals(consumed)){
+                locationEntities.get("artefacts").remove(curEntity); // remove the entity from the current location
+                storeroomEntities.get("artefacts").add(curEntity); // add the entity to the store room
                 return "[OK]";
             }
         }
@@ -383,7 +391,8 @@ public class GameEngine {
     }
     // Create something to the map.
     private String producedAction(String produced, Player player) {
-        return "[Warning]This entity does not exist";
+        return "This entity does not exist";
     }
+
 
 }
