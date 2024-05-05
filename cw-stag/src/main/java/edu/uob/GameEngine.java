@@ -53,7 +53,7 @@ public class GameEngine {
             if(gameAction.contains("Warning")){
                 return "[Warning]No valid trigger/gameAction or trigger/gameAction more than one.";
             }
-            return gameActionCommand(trigger,gameAction,player);
+            return gameActionCommand(trigger,player);
         }
     }
 
@@ -97,33 +97,37 @@ public class GameEngine {
         int entityCounter = 0;
         mergeSet();
         for(String entity: entities){
-            if(trigger.equals("goto")) {
-                for (String location : locations) {
-                    if (entity.equals(location)) {
-                        curEntity = entity;
-                        entityCounter++;
+            switch (trigger) {
+                case "goto" -> {
+                    for (String location : locations) {
+                        if (entity.equals(location)) {
+                            curEntity = entity;
+                            entityCounter++;
+                        }
                     }
                 }
-            }else if(trigger.equals("get")) {
-                for (String artefact : artefacts) {
-                    if (entity.equals(artefact)) {
-                        curEntity = entity;
-                        entityCounter++;
+                case "get" -> {
+                    for (String artefact : artefacts) {
+                        if (entity.equals(artefact)) {
+                            curEntity = entity;
+                            entityCounter++;
+                        }
                     }
                 }
-            } else if(trigger.equals("drop")) {
-                for (GameEntity artefact : bagMap.get(playerName)) {
-                    if (entity.equals(artefact.getName())) {
-                        curEntity = entity;
-                        entityCounter++;
+                case "drop" -> {
+                    for (GameEntity artefact : bagMap.get(playerName)) {
+                        if (entity.equals(artefact.getName())) {
+                            curEntity = entity;
+                            entityCounter++;
+                        }
                     }
                 }
-            }
-            else{
-                for (String mergeEntity: mergedSet){
-                    if (mergeEntity.equals(entity)) {
-                        curEntity = entity;
-                        entityCounter++;
+                default -> {
+                    for (String mergeEntity : mergedSet) {
+                        if (mergeEntity.equals(entity)) {
+                            curEntity = entity;
+                            entityCounter++;
+                        }
                     }
                 }
             }
@@ -159,19 +163,19 @@ public class GameEngine {
         String gameAction = ""; //Check the game action is valid or not
         int actionCounter = 0;
         HashSet<GameAction> actionSet = actions.get(trigger);
-        HashSet<String> subjects = null;
+        HashSet<String> subjects;
         for (GameAction action : actionSet) {
             subjects = action.getSubjects();
-        }
-        // 1. Check the trigger is valid or not 2.Check the action is valid or not
-        for(String subject: subjects){
-            for(String word : wordSet){
-                if (subject.equals(word)){
-                    gameAction = word;
-                    actionCounter++;
+            for(String subject: subjects){
+                for(String word : wordSet){
+                    if (subject.equals(word)){
+                        gameAction = word;
+                        actionCounter++;
+                    }
                 }
             }
         }
+        // 1. Check the trigger is valid or not 2.Check the action is valid or not
         if(actionCounter != 1){
             return "[Warning]Multiple game actions";
         }
@@ -335,8 +339,51 @@ public class GameEngine {
         return locationDetails + "\n" + EntityDetail + "You can go to the: " + pathDetails + totalPlayers;
     }
 
-    public String gameActionCommand(String trigger,String gameAction,Player player){
-
-        return "Here is game action command";
+    // For execute the player's valid game action
+    public String gameActionCommand(String trigger,Player player){
+        HashSet<GameAction> actionSet = actions.get(trigger);
+        gameActionLoop:
+        for (GameAction gameAction : actionSet) {
+            for (String consumed : gameAction.getConsumed()) {
+                System.out.println(consumed);
+                if(consumedAction(consumed,player).contains("Warning")){
+                    break gameActionLoop;
+                }
+            }
+            for (String produced : gameAction.getProduced()) {
+                System.out.println(produced);
+                if(producedAction(produced,player).contains("Warning")){
+                    break gameActionLoop;
+                }
+            }
+            // Return the narration to client(player)
+            return gameAction.getNarration();
+        }
+        return "[Warning]Invalid or no meaning command.";
     }
+
+    // Check the location & player bag has the entity or not
+    public String consumedAction(String consumed,Player player){
+        //Check player bag & location's entity first
+        HashSet<GameEntity> totalEntities;
+        HashMap<String, HashSet<GameEntity>> locationEntities = getLocationEntities(player);
+        HashSet<GameEntity> artefactsSet = locationEntities.get("artefacts");
+        String playerName = player.getName();
+        //String curLocation = player.getCurrentLocation();
+        totalEntities = getPlayerBag(playerName);
+        totalEntities.addAll(artefactsSet);
+        for(GameEntity curEntity: totalEntities){
+            if(curEntity.getName().equals(consumed)){
+                System.out.println("Now the " + curEntity.getName()+ " should be move to the storeRoom");
+                
+                return "[OK]";
+            }
+        }
+        return "[Warning]This entity does not exist";
+    }
+    // Create something to the map.
+    private String producedAction(String produced, Player player) {
+        return "[Warning]This entity does not exist";
+    }
+
 }

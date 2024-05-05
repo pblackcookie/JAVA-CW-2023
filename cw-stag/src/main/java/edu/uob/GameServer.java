@@ -60,7 +60,12 @@ public final class GameServer {
         // TODO implement your server logic here
         command = command.toLowerCase(); // Convert all command to lower case first
         gameEngine = new GameEngine(pathMap,entitiesMap,actions,playerMap,bagMap);
+        if(command.isEmpty()){
+            return "Empty command";
+        }
         return gameEngine.commandParser(command);
+
+
     }
 
     /**
