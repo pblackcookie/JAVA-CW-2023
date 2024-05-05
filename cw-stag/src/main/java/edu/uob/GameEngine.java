@@ -37,9 +37,6 @@ public class GameEngine {
             return "[Warning]Invalid player name.";
         }
         Player player = playerChecker(currentPlayer);
-        if(player.getHealth() <= 0){
-            return "[Game over]Your health is 0";
-        }
         // Split the command.
         HashSet<String> wordSet = new HashSet<>(Arrays.asList(command.split(" ")));
         // Check the trigger && entity valid or not
@@ -70,6 +67,17 @@ public class GameEngine {
             bagMap.put(playerName, new HashSet<>()); // create the bag
         }
         return nowPlayer;
+    }
+    // Reset the player state when the health is down to 0
+    public void resetPlayerState(Player player){
+        String name = player.getName();
+        String curLocation = player.getCurrentLocation();
+        getPlayerBag(name);
+        player.setHealth(3);
+        player.setCurrentLocation("cabin");
+        for(GameEntity entity: getPlayerBag(name)){
+            drop(player,entity.getName());
+        }
     }
 
     // Check if the trigger is valid or not(only 1 trigger is valid)
@@ -375,7 +383,11 @@ public class GameEngine {
         if(consumed.equals("health")){
             int health = player.getHealth();
             player.setHealth(health-1);
-            return "OK";
+            if(health == 0){
+                resetPlayerState(player);
+                return "[Warning]";
+            }
+
         }
         HashMap<String, HashSet<GameEntity>> locationEntities = getLocationEntities(player);
         HashMap<String, HashSet<GameEntity>> storeroomEntities = getStoreroomEntities();
@@ -385,27 +397,36 @@ public class GameEngine {
             furnitureSet = new HashSet<>();
             storeroomEntities.put("furniture", furnitureSet);
         }
+        if (locationEntities.get("artefacts") == null) {
+            artefactsSet = new HashSet<>();
+            locationEntities.put("artefacts", artefactsSet);
+        }
         HashSet<GameEntity> playerEntities = getPlayerBag(playerName);
-        for(GameEntity curEntity: playerEntities){
-            if(curEntity.getName().equals(consumed)){
-                playerEntities.remove(curEntity); // remove the entity from the current player's bag
-                storeroomEntities.get("artefacts").add(curEntity); // add the entity to the store room
-                return "[OK]";
+        if(playerEntities!=null) {
+            for (GameEntity curEntity : playerEntities) {
+                if (curEntity.getName().equals(consumed)) {
+                    playerEntities.remove(curEntity); // remove the entity from the current player's bag
+                    storeroomEntities.get("artefacts").add(curEntity); // add the entity to the store room
+                    return "[OK]";
+                }
             }
         }
-        for(GameEntity curEntity: artefactsSet){
-            if(curEntity.getName().equals(consumed)){
-                locationEntities.get("artefacts").remove(curEntity); // remove the entity from the current location
-                storeroomEntities.get("artefacts").add(curEntity); // add the entity to the store room
-                return "[OK]";
+        if(artefactsSet!=null){
+            for(GameEntity curEntity: artefactsSet){
+                if(curEntity.getName().equals(consumed)){
+                    locationEntities.get("artefacts").remove(curEntity); // remove the entity from the current location
+                    storeroomEntities.get("artefacts").add(curEntity); // add the entity to the store room
+                    return "[OK]";
+                }
             }
         }
-        for(GameEntity curEntity: furnitureSet){
-            if(curEntity.getName().equals(consumed)){
-                locationEntities.get("furniture").remove(curEntity); // remove the entity from the current location
-                storeroomEntities.get("furniture").add(curEntity); // add the entity to the store room
-
-                return "[OK]";
+        if(furnitureSet!=null) {
+            for (GameEntity curEntity : furnitureSet) {
+                if (curEntity.getName().equals(consumed)) {
+                    locationEntities.get("furniture").remove(curEntity); // remove the entity from the current location
+                    storeroomEntities.get("furniture").add(curEntity); // add the entity to the store room
+                    return "[OK]";
+                }
             }
         }
         return "[Warning]This entity does not exist";
