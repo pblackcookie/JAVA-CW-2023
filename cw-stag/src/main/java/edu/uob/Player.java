@@ -5,12 +5,15 @@ import java.util.HashSet;
 
 public class Player extends Characters{
     String currentLocation;
+    int health;
     HashMap<Location, HashMap<String, HashSet<GameEntity>>> entitiesMap;
     public Player(String name, String description, String currentLocation,
-                  HashMap<Location, HashMap<String, HashSet<GameEntity>>> entitiesMap) {
+                  HashMap<Location, HashMap<String, HashSet<GameEntity>>> entitiesMap,
+                  int health) {
         super(name, description);
         this.currentLocation = currentLocation;
         this.entitiesMap = entitiesMap;
+        this.health = health;
     }
 
     public String getCurrentLocation() {
@@ -19,6 +22,14 @@ public class Player extends Characters{
 
     public void setCurrentLocation(String currentLocation) {
         this.currentLocation = currentLocation;
+    }
+
+    public int getHealth() {
+        return health;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
     }
 
     public String getDescription(){

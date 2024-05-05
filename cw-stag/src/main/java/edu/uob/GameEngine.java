@@ -37,6 +37,9 @@ public class GameEngine {
             return "[Warning]Invalid player name.";
         }
         Player player = playerChecker(currentPlayer);
+        if(player.getHealth() <= 0){
+            return "[Game over]Your health is 0";
+        }
         // Split the command.
         HashSet<String> wordSet = new HashSet<>(Arrays.asList(command.split(" ")));
         // Check the trigger && entity valid or not
@@ -62,7 +65,7 @@ public class GameEngine {
     public Player playerChecker(String playerName){
         Player nowPlayer = playerMap.get(playerName);
         if(nowPlayer == null){ // put thr new player into player map
-            nowPlayer = new Player(playerName,"","cabin",entitiesMap);
+            nowPlayer = new Player(playerName,"","cabin",entitiesMap,3);
             playerMap.put(playerName,nowPlayer);
             bagMap.put(playerName, new HashSet<>()); // create the bag
         }
@@ -368,10 +371,20 @@ public class GameEngine {
 
     // Check the location & player bag has the entity or not
     public String consumedAction(String consumed,Player player){
+        String playerName = player.getName();
+        if(consumed.equals("health")){
+            int health = player.getHealth();
+            player.setHealth(health-1);
+            return "OK";
+        }
         HashMap<String, HashSet<GameEntity>> locationEntities = getLocationEntities(player);
         HashMap<String, HashSet<GameEntity>> storeroomEntities = getStoreroomEntities();
         HashSet<GameEntity> artefactsSet = locationEntities.get("artefacts");
-        String playerName = player.getName();
+        HashSet<GameEntity> furnitureSet = locationEntities.get("furniture");
+        if (getStoreroomEntities().get("furniture") == null) {
+            furnitureSet = new HashSet<>();
+            storeroomEntities.put("furniture", furnitureSet);
+        }
         HashSet<GameEntity> playerEntities = getPlayerBag(playerName);
         for(GameEntity curEntity: playerEntities){
             if(curEntity.getName().equals(consumed)){
@@ -387,10 +400,26 @@ public class GameEngine {
                 return "[OK]";
             }
         }
+        for(GameEntity curEntity: furnitureSet){
+            if(curEntity.getName().equals(consumed)){
+                locationEntities.get("furniture").remove(curEntity); // remove the entity from the current location
+                storeroomEntities.get("furniture").add(curEntity); // add the entity to the store room
+
+                return "[OK]";
+            }
+        }
         return "[Warning]This entity does not exist";
     }
     // Create something to the map.
     private String producedAction(String produced, Player player) {
+        String playerName = player.getName();
+        if(produced.equals("health")){
+            int health = player.getHealth();
+            if(health<3) {
+                player.setHealth(health + 1);
+                return "OK";
+            }
+        }
         return "This entity does not exist";
     }
 
