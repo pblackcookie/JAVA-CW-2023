@@ -366,13 +366,11 @@ public class GameEngine {
         gameActionLoop:
         for (GameAction gameAction : actionSet) {
             for (String consumed : gameAction.getConsumed()) {
-                System.out.println("Consumed is: " + consumed);
                 if(consumedAction(consumed,player).contains("Warning")){
                     break gameActionLoop;
                 }
             }
             for (String produced : gameAction.getProduced()) {
-                System.out.println("Produced is: "+ produced);
                 if(producedAction(produced,player).contains("Warning")){
                     break gameActionLoop;
                 }
@@ -450,7 +448,6 @@ public class GameEngine {
             for (GameEntity entity : entities) {
                 if (entity.getName().equals(produced)) {
                     // In here remove the entity from storeroom and add it to the current location
-                    System.out.println("找到了想要的 " + produced + "，它在键为 " + key + " 中");
                     storeroomEntities.get(key).remove(entity);
                     locationEntities.get(key).add(entity);
                     return "OK";
