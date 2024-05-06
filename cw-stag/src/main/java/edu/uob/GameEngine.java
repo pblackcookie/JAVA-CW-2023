@@ -51,7 +51,7 @@ public class GameEngine {
         }else{// If is is not a built in command
             String gameAction = gameActionChecker(trigger,wordSet);
             if(gameAction.contains("Warning")){
-                return "[Warning]No valid trigger/gameAction or trigger/gameAction more than one.";
+                return "[Warning]No valid trigger/game acton or trigger/game acton more than one.";
             }
             return gameActionCommand(trigger,player);
         }
@@ -178,6 +178,7 @@ public class GameEngine {
     public String gameActionChecker(String trigger, HashSet<String> wordSet){
         String gameAction = ""; //Check the game action is valid or not
         int actionCounter = 0;
+        int subjectsCounter = 0;
         HashSet<GameAction> actionSet = actions.get(trigger);
         HashSet<String> subjects;
         for (GameAction action : actionSet) {
@@ -189,11 +190,12 @@ public class GameEngine {
                         actionCounter++;
                     }
                 }
+                subjectsCounter++;
             }
         }
         // 1. Check the trigger is valid or not 2.Check the action is valid or not
-        if(actionCounter < 1){
-            return "No valid game actions";
+        if(actionCounter != subjectsCounter){
+            return "[Warning]No valid game actions";
         }
         return gameAction;
     }
@@ -380,7 +382,8 @@ public class GameEngine {
         }
         if(player.getHealth()==0){
             resetPlayerState(player);
-            return "You died and lost all of your items, you must return to the start of the game.";
+            return  "You attack the elf, but he fights back and you lose some health.\n" +
+                    "You died and lost all of your items, you must return to the start of the game.";
         }
         return "[Warning]Invalid or no meaning command.";
     }
@@ -398,12 +401,8 @@ public class GameEngine {
         }
         HashMap<String, HashSet<GameEntity>> locationEntities = getLocationEntities(player);
         HashMap<String, HashSet<GameEntity>> storeroomEntities = getStoreroomEntities();
-        if (getStoreroomEntities().get("furniture") == null) {
-            storeroomEntities.put("furniture", new HashSet<>());
-        }
-        if (locationEntities.get("furniture") == null) {
-            storeroomEntities.put("furniture", new HashSet<>());
-        }
+        storeroomEntities.computeIfAbsent("furniture", k -> new HashSet<>());
+        locationEntities.computeIfAbsent("furniture", k -> new HashSet<>());
         locationEntities.computeIfAbsent("artefacts", k -> new HashSet<>());
         HashSet<GameEntity> playerEntities = getPlayerBag(playerName);
         for (GameEntity curEntity : playerEntities) {
@@ -456,9 +455,8 @@ public class GameEngine {
                         locationEntities.put(key, locationSet);
                     }else {
                         locationEntities.get(key).add(entity);
-
-                    }return "OK";
-
+                    }
+                    return "OK";
                 }
             }
         }
