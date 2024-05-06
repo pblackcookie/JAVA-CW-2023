@@ -188,8 +188,8 @@ public class GameEngine {
             }
         }
         // 1. Check the trigger is valid or not 2.Check the action is valid or not
-        if(actionCounter != 1){
-            return "[Warning]Multiple game actions";
+        if(actionCounter < 1){
+            return "No valid game actions";
         }
         return gameAction;
     }
@@ -307,6 +307,7 @@ public class GameEngine {
         for (Location location : locations){
             locationNames.add(location.getName());
         }
+        // TODO: Add the produced for check the available path
         for(String currentLocation: locationNames){
             if(currentLocation.equals(destination)){
                 player.setCurrentLocation(destination);
@@ -439,14 +440,25 @@ public class GameEngine {
     // Create something to the map.
     private String producedAction(String produced, Player player) {
         String playerName = player.getName();
+        String curLocation = player.getCurrentLocation();
         if(produced.equals("health")){
             int health = player.getHealth();
             if(health<3) {
                 player.setHealth(health + 1);
+            }
+            return "OK";
+        }
+        // If the entity is not location, then it must in the storeroom
+        HashMap<String, HashSet<GameEntity>> storeroomEntities = getStoreroomEntities();
+        // If not exist try to look if it is the location
+        for(String producedLocation: locations){
+            if(producedLocation.equals(produced)){
+                // Create a new Path in here, and add it to the path map
+                pathMap.get(curLocation).add(producedLocation);
                 return "OK";
             }
         }
-        return "This entity does not exist";
+        return "This entity/location does not exist";
     }
 
 
