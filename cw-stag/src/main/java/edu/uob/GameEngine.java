@@ -176,9 +176,10 @@ public class GameEngine {
 
     // trigger -> action trigger gameActions -> subjects from now trigger
     public String gameActionChecker(String trigger, HashSet<String> wordSet){
-        String gameAction = ""; //Check the game action is valid or not
         int actionCounter = 0;
-        int subjectsCounter = 0;
+        int noSubjectsCounter = 0;
+        HashSet<String> newMergeSet = new HashSet<>();
+        newMergeSet = mergedSet;
         HashSet<GameAction> actionSet = actions.get(trigger);
         HashSet<String> subjects;
         for (GameAction action : actionSet) {
@@ -186,18 +187,25 @@ public class GameEngine {
             for(String subject: subjects){
                 for(String word : wordSet){
                     if (subject.equals(word)){
-                        gameAction = word;
                         actionCounter++;
                     }
                 }
-                subjectsCounter++;
+                newMergeSet.remove(subject);
+            }
+        }
+        newMergeSet.remove(trigger);
+        for (String entity: newMergeSet){
+            for(String word : wordSet){
+                if (entity.equals(word)){
+                    noSubjectsCounter++;
+                }
             }
         }
         // 1. Check the trigger is valid or not 2.Check the action is valid or not
-        if(actionCounter != subjectsCounter){
+        if(actionCounter < 1 || noSubjectsCounter >0){
             return "[Warning]No valid game actions";
         }
-        return gameAction;
+        return "OK";
     }
     public void entitiesSet(Player player){
         // Get all location entities
@@ -313,7 +321,7 @@ public class GameEngine {
         for (Location location : locations){
             locationNames.add(location.getName());
         }
-        // TODO: Add the produced for check the available path
+        // TODO: Add the produced for check the available path(Player can not goto the unreachable location)
         for(String currentLocation: locationNames){
             if(currentLocation.equals(destination)){
                 player.setCurrentLocation(destination);
@@ -431,7 +439,6 @@ public class GameEngine {
 
     // Create something into the map.
     private String producedAction(String produced, Player player) {
-        String playerName = player.getName();
         String curLocation = player.getCurrentLocation();
         if(produced.equals("health")){
             int health = player.getHealth();
