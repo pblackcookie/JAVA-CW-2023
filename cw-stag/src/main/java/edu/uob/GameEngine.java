@@ -429,7 +429,8 @@ public class GameEngine {
         }
         return "[Warning]This entity does not exist";
     }
-    // Create something to the map.
+
+    // Create something into the map.
     private String producedAction(String produced, Player player) {
         String playerName = player.getName();
         String curLocation = player.getCurrentLocation();
@@ -449,8 +450,14 @@ public class GameEngine {
                 if (entity.getName().equals(produced)) {
                     // In here remove the entity from storeroom and add it to the current location
                     storeroomEntities.get(key).remove(entity);
-                    locationEntities.get(key).add(entity);
-                    return "OK";
+                    if(locationEntities.get(key)==null){
+                        HashSet<GameEntity> locationSet = new HashSet<>();
+                        locationSet.add(entity);
+                        locationEntities.put(key, locationSet);
+                    }else {
+                        locationEntities.get(key).add(entity);
+
+                    }return "OK";
 
                 }
             }
@@ -465,6 +472,4 @@ public class GameEngine {
         }
         return "[Warning]This entity/location does not exist";
     }
-
-
 }
