@@ -44,6 +44,7 @@ public class GameEngine {
         Player player = playerChecker(currentPlayer);
         HashSet<String> wordSet = new HashSet<>(Arrays.asList(command.split(" ")));
         entitiesSet(player);
+        mergeSet();
         return commandChecker(wordSet,player);
     }
 
@@ -126,11 +127,22 @@ public class GameEngine {
         HashSet<String> subjects;
         HashSet<String> entitiesInCommand = new HashSet<>();
         HashSet<String> entitiesForCheck = new HashSet<>();
+        HashSet<String> newMergeSet = new HashSet<>();
+        HashSet<String> noSubjectEntities = new HashSet<>();
         subjects = action.getSubjects();
+        newMergeSet = mergedSet;
         for(String curWord:command){
-            for(String entity:mergedSet){
+            for(String entity: subjects){
                 if(curWord.equals(entity)){
-                    entitiesInCommand.add(curWord);
+                    entitiesInCommand.add(curWord); // check if the command has the subject
+                }
+                newMergeSet.remove(entity);
+            }
+        }
+        for(String curWord: command){
+            for(String noSubject: newMergeSet){
+                if(curWord.equals(noSubject)){
+                    noSubjectEntities.add(curWord);
                 }
             }
         }
@@ -143,15 +155,15 @@ public class GameEngine {
             entitiesForCheck.add(entity.getName());
         }
         entitiesForCheck.add(curLocation);
+        boolean subjectCheck = !entitiesInCommand.isEmpty() && noSubjectEntities.isEmpty();
         // Check if the command entity has the subjects and check if the current entities has all the subjects
-        return subjects.containsAll(entitiesInCommand) && entitiesForCheck.containsAll(subjects);
+        return  subjectCheck && subjects.containsAll(entitiesInCommand) && entitiesForCheck.containsAll(subjects);
     }
 
     // Check if the entity is valid or not(only 1 entity is valid)
     public String entityChecker(String playerName,String trigger, HashSet<String> entities){
         String curEntity = "";
         int entityCounter = 0;
-        mergeSet();
         for(String entity: entities){
             switch (trigger) {
                 case "goto" -> {
