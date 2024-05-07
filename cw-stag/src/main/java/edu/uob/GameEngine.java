@@ -42,10 +42,7 @@ public class GameEngine {
             }
         }
         Player player = playerChecker(currentPlayer);
-        // Split the command.
         HashSet<String> wordSet = new HashSet<>(Arrays.asList(command.split(" ")));
-        // Check the trigger && entity valid or not
-        // TODO: check multiple game action(built in + game action)
         entitiesSet(player);
         return commandChecker(wordSet,player);
     }
@@ -191,7 +188,7 @@ public class GameEngine {
                 }
             }
         }
-        if((trigger.contains("inv") || trigger.equals("look")) && entityCounter != 0){
+        if((trigger.contains("inv") || trigger.equals("look") || trigger.equals("health")) && entityCounter != 0){
             return "[Warning]Not a valid command.";
         }else if((trigger.equals("get")||trigger.equals("drop") || trigger.equals("goto")) && entityCounter !=1){
             return "[Warning]Not a valid entity.";
@@ -210,6 +207,7 @@ public class GameEngine {
         builtInCommand.add("drop");
         builtInCommand.add("get");
         builtInCommand.add("look");
+        builtInCommand.add("health");
     }
     public void entitiesSet(Player player){
         // Get all location entities
@@ -278,7 +276,8 @@ public class GameEngine {
         }else if (trigger.equals("look")) { return look(player);
         }else if(trigger.equals("goto")){ return goto_(player,entity);
         }else if(trigger.equals("get")){ return get(player,entity);
-        }else if(trigger.equals("drop")){ return drop(player,entity); }
+        }else if(trigger.equals("drop")) {return drop(player, entity);
+        }else if(trigger.equals("health")) return health(player);
         return "[Warning]Can not found the current command.";
     }
 
@@ -286,6 +285,10 @@ public class GameEngine {
     public String inv(Player player){
         String playerName = player.getName();
         return "You are " + playerName + ". Your bag now has:" + bagMap.get(playerName);
+    }
+
+    public String health(Player player){
+        return "Your health now is: " + player.getHealth();
     }
 
     // get picks up a specified artefact from the current location and adds it into player's inventory
