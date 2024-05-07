@@ -21,6 +21,7 @@ public final class GameServer {
     HashMap<String,HashSet<GameAction>> actions;
     HashMap<String, Player> playerMap = new HashMap<>();
     HashMap<String, HashSet<GameEntity> > bagMap = new HashMap<>();
+    String bornLocation = null;
     GameEngine gameEngine;
 
     public static void main(String[] args) throws IOException {
@@ -44,6 +45,7 @@ public final class GameServer {
         gameEntityParser.entitiesFileReader(String.valueOf(entitiesFile));
         pathMap = gameEntityParser.pathMap;
         entitiesMap = gameEntityParser.entitiesMap;
+        bornLocation = gameEntityParser.bornLocation;
         // Statements to read the actions file
         GameActionParser gameActionParser = new GameActionParser();
         gameActionParser.actionsFileReader(String.valueOf(actionsFile));
@@ -59,7 +61,7 @@ public final class GameServer {
     public String handleCommand(String command) {
         // TODO implement your server logic here
         command = command.toLowerCase(); // Convert all command to lower case first
-        gameEngine = new GameEngine(pathMap,entitiesMap,actions,playerMap,bagMap);
+        gameEngine = new GameEngine(pathMap,entitiesMap,actions,playerMap,bagMap,bornLocation);
         if(command.isEmpty()){
             return "Empty command";
         }

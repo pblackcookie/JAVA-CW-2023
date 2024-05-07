@@ -18,6 +18,7 @@ public class GameEntityParser {
     // Read the config file
     HashMap<String, HashSet<String>> pathMap = new HashMap<>();
     HashMap<Location,HashMap<String, HashSet<GameEntity>>> entitiesMap = new HashMap<>();
+    String bornLocation = null;
 
 
     //Reading the entities config file
@@ -35,6 +36,9 @@ public class GameEntityParser {
                 Node locationDetails = location.getNodes(false).get(0);
                 // Get the each location's name and description
                 String locationName = locationDetails.getId().getId();
+                if(bornLocation == null) {
+                    bornLocation = locationName;
+                }
                 String description = locationDetails.getAttributes().get("description");
                 // Put the entities to the Location object
                 Location currentLocation = new Location(locationName,description);

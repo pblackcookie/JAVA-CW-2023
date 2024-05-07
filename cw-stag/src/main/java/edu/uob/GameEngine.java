@@ -14,18 +14,21 @@ public class GameEngine {
     HashSet<String> furniture = new HashSet<>();
     HashSet<String> characters = new HashSet<>();
     HashSet<String> mergedSet = new HashSet<>();
+    String bornLocation = null;
 
 
     public GameEngine(HashMap<String, HashSet<String>> pathMap,
                       HashMap<Location, HashMap<String, HashSet<GameEntity>>> entitiesMap,
                       HashMap<String, HashSet<GameAction>> actions,
                       HashMap<String, Player> playerMap,
-                      HashMap<String, HashSet<GameEntity>> bagMap) {
+                      HashMap<String, HashSet<GameEntity>> bagMap,
+                      String bornLocation) {
         this.pathMap = pathMap;
         this.entitiesMap = entitiesMap;
         this.actions = actions;
         this.playerMap = playerMap;
         this.bagMap = bagMap;
+        this.bornLocation = bornLocation;
     }
 
     public String commandParser(String command){
@@ -62,7 +65,7 @@ public class GameEngine {
     public Player playerChecker(String playerName){
         Player nowPlayer = playerMap.get(playerName);
         if(nowPlayer == null){ // put thr new player into player map
-            nowPlayer = new Player(playerName,"","cabin",entitiesMap,3);
+            nowPlayer = new Player(playerName,"",bornLocation,entitiesMap,3);
             playerMap.put(playerName,nowPlayer);
             bagMap.put(playerName, new HashSet<>()); // create the bag
         }
@@ -82,7 +85,7 @@ public class GameEngine {
             }
         }
         player.setHealth(3);
-        player.setCurrentLocation("cabin");
+        player.setCurrentLocation(bornLocation);
     }
 
     // Check if the trigger is valid or not(only 1 trigger is valid)
@@ -373,6 +376,7 @@ public class GameEngine {
     // For execute the player's valid game action
     public String gameActionCommand(String trigger,Player player){
         HashSet<GameAction> actionSet = actions.get(trigger);
+        // TODO: check if the subject is enough(location + bag entity)
         gameActionLoop:
         for (GameAction gameAction : actionSet) {
             for (String consumed : gameAction.getConsumed()) {
