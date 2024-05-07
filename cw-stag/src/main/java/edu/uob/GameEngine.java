@@ -42,9 +42,10 @@ public class GameEngine {
             }
         }
         Player player = playerChecker(currentPlayer);
+        command = command.substring(currentPlayer.length()+1).trim();
         HashSet<String> wordSet = new HashSet<>(Arrays.asList(command.split(" ")));
         entitiesSet(player);
-        mergeSet();
+        mergeSet(player);
         return commandChecker(wordSet,player);
     }
 
@@ -127,10 +128,9 @@ public class GameEngine {
         HashSet<String> subjects;
         HashSet<String> entitiesInCommand = new HashSet<>();
         HashSet<String> entitiesForCheck = new HashSet<>();
-        HashSet<String> newMergeSet = new HashSet<>();
         HashSet<String> noSubjectEntities = new HashSet<>();
+        HashSet<String> newMergeSet = new HashSet<>(mergedSet);
         subjects = action.getSubjects();
-        newMergeSet = mergedSet;
         for(String curWord:command){
             for(String entity: subjects){
                 if(curWord.equals(entity)){
@@ -239,11 +239,13 @@ public class GameEngine {
             }
         }
     }
-    public void mergeSet(){
+    public void mergeSet(Player player){
+        String name = player.getName();
         mergedSet.addAll(locations);
         mergedSet.addAll(artefacts);
         mergedSet.addAll(furniture);
         mergedSet.addAll(characters);
+        mergedSet.addAll(bagMap.keySet());
     }
 
     /*--------------------Get some entities--------------------------
