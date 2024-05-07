@@ -240,12 +240,10 @@ public class GameEngine {
         }
     }
     public void mergeSet(Player player){
-        String name = player.getName();
         mergedSet.addAll(locations);
         mergedSet.addAll(artefacts);
         mergedSet.addAll(furniture);
         mergedSet.addAll(characters);
-        mergedSet.addAll(bagMap.keySet());
     }
 
     /*--------------------Get some entities--------------------------
@@ -343,17 +341,11 @@ public class GameEngine {
 
     // goto moves the player from the current location to the specified location (if there is a path to that location)
     public String goto_(Player player, String destination){
-        Set<Location> locations = entitiesMap.keySet();
-        ArrayList<String> locationNames = new ArrayList<>();
-        for (Location location : locations){
-            locationNames.add(location.getName());
-        }
-        // TODO: Add the produced for check the available path(Player can not goto the unreachable location)
-        for(String currentLocation: locationNames){
-            if(currentLocation.equals(destination)){
-                player.setCurrentLocation(destination);
-                return "You are now in the: " + destination;
-            }
+        String curLocation = player.getCurrentLocation();
+        Set<String> locations = pathMap.get(curLocation);
+        if(locations!=null && locations.contains(destination)){
+            player.setCurrentLocation(destination);
+            return "You are now in the: " + destination;
         }
         return "[Warning]You entered a non-existent location. -Maybe a typo?";
 
