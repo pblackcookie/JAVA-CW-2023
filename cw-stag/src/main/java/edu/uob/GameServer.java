@@ -21,7 +21,7 @@ public final class GameServer {
     HashMap<String,HashSet<GameAction>> actions;
     HashMap<String, Player> playerMap = new HashMap<>();
     HashMap<String, HashSet<GameEntity> > bagMap = new HashMap<>();
-    String bornLocation = null;
+    String bornLocation;
     GameEngine gameEngine;
 
     public static void main(String[] args) throws IOException {

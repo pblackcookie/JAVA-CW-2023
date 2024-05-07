@@ -61,7 +61,11 @@ public class GameActionParser {
             String curNarration = narration.getTextContent();
             GameAction newGameAction = new GameAction(subjectSet, consumedSet, producedSet, curNarration);
             actionSet.add(newGameAction);
-            actions.put(curTrigger, actionSet);
+            if(actions.containsKey(curTrigger)){
+                actions.get(curTrigger).add(newGameAction);
+            }else {
+                actions.put(curTrigger, actionSet);
+            }
         }
     }
 

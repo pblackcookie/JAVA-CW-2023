@@ -27,7 +27,6 @@ public class GameAction
                 '}';
     }
 
-
     public HashSet<String> getSubjects() {
         return subjects;
     }
