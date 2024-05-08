@@ -446,6 +446,7 @@ public class GameEngine {
         player.setHealth(health - 1);
         return (health - 1 == 0) ? "[Warning]" : "OK";
     }
+    // If the command is valid then consumed the entity.
     private boolean moveEntity(String entityName, HashSet<GameEntity> sourceContainer,
                                HashSet<GameEntity> targetContainer) {
         for (GameEntity curEntity : sourceContainer) {
@@ -459,42 +460,49 @@ public class GameEngine {
     }
 
     // Create something into the map.
-    private String producedAction(String produced, Player player) {
-        String curLocation = player.getCurrentLocation();
+    public String producedAction(String produced, Player player) {
         if(produced.equals("health")){
-            int health = player.getHealth();
-            if(health<3) {
-                player.setHealth(health + 1);
-            }
-            return "OK";
+            return increaseHealth(player);
         }
-        // If the entity is not location, then it must in the storeroom(with different type)
+        String result = moveEntityFromStoreroomToLocation(produced, player);
+        if (!result.equals("[Warning] Entity does not exist in the storeroom.")) {
+            return result;
+        }
+        return createPath(produced, player);
+    }
+    // Method for add player health
+    private String increaseHealth(Player player) {
+        int health = player.getHealth();
+        if (health < 3) {
+            player.setHealth(health + 1);
+        }
+        return "OK";
+    }
+    // If the entity is not location, then it must in the storeroom(with different type)
+    private String moveEntityFromStoreroomToLocation(String produced, Player player) {
         HashMap<String, HashSet<GameEntity>> storeroomEntities = getStoreroomEntities();
         HashMap<String, HashSet<GameEntity>> locationEntities = getLocationEntities(player);
         for (String key : storeroomEntities.keySet()) {
             for (GameEntity entity : storeroomEntities.get(key)) {
                 if (entity.getName().equals(produced)) {
-                    // In here remove the entity from storeroom and add it to the current location
                     storeroomEntities.get(key).remove(entity);
-                    if(locationEntities.get(key)==null){
-                        HashSet<GameEntity> locationSet = new HashSet<>();
-                        locationSet.add(entity);
-                        locationEntities.put(key, locationSet);
-                    }else {
-                        locationEntities.get(key).add(entity);
-                    }
+                    locationEntities.computeIfAbsent(key, k -> new HashSet<>()).add(entity);
                     return "OK";
                 }
             }
         }
-        // If not exist try to look if it is the location
-        for(String producedLocation: locations){
-            if(producedLocation.equals(produced)){
-                // Create a new Path in here, and add it to the path map
+        return "[Warning] Entity does not exist in the storeroom.";
+    }
+    // If not exist try to look if it is the location
+    private String createPath(String produced, Player player) {
+        String curLocation = player.getCurrentLocation();
+        for (String producedLocation : locations) {
+            if (producedLocation.equals(produced)) {
                 pathMap.get(curLocation).add(producedLocation);
                 return "OK";
             }
         }
-        return "[Warning]This entity/location does not exist";
+        return "[Warning] Location does not exist.";
     }
+
 }
