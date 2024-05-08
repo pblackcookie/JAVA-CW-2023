@@ -136,7 +136,7 @@ public class GameEngine {
         String curLocation = player.getCurrentLocation();
         HashSet<String> subjects = action.getSubjects();
         boolean hasCommandSubjects = checkCommandSubjects(command, subjects);
-        boolean hasNoSubjectEntities = checkNoSubjectEntities(player,command, subjects);
+        boolean hasNoSubjectEntities = checkNoSubjectEntities(command, subjects);
         boolean hasAllEntitiesForCheck = checkAllEntitiesForCheck(player, curLocation, subjects);
         return hasCommandSubjects && !hasNoSubjectEntities && hasAllEntitiesForCheck;
     }
@@ -150,8 +150,8 @@ public class GameEngine {
         return false;
     }
     // Check if the command has no relative entities
-    private boolean checkNoSubjectEntities(Player player,HashSet<String> command, HashSet<String> subjects) {
-        getAllEntities(player); // All map entities
+    private boolean checkNoSubjectEntities(HashSet<String> command, HashSet<String> subjects) {
+        getAllEntities(); // All map entities
         HashSet<String> newMergeSet = new HashSet<>(entitiesSet);
         newMergeSet.removeAll(subjects);
         for (String curWord : command) {
@@ -251,7 +251,7 @@ public class GameEngine {
         mergedSet.addAll(characters);
     }
     // Get all the entities from entities map(type:string)
-    public void getAllEntities(Player player){
+    public void getAllEntities(){
         Set<GameEntity> allEntities = new HashSet<>();
         Set<Location> allLocations = entitiesMap.keySet();
         for (HashMap<String, HashSet<GameEntity>> locationMap : entitiesMap.values()) {
