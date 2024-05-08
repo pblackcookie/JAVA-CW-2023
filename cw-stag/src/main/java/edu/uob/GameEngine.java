@@ -172,19 +172,17 @@ public class GameEngine {
         String curEntity = "";
         int entityCounter = 0;
         for(String entity: entities){
-            boolean isValid;
-            switch (trigger) {
-                case "goto": isValid = checkNeededEntity(entity,locations); break;
-                case "get":  isValid = checkNeededEntity(entity,artefacts); break;
-                case "drop": isValid = checkNeededEntity(entity,getPlayerBagString(playerName)); break;
-                default :    isValid = checkNeededEntity(entity,mergedSet); break;
-            }
+            boolean isValid = switch (trigger) {
+                case "goto" -> checkNeededEntity(entity, locations);
+                case "get" -> checkNeededEntity(entity, artefacts);
+                case "drop" -> checkNeededEntity(entity, getPlayerBagString(playerName));
+                default -> checkNeededEntity(entity, mergedSet);
+            };
             if(isValid){
                 curEntity = entity;
                 entityCounter++;
             }
-        }
-
+        } // inv look health does not need the entity exist & get,drop and goto only need one entity exist
         if((trigger.contains("inv") || trigger.equals("look") || trigger.equals("health")) && entityCounter != 0){
             return "[Warning]Not a valid command.";
         }else if((trigger.equals("get")||trigger.equals("drop") || trigger.equals("goto")) && entityCounter !=1){
@@ -192,7 +190,7 @@ public class GameEngine {
         }
         return curEntity;
     }
-    private boolean checkNeededEntity(String entity,HashSet<String> entities) {
+    private boolean checkNeededEntity(String entity,HashSet<String> entities){
         for (String curEntity : entities) {
             if (entity.equals(curEntity)) {
                 return true;
