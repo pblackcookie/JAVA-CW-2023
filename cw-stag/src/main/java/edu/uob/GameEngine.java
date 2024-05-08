@@ -208,7 +208,6 @@ public class GameEngine {
      ---------------------------------------------------------*/
     public void builtInInit(){
         builtInCommand.add("inv");
-        builtInCommand.add("inventory");
         builtInCommand.add("goto");
         builtInCommand.add("drop");
         builtInCommand.add("get");
@@ -245,9 +244,6 @@ public class GameEngine {
             for (GameAction action : actionSet) {
                 gameActionSubject.addAll(action.getSubjects());
             }
-        }
-        for (String subject : gameActionSubject) {
-            System.out.println(subject);
         }
     }
 
