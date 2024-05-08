@@ -45,7 +45,7 @@ public class GameEngine {
         command = command.substring(currentPlayer.length()+1).trim();
         HashSet<String> wordSet = new HashSet<>(Arrays.asList(command.split(" ")));
         entitiesSet(player);
-        mergeSet(player);
+        mergeSet();
         return commandChecker(wordSet,player);
     }
 
@@ -122,7 +122,7 @@ public class GameEngine {
         }else if(builtInTrigger != null){
             String entity = entityChecker(player.getName(),builtInTrigger, words);
             if(entity.contains("Warning")){
-                return "[ERROR]No valid command";
+                return "[ERROR]" + entity;
             }
             return builtInCommand(builtInTrigger,entity,player);
         }else {
@@ -153,7 +153,7 @@ public class GameEngine {
                 }
             }
         }
-        for(String key: getLocationEntities(player).keySet()){
+        for(String key: getLocationEntities(player).keySet()){ //Put all entities for check(if subjects contains these)
             for(GameEntity entity: getLocationEntities(player).get(key)){
                 entitiesForCheck.add(entity.getName());
             }
@@ -172,41 +172,19 @@ public class GameEngine {
         String curEntity = "";
         int entityCounter = 0;
         for(String entity: entities){
+            boolean isValid;
             switch (trigger) {
-                case "goto" -> {
-                    for (String location : locations) {
-                        if (entity.equals(location)) {
-                            curEntity = entity;
-                            entityCounter++;
-                        }
-                    }
-                }
-                case "get" -> {
-                    for (String artefact : artefacts) {
-                        if (entity.equals(artefact)) {
-                            curEntity = entity;
-                            entityCounter++;
-                        }
-                    }
-                }
-                case "drop" -> {
-                    for (GameEntity artefact : bagMap.get(playerName)) {
-                        if (entity.equals(artefact.getName())) {
-                            curEntity = entity;
-                            entityCounter++;
-                        }
-                    }
-                }
-                default -> {
-                    for (String mergeEntity : mergedSet) {
-                        if (mergeEntity.equals(entity)) {
-                            curEntity = entity;
-                            entityCounter++;
-                        }
-                    }
-                }
+                case "goto": isValid = checkNeededEntity(entity,locations); break;
+                case "get":  isValid = checkNeededEntity(entity,artefacts); break;
+                case "drop": isValid = checkNeededEntity(entity,getPlayerBagString(playerName)); break;
+                default :    isValid = checkNeededEntity(entity,mergedSet); break;
+            }
+            if(isValid){
+                curEntity = entity;
+                entityCounter++;
             }
         }
+
         if((trigger.contains("inv") || trigger.equals("look") || trigger.equals("health")) && entityCounter != 0){
             return "[Warning]Not a valid command.";
         }else if((trigger.equals("get")||trigger.equals("drop") || trigger.equals("goto")) && entityCounter !=1){
@@ -214,6 +192,15 @@ public class GameEngine {
         }
         return curEntity;
     }
+    private boolean checkNeededEntity(String entity,HashSet<String> entities) {
+        for (String curEntity : entities) {
+            if (entity.equals(curEntity)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /*---------------Some initialization methods--------------
     builtInInit: Put all the built in command into one HashSet.
     entitiesSet: Initialize all the entities name(Type: String)(No description, only name)
@@ -246,7 +233,7 @@ public class GameEngine {
             }
         }
     }
-    public void mergeSet(Player player){
+    public void mergeSet(){
         mergedSet.addAll(locations);
         mergedSet.addAll(artefacts);
         mergedSet.addAll(furniture);
@@ -286,8 +273,29 @@ public class GameEngine {
         }
         return null;
     }
+
+    public HashSet<String> getPlayerBagString(String playerName){
+        HashSet<String> bagEntity = new HashSet<>();
+        for(String player: bagMap.keySet()){
+            if(player.equals(playerName)){
+                for(GameEntity entity: bagMap.get(playerName)){
+                    bagEntity.add(entity.getName());
+                }
+            }
+        }
+        return bagEntity;
+    }
     /*------------------------Built in command and execute-----------------
     If it is a built in command they determine which command should be execute
+    builtInCommand: The switcher to determine which command should be execute
+    -------------------No entity function------------------
+    inv: look the player's bag
+    look: look the current location(include the location, path, entities and other players)
+    health: look the current player health
+    -------------------One entity function-------------------
+    get: get some entity from the current location to the player's bag
+    drop: drop some entity from the player's bag to the current location
+    goto_: go to one reachable location
     ---------------------------------------------------------------------- */
     public String builtInCommand(String trigger, String entity, Player player){
         //look the trigger first
@@ -357,14 +365,13 @@ public class GameEngine {
         return "[Warning]You entered a non-existent location. -Maybe a typo?";
 
     }
-
     // look 1.prints names and descriptions of entities in the current location and 2.lists paths to other locations
     public String look(Player player){
         String currentLocation = player.getCurrentLocation();
-        StringBuilder EntitiesDetails = new StringBuilder();;
+        StringBuilder EntitiesDetails = new StringBuilder();
         StringBuilder pathDetails = new StringBuilder();
         StringBuilder totalPlayers = new StringBuilder();
-        HashMap<String, HashSet<GameEntity>> currentEntities = getLocationEntities(player);;
+        HashMap<String, HashSet<GameEntity>> currentEntities = getLocationEntities(player);
         for(String entityType: currentEntities.keySet()){ // // Get the current entities
             for(GameEntity entity: currentEntities.get(entityType)){
                 EntitiesDetails.append(entity.getName()).append(":").append(entity.getDescription()).append(". ");
