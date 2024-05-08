@@ -114,9 +114,16 @@ public class GameEngine {
         if (actionCounter != 1){
             return "[Error]No or More than one action";
         }else if(gameActionTrigger!=null && builtInTrigger == null){
-            return gameActionCommand(gameActionTrigger,player);
+            String result = gameActionCommand(gameActionTrigger,player);
+            if(result.contains("Warning")){
+                return "[ERROR]No valid command in game action";
+            }
+            return result;
         }else if(builtInTrigger != null){
             String entity = entityChecker(player.getName(),builtInTrigger, words);
+            if(entity.contains("Warning")){
+                return "[ERROR]No valid command";
+            }
             return builtInCommand(builtInTrigger,entity,player);
         }else {
             return "[ERROR]Unknown error";
@@ -210,7 +217,7 @@ public class GameEngine {
     /*---------------Some initialization methods--------------
     builtInInit: Put all the built in command into one HashSet.
     entitiesSet: Initialize all the entities name(Type: String)(No description, only name)
-    mergeSet: Put all the entities(including location) into the one Hashset
+    mergeSet: Put all the entities(including location) into the one Hashset(But only from the current location)
      ---------------------------------------------------------*/
     public void builtInInit(){
         builtInCommand.add("inv");
@@ -354,39 +361,27 @@ public class GameEngine {
     // look 1.prints names and descriptions of entities in the current location and 2.lists paths to other locations
     public String look(Player player){
         String currentLocation = player.getCurrentLocation();
-        String locationDetails = "";
+        StringBuilder EntitiesDetails = new StringBuilder();;
         StringBuilder pathDetails = new StringBuilder();
         StringBuilder totalPlayers = new StringBuilder();
-        Set<Location> locations = entitiesMap.keySet();
-        HashMap<String, HashSet<GameEntity>> currentEntities;
-        StringBuilder EntityDetail = new StringBuilder();
-        for (Location location : locations){
-            if(location.getName().equals(currentLocation)){
-                locationDetails = location.toString();
-                currentEntities = entitiesMap.get(location);
-                Set<String> entities = currentEntities.keySet();
-                for (String entityType : entities){
-                    EntityDetail.append(currentEntities.get(entityType).toString()).append("\n");
-                }
-                break;
+        HashMap<String, HashSet<GameEntity>> currentEntities = getLocationEntities(player);;
+        for(String entityType: currentEntities.keySet()){ // // Get the current entities
+            for(GameEntity entity: currentEntities.get(entityType)){
+                EntitiesDetails.append(entity.getName()).append(":").append(entity.getDescription()).append(". ");
             }
         }
-        // Get the current map
-        Set<String> paths = pathMap.keySet();
-        for(String path: paths){
+        for(String path: pathMap.keySet()){ // Get the current path map
             if (path.equals(currentLocation)){
                 pathDetails.append(pathMap.get(path)).append(" ");
             }
         }
-        // Get the other players
-        Set<String> players = playerMap.keySet();
-        for (String curPlayer: players){
+        for (String curPlayer: playerMap.keySet()){ // Get the other players
             Player loaclPlayer = playerMap.get(curPlayer);
             if(loaclPlayer.getCurrentLocation().equals(currentLocation)){
                 totalPlayers.append(loaclPlayer.getDescription()).append(" ");
             }
         }
-        return locationDetails + "\n" + EntityDetail + "You can go to the: " + pathDetails + totalPlayers;
+        return currentLocation + "\n" + EntitiesDetails + "\nYou can go to the: " + pathDetails + totalPlayers;
     }
 
     // For execute the player's valid game action
