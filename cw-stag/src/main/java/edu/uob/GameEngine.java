@@ -99,8 +99,7 @@ public class GameEngine {
                     actionCounter++;
                 }
             }
-            if(actions.containsKey(curWord)){
-                // in here look if two game action equals
+            if(actions.containsKey(curWord)){ // in here look if two game action equals
                 for(GameAction curAction: actions.get(curWord)){
                     if(gameActionChecker(curAction, player, words)){
                         gameActionTrigger = curWord;
@@ -132,42 +131,55 @@ public class GameEngine {
             return "[ERROR]Unknown error";
         }
     }
+    /*--------------Game Action valid or not checker------------
+
+    ----------------------------------------------------------- */
     public boolean gameActionChecker(GameAction action,Player player,HashSet<String> command){
         String curLocation = player.getCurrentLocation();
-        String playerName = player.getName();
-        HashSet<String> subjects;
-        HashSet<String> entitiesInCommand = new HashSet<>();
-        HashSet<String> entitiesForCheck = new HashSet<>();
-        HashSet<String> noSubjectEntities = new HashSet<>();
+        HashSet<String> subjects = action.getSubjects();
+        boolean hasCommandSubjects = checkCommandSubjects(command, subjects);
+        boolean hasNoSubjectEntities = checkNoSubjectEntities(command, subjects);
+        boolean hasAllEntitiesForCheck = checkAllEntitiesForCheck(player, curLocation, subjects);
+        return hasCommandSubjects && !hasNoSubjectEntities && hasAllEntitiesForCheck;
+    }
+    // Check if the current command has the needed subjects or not
+    private boolean checkCommandSubjects(HashSet<String> command, HashSet<String> subjects) {
+        for (String curWord : command) {
+            if (subjects.contains(curWord)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // Check if the command has no relative entities
+    private boolean checkNoSubjectEntities(HashSet<String> command, HashSet<String> subjects) {
         HashSet<String> newMergeSet = new HashSet<>(entitiesSet);
-        subjects = action.getSubjects();
-        for(String curWord:command){
-            for(String entity: subjects){
-                if(curWord.equals(entity)){
-                    entitiesInCommand.add(curWord); // check if the command has the subject
-                }
-                newMergeSet.remove(entity);
+        newMergeSet.removeAll(subjects);
+        for (String curWord : command) {
+            if (newMergeSet.contains(curWord)) {
+                return true;
             }
         }
-        for(String curWord: command){
-            for(String noSubject: newMergeSet){
-                if(curWord.equals(noSubject)){
-                    noSubjectEntities.add(curWord);
-                }
-            }
-        }
-        for(String key: getLocationEntities(player).keySet()){ //Put all entities for check(if subjects contains these)
-            for(GameEntity entity: getLocationEntities(player).get(key)){
+        return false;
+    }
+    // Check if current location satisfies all the needed subjects
+    private boolean checkAllEntitiesForCheck(Player player, String curLocation, HashSet<String> subjects) {
+        HashSet<String> entitiesForCheck = new HashSet<>();
+        for (String key : getLocationEntities(player).keySet()) {
+            for (GameEntity entity : getLocationEntities(player).get(key)) {
                 entitiesForCheck.add(entity.getName());
             }
         }
-        for(GameEntity entity: bagMap.get(playerName)){
+        for (GameEntity entity : bagMap.get(player.getName())) {
             entitiesForCheck.add(entity.getName());
         }
         entitiesForCheck.add(curLocation);
-        boolean subjectCheck = !entitiesInCommand.isEmpty() && noSubjectEntities.isEmpty();
-        // Check if the command entity has the subjects and check if the current entities has all the subjects
-        return  subjectCheck && subjects.containsAll(entitiesInCommand) && entitiesForCheck.containsAll(subjects);
+        for (String subject : subjects) {
+            if (!entitiesForCheck.contains(subject)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // Check if the entity is valid or not(only 1 entity is valid)
