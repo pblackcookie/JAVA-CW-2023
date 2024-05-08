@@ -34,20 +34,24 @@ public class GameEngine {
     }
 
     public String commandParser(String command){
-        // get current player name & check the player exists or not.
-        String currentPlayer = command.split(":")[0].trim();
-        builtInInit(); // Check if the player name contains the built in command
-        for(String builtIn: builtInCommand){
-            if(currentPlayer.equals(builtIn)){
-                return "[Warning]Invalid player name.";
+        try {
+            // get current player name & check the player exists or not.
+            String currentPlayer = command.split(":")[0].trim();
+            builtInInit(); // Check if the player name contains the built in command
+            for (String builtIn : builtInCommand) {
+                if (currentPlayer.equals(builtIn)) {
+                    return "[Warning]Invalid player name.";
+                }
             }
+            Player player = playerChecker(currentPlayer);
+            command = command.substring(currentPlayer.length() + 1).trim();
+            HashSet<String> wordSet = new HashSet<>(Arrays.asList(command.split(" ")));
+            entitiesSet(player);
+            mergeSet(); //player current location entities
+            return commandChecker(wordSet, player);
+        }catch (Exception e){
+            return "[Error] An unexpected error occurred: " + e.getMessage();
         }
-        Player player = playerChecker(currentPlayer);
-        command = command.substring(currentPlayer.length()+1).trim();
-        HashSet<String> wordSet = new HashSet<>(Arrays.asList(command.split(" ")));
-        entitiesSet(player);
-        mergeSet(); //player current location entities
-        return commandChecker(wordSet,player);
     }
 
     /*----------------------Player related checker------------------------------------
