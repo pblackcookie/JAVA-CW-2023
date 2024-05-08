@@ -47,7 +47,6 @@ public class GameEngine {
         HashSet<String> wordSet = new HashSet<>(Arrays.asList(command.split(" ")));
         entitiesSet(player);
         mergeSet(); //player current location entities
-        getAllEntities(); // All map entities
         return commandChecker(wordSet,player);
     }
 
@@ -132,13 +131,12 @@ public class GameEngine {
         }
     }
     /*--------------Game Action valid or not checker------------
-
     ----------------------------------------------------------- */
     public boolean gameActionChecker(GameAction action,Player player,HashSet<String> command){
         String curLocation = player.getCurrentLocation();
         HashSet<String> subjects = action.getSubjects();
         boolean hasCommandSubjects = checkCommandSubjects(command, subjects);
-        boolean hasNoSubjectEntities = checkNoSubjectEntities(command, subjects);
+        boolean hasNoSubjectEntities = checkNoSubjectEntities(player,command, subjects);
         boolean hasAllEntitiesForCheck = checkAllEntitiesForCheck(player, curLocation, subjects);
         return hasCommandSubjects && !hasNoSubjectEntities && hasAllEntitiesForCheck;
     }
@@ -152,7 +150,8 @@ public class GameEngine {
         return false;
     }
     // Check if the command has no relative entities
-    private boolean checkNoSubjectEntities(HashSet<String> command, HashSet<String> subjects) {
+    private boolean checkNoSubjectEntities(Player player,HashSet<String> command, HashSet<String> subjects) {
+        getAllEntities(player); // All map entities
         HashSet<String> newMergeSet = new HashSet<>(entitiesSet);
         newMergeSet.removeAll(subjects);
         for (String curWord : command) {
@@ -252,7 +251,7 @@ public class GameEngine {
         mergedSet.addAll(characters);
     }
     // Get all the entities from entities map(type:string)
-    public void getAllEntities(){
+    public void getAllEntities(Player player){
         Set<GameEntity> allEntities = new HashSet<>();
         Set<Location> allLocations = entitiesMap.keySet();
         for (HashMap<String, HashSet<GameEntity>> locationMap : entitiesMap.values()) {
@@ -266,6 +265,11 @@ public class GameEngine {
        for (Location curLocation: allLocations){
            entitiesSet.add(curLocation.getName());
        }
+        for (HashSet<GameEntity> entitySet : bagMap.values()) {
+            for (GameEntity entity : entitySet) {
+                entitiesSet.add(entity.getName());
+            }
+        }
     }
 
     /*--------------------Get some entities--------------------------
@@ -401,8 +405,7 @@ public class GameEngine {
         StringBuilder pathDetails = new StringBuilder();
         StringBuilder totalPlayers = new StringBuilder();
         HashMap<String, HashSet<GameEntity>> currentEntities = getLocationEntities(player);
-        Set<Location> allLocations = entitiesMap.keySet();
-        for (Location curLocation: allLocations){
+        for (Location curLocation: entitiesMap.keySet()){
             if(curLocation.getName().equals(currentLocation)){
                 locationDescription = curLocation.getDescription();
             }
@@ -423,7 +426,7 @@ public class GameEngine {
                 totalPlayers.append(loaclPlayer.getDescription()).append(" ");
             }
         }
-        String locationDetails = currentLocation + locationDescription;
+        String locationDetails = currentLocation + ": " + locationDescription;
         return locationDetails + "\n" + EntitiesDetails + "\nYou can go to the: " + pathDetails + totalPlayers;
     }
 
