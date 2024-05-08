@@ -396,10 +396,17 @@ public class GameEngine {
     // look 1.prints names and descriptions of entities in the current location and 2.lists paths to other locations
     public String look(Player player){
         String currentLocation = player.getCurrentLocation();
+        String locationDescription = null;
         StringBuilder EntitiesDetails = new StringBuilder();
         StringBuilder pathDetails = new StringBuilder();
         StringBuilder totalPlayers = new StringBuilder();
         HashMap<String, HashSet<GameEntity>> currentEntities = getLocationEntities(player);
+        Set<Location> allLocations = entitiesMap.keySet();
+        for (Location curLocation: allLocations){
+            if(curLocation.getName().equals(currentLocation)){
+                locationDescription = curLocation.getDescription();
+            }
+        }
         for(String entityType: currentEntities.keySet()){ // // Get the current entities
             for(GameEntity entity: currentEntities.get(entityType)){
                 EntitiesDetails.append(entity.getName()).append(":").append(entity.getDescription()).append(". ");
@@ -416,7 +423,8 @@ public class GameEngine {
                 totalPlayers.append(loaclPlayer.getDescription()).append(" ");
             }
         }
-        return currentLocation + "\n" + EntitiesDetails + "\nYou can go to the: " + pathDetails + totalPlayers;
+        String locationDetails = currentLocation + locationDescription;
+        return locationDetails + "\n" + EntitiesDetails + "\nYou can go to the: " + pathDetails + totalPlayers;
     }
 
     // For execute the player's valid game action
