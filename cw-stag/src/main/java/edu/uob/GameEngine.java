@@ -16,7 +16,7 @@ public class GameEngine {
     HashSet<String> mergedSet = new HashSet<>();
     String bornLocation;
     HashSet<String> builtInCommand = new HashSet<>();
-    HashSet<String> gameActionSubject = new HashSet<>();
+    HashSet<String> entitiesSet = new HashSet<>();
 
 
     public GameEngine(HashMap<String, HashSet<String>> pathMap,
@@ -46,8 +46,8 @@ public class GameEngine {
         command = command.substring(currentPlayer.length()+1).trim();
         HashSet<String> wordSet = new HashSet<>(Arrays.asList(command.split(" ")));
         entitiesSet(player);
-        mergeSet();
-        getGameActionSubject();
+        mergeSet(); //player current location entities
+        getAllEntities(); // All map entities
         return commandChecker(wordSet,player);
     }
 
@@ -84,7 +84,8 @@ public class GameEngine {
         player.setCurrentLocation(bornLocation);
     }
     /*-------------------------Trigger and game action checker----------
-
+    1. built in command -> execute the built in command
+    2. game action -> execute the current game action
     ------------------------------------------------------------------- */
     public String commandChecker(HashSet<String> words,Player player){
         int actionCounter = 0;
@@ -138,7 +139,7 @@ public class GameEngine {
         HashSet<String> entitiesInCommand = new HashSet<>();
         HashSet<String> entitiesForCheck = new HashSet<>();
         HashSet<String> noSubjectEntities = new HashSet<>();
-        HashSet<String> newMergeSet = new HashSet<>(gameActionSubject);
+        HashSet<String> newMergeSet = new HashSet<>(entitiesSet);
         subjects = action.getSubjects();
         for(String curWord:command){
             for(String entity: subjects){
@@ -238,13 +239,21 @@ public class GameEngine {
         mergedSet.addAll(furniture);
         mergedSet.addAll(characters);
     }
-
-    public void getGameActionSubject(){
-        for (HashSet<GameAction> actionSet : actions.values()) {
-            for (GameAction action : actionSet) {
-                gameActionSubject.addAll(action.getSubjects());
+    // Get all the entities from entities map(type:string)
+    public void getAllEntities(){
+        Set<GameEntity> allEntities = new HashSet<>();
+        Set<Location> allLocations = entitiesMap.keySet();
+        for (HashMap<String, HashSet<GameEntity>> locationMap : entitiesMap.values()) {
+            for (HashSet<GameEntity> entitySet : locationMap.values()) {
+                allEntities.addAll(entitySet);
             }
         }
+       for(GameEntity curEntity: allEntities){
+           entitiesSet.add(curEntity.getName());
+       }
+       for (Location curLocation: allLocations){
+           entitiesSet.add(curLocation.getName());
+       }
     }
 
     /*--------------------Get some entities--------------------------
