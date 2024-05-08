@@ -31,9 +31,7 @@ public class GameAction
         return subjects;
     }
 
-    public HashSet<String> getConsumed() {
-        return consumed;
-    }
+    public HashSet<String> getConsumed() {return consumed;}
 
     public HashSet<String> getProduced() {
         return produced;

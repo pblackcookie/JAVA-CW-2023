@@ -16,6 +16,7 @@ public class GameEngine {
     HashSet<String> mergedSet = new HashSet<>();
     String bornLocation;
     HashSet<String> builtInCommand = new HashSet<>();
+    HashSet<String> gameActionSubject = new HashSet<>();
 
 
     public GameEngine(HashMap<String, HashSet<String>> pathMap,
@@ -46,6 +47,7 @@ public class GameEngine {
         HashSet<String> wordSet = new HashSet<>(Arrays.asList(command.split(" ")));
         entitiesSet(player);
         mergeSet();
+        getGameActionSubject();
         return commandChecker(wordSet,player);
     }
 
@@ -136,7 +138,7 @@ public class GameEngine {
         HashSet<String> entitiesInCommand = new HashSet<>();
         HashSet<String> entitiesForCheck = new HashSet<>();
         HashSet<String> noSubjectEntities = new HashSet<>();
-        HashSet<String> newMergeSet = new HashSet<>(mergedSet);
+        HashSet<String> newMergeSet = new HashSet<>(gameActionSubject);
         subjects = action.getSubjects();
         for(String curWord:command){
             for(String entity: subjects){
@@ -236,6 +238,17 @@ public class GameEngine {
         mergedSet.addAll(artefacts);
         mergedSet.addAll(furniture);
         mergedSet.addAll(characters);
+    }
+
+    public void getGameActionSubject(){
+        for (HashSet<GameAction> actionSet : actions.values()) {
+            for (GameAction action : actionSet) {
+                gameActionSubject.addAll(action.getSubjects());
+            }
+        }
+        for (String subject : gameActionSubject) {
+            System.out.println(subject);
+        }
     }
 
     /*--------------------Get some entities--------------------------
