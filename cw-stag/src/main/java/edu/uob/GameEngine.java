@@ -271,7 +271,7 @@ public class GameEngine {
         }
         return null;
     }
-
+    // Can get the current player bag
     public HashSet<String> getPlayerBagString(String playerName){
         HashSet<String> bagEntity = new HashSet<>();
         for(String player: bagMap.keySet()){
@@ -418,42 +418,44 @@ public class GameEngine {
     // Check the location & player bag has the entity or not
     public String consumedAction(String consumed,Player player){
         String playerName = player.getName();
-        if(consumed.equals("health")){
-            int health = player.getHealth();
-            player.setHealth(health-1);
-            if((health-1) == 0){
-                return "[Warning]";
-            }
-            return "OK";
+        if(consumed.equals("health")){  //Check if the player is still alive
+            return handleHealthConsumption(player);
         }
         HashMap<String, HashSet<GameEntity>> locationEntities = getLocationEntities(player);
         HashMap<String, HashSet<GameEntity>> storeroomEntities = getStoreroomEntities();
-        storeroomEntities.computeIfAbsent("furniture", k -> new HashSet<>());
-        locationEntities.computeIfAbsent("furniture", k -> new HashSet<>());
-        locationEntities.computeIfAbsent("artefacts", k -> new HashSet<>());
+        Arrays.asList("furniture", "artefacts").forEach(category -> {
+            locationEntities.computeIfAbsent(category, k -> new HashSet<>());
+            storeroomEntities.computeIfAbsent(category, k -> new HashSet<>());
+        });
         HashSet<GameEntity> playerEntities = getPlayerBag(playerName);
-        for (GameEntity curEntity : playerEntities) {
-            if (curEntity.getName().equals(consumed)) {
-                playerEntities.remove(curEntity); // remove the entity from the current player's bag
-                storeroomEntities.get("artefacts").add(curEntity); // add the entity to the store room
-                return "[OK]";
-            }
+        if (moveEntity(consumed, playerEntities, storeroomEntities.get("artefacts"))) {
+            return "[OK]";
         }
-        for(GameEntity curEntity: locationEntities.get("artefacts")){
-            if(curEntity.getName().equals(consumed)){
-                locationEntities.get("artefacts").remove(curEntity); // remove the entity from the current location
-                storeroomEntities.get("artefacts").add(curEntity); // add the entity to the store room
-                return "[OK]";
-            }
+        if (moveEntity(consumed, locationEntities.get("artefacts"), storeroomEntities.get("artefacts"))) {
+            return "[OK]";
         }
-        for (GameEntity curEntity : locationEntities.get("furniture")) {
-            if (curEntity.getName().equals(consumed)) {
-                locationEntities.get("furniture").remove(curEntity); // remove the entity from the current location
-                storeroomEntities.get("furniture").add(curEntity); // add the entity to the store room
-                return "[OK]";
-            }
+        if (moveEntity(consumed, locationEntities.get("furniture"),
+                storeroomEntities.get("furniture"))) {
+            return "[OK]";
         }
         return "[Warning]This entity does not exist";
+    }
+    // Check the player's health and handle it
+    private String handleHealthConsumption(Player player) {
+        int health = player.getHealth();
+        player.setHealth(health - 1);
+        return (health - 1 == 0) ? "[Warning]" : "OK";
+    }
+    private boolean moveEntity(String entityName, HashSet<GameEntity> sourceContainer,
+                               HashSet<GameEntity> targetContainer) {
+        for (GameEntity curEntity : sourceContainer) {
+            if (curEntity.getName().equals(entityName)) {
+                sourceContainer.remove(curEntity);
+                targetContainer.add(curEntity);
+                return true;
+            }
+        }
+        return false;
     }
 
     // Create something into the map.
@@ -470,8 +472,7 @@ public class GameEngine {
         HashMap<String, HashSet<GameEntity>> storeroomEntities = getStoreroomEntities();
         HashMap<String, HashSet<GameEntity>> locationEntities = getLocationEntities(player);
         for (String key : storeroomEntities.keySet()) {
-            HashSet<GameEntity> entities = storeroomEntities.get(key);
-            for (GameEntity entity : entities) {
+            for (GameEntity entity : storeroomEntities.get(key)) {
                 if (entity.getName().equals(produced)) {
                     // In here remove the entity from storeroom and add it to the current location
                     storeroomEntities.get(key).remove(entity);
